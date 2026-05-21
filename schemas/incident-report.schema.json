@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pnats.cloud/schemas/incident/incident-report.schema.json",
+  "title": "IncidentReport",
+  "description": "NIST SP 800-61r2 incident report. Authored by incident-report-author after recovery completes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "incident_id",
+    "severity",
+    "detection",
+    "timeline",
+    "impact",
+    "response_actions",
+    "recovery",
+    "lessons_learned"
+  ],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "pattern": "^INC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["P1", "P2", "P3", "P4"]
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected_at_utc", "detected_by", "method"],
+      "properties": {
+        "detected_at_utc": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "first_symptom_at_utc": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "detected_by": { "type": "string" },
+        "method": {
+          "type": "string",
+          "enum": ["alert", "user_report", "manual_check", "scheduled_task", "external_notification"]
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceRef" }
+        }
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/timelineEntry" }
+    },
+    "impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["affected_users", "affected_services", "customer_impact", "sla_breach"],
+      "properties": {
+        "affected_users": { "type": ["integer", "string"] },
+        "affected_services": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "customer_impact": { "type": "string" },
+        "sla_breach": { "type": "boolean" },
+        "data_loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "occurred": { "type": "boolean" },
+            "scope": { "type": "string" },
+            "recovered": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "response_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["timestamp_utc", "actor", "action"],
+        "properties": {
+          "timestamp_utc": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+          },
+          "actor": { "type": "string" },
+          "action": { "type": "string" },
+          "evidence": { "$ref": "#/$defs/evidenceRef" }
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recovery_began_at_utc", "recovery_completed_at_utc", "method"],
+      "properties": {
+        "recovery_began_at_utc": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "recovery_completed_at_utc": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "method": { "type": "string" },
+        "verification_evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceRef" }
+        }
+      }
+    },
+    "lessons_learned": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding", "action_item"],
+        "properties": {
+          "finding": { "type": "string" },
+          "action_item": { "type": "string" },
+          "owner": { "type": "string" },
+          "due_date": { "type": "string", "format": "date" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "timelineEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestamp_utc", "event"],
+      "properties": {
+        "timestamp_utc": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "actor": { "type": "string" },
+        "event": { "type": "string" }
+      }
+    }
+  }
+}

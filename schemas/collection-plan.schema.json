@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pnats.cloud/schemas/incident/collection-plan.schema.json",
+  "title": "CollectionPlan",
+  "description": "Output of evidence-source-discoverer. Enumerates available evidence sources and per-family collection budgets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["incident_id", "incident_time_utc", "sources", "budgets", "skip_sources"],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "pattern": "^INC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$"
+    },
+    "incident_time_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "round": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "default": 1
+    },
+    "sources": {
+      "type": "object",
+      "description": "Keyed by source-family. Each family is enumerated even when disabled, so consumers know what was considered.",
+      "additionalProperties": false,
+      "properties": {
+        "control_plane": { "$ref": "#/$defs/sourceFamily" },
+        "nodes": { "$ref": "#/$defs/sourceFamily" },
+        "observability": { "$ref": "#/$defs/sourceFamily" },
+        "storage": { "$ref": "#/$defs/sourceFamily" },
+        "network": { "$ref": "#/$defs/sourceFamily" },
+        "app_layer": { "$ref": "#/$defs/sourceFamily" },
+        "security": { "$ref": "#/$defs/sourceFamily" },
+        "platform": { "$ref": "#/$defs/sourceFamily" }
+      },
+      "minProperties": 1
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["per_family_minutes", "total_minutes", "estimated_artifacts"],
+      "properties": {
+        "per_family_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "total_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "estimated_artifacts": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "skip_sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reason"],
+        "properties": {
+          "source": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sourceFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "endpoint": { "type": "string" },
+        "auth": { "type": "string", "enum": ["none", "bearer", "basic", "kubeconfig", "azure-cli", "aws-cli", "mtls", "ssh-key"] },
+        "queries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "query"],
+            "properties": {
+              "name": { "type": "string" },
+              "query": { "type": "string" },
+              "time_range": { "type": "string" },
+              "hypothesis_served": { "type": "string" }
+            }
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "command"],
+            "properties": {
+              "name": { "type": "string" },
+              "command": { "type": "string" },
+              "target": { "type": "string" },
+              "hypothesis_served": { "type": "string" }
+            }
+          }
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

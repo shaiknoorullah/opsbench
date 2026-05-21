@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pnats.cloud/schemas/incident/hypothesis-verdict.schema.json",
+  "title": "HypothesisVerdict",
+  "description": "Output of a hypothesis-* analysis agent. Must include both confirm and falsify criteria, plus explicit falsification attempts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hypothesis_id",
+    "hypothesis_text",
+    "status",
+    "confidence",
+    "evidence_for",
+    "evidence_against",
+    "confirm_criteria",
+    "falsify_criteria",
+    "falsify_attempts"
+  ],
+  "properties": {
+    "hypothesis_id": {
+      "type": "string",
+      "pattern": "^H[0-9]+(\\.[0-9]+)?$",
+      "description": "e.g., H1, H2.3"
+    },
+    "hypothesis_text": {
+      "type": "string",
+      "minLength": 10
+    },
+    "status": {
+      "type": "string",
+      "enum": ["CONFIRMED", "LIKELY", "UNLIKELY", "FALSIFIED"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["HIGH", "MEDIUM", "LOW", "INCONCLUSIVE"]
+    },
+    "evidence_for": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceRef" }
+    },
+    "evidence_against": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidenceRef" }
+    },
+    "confirm_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "falsify_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "falsify_attempts": {
+      "type": "array",
+      "description": "Every falsify_criterion must appear here with an attempted+result. Empty attempts are forbidden for status=CONFIRMED.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["criterion", "attempted", "result"],
+        "properties": {
+          "criterion": { "type": "string" },
+          "attempted": { "type": "boolean" },
+          "result": {
+            "type": "string",
+            "enum": ["did_not_falsify", "falsified", "inconclusive", "skipped_with_reason"]
+          },
+          "evidence": { "$ref": "#/$defs/evidenceRef" },
+          "skip_reason": { "type": "string" }
+        }
+      }
+    },
+    "agent_name": { "type": "string" },
+    "analyzed_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    }
+  },
+  "allOf": [
+    {
+      "description": "CONFIRMED + HIGH requires at least one supporting evidence file with sha256.",
+      "if": {
+        "properties": {
+          "status": { "const": "CONFIRMED" },
+          "confidence": { "const": "HIGH" }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence_for": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^([a-f0-9]{64}|PENDING)$" },
+        "quote": { "type": "string" },
+        "line_range": { "type": "string", "pattern": "^[0-9]+(-[0-9]+)?$" }
+      }
+    }
+  }
+}

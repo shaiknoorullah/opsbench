@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pnats.cloud/schemas/incident/round-verdict.schema.json",
+  "title": "RoundVerdict",
+  "description": "Round-N forensic verdict, output of forensic-synthesizer + verdict-arbiter. Drives the loop-or-recover decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "incident_id",
+    "round",
+    "analyzed_at_utc",
+    "status",
+    "parent_evidence_bundle_sha256",
+    "hypotheses_evaluated",
+    "governor_check"
+  ],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "pattern": "^INC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$"
+    },
+    "round": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "analyzed_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ROOT_CAUSE_CONFIRMED", "NEED_MORE_EVIDENCE", "INCONCLUSIVE"]
+    },
+    "parent_evidence_bundle_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of round-N/bundle.sha256.txt — the cryptographic anchor for this verdict."
+    },
+    "hypotheses_evaluated": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^H[0-9]+(\\.[0-9]+)?$"
+      }
+    },
+    "confirmed_root_cause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hypothesis_id", "statement", "primary_evidence"],
+      "properties": {
+        "hypothesis_id": { "type": "string", "pattern": "^H[0-9]+(\\.[0-9]+)?$" },
+        "statement": { "type": "string" },
+        "primary_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidenceRef" }
+        }
+      }
+    },
+    "evidence_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hypothesis_id", "gap", "what_would_resolve"],
+        "properties": {
+          "hypothesis_id": { "type": "string" },
+          "gap": { "type": "string" },
+          "what_would_resolve": { "type": "string" },
+          "source_family": { "type": "string" }
+        }
+      }
+    },
+    "governor_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rounds_used",
+        "rounds_remaining",
+        "artifact_budget_used",
+        "wall_clock_used_min",
+        "new_hypotheses_this_round",
+        "falsification_artifacts_present"
+      ],
+      "properties": {
+        "rounds_used": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "rounds_remaining": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "artifact_budget_used": { "type": "integer", "minimum": 0 },
+        "wall_clock_used_min": { "type": "integer", "minimum": 0 },
+        "new_hypotheses_this_round": { "type": "boolean" },
+        "falsification_artifacts_present": { "type": "boolean" }
+      }
+    },
+    "arbiter_notes": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "description": "ROOT_CAUSE_CONFIRMED requires confirmed_root_cause block.",
+      "if": { "properties": { "status": { "const": "ROOT_CAUSE_CONFIRMED" } } },
+      "then": { "required": ["confirmed_root_cause"] }
+    },
+    {
+      "description": "NEED_MORE_EVIDENCE requires evidence_gaps with at least one entry.",
+      "if": { "properties": { "status": { "const": "NEED_MORE_EVIDENCE" } } },
+      "then": {
+        "required": ["evidence_gaps"],
+        "properties": { "evidence_gaps": { "minItems": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "quote": { "type": "string" },
+        "line_range": { "type": "string", "pattern": "^[0-9]+(-[0-9]+)?$" }
+      }
+    }
+  }
+}

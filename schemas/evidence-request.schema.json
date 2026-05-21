@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pnats.cloud/schemas/incident/evidence-request.schema.json",
+  "title": "EvidenceRequest",
+  "description": "Round-(N+1) collection request. Requires explicit human approval before evidence-collection-orchestrator is dispatched.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "incident_id",
+    "requesting_round",
+    "based_on_verdict_sha256",
+    "parent_verdict_status",
+    "requested_at_utc",
+    "staleness_deadline_utc",
+    "governor_check",
+    "hypotheses",
+    "artifacts",
+    "human_approval"
+  ],
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "pattern": "^INC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$"
+    },
+    "requesting_round": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 5,
+      "description": "Round being requested. Round 1 is always the initial collection — no request artifact for it."
+    },
+    "based_on_verdict_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "parent_verdict_status": {
+      "type": "string",
+      "enum": ["NEED_MORE_EVIDENCE"]
+    },
+    "requested_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "staleness_deadline_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$",
+      "description": "After this UTC instant the request is stale and a new one must be issued."
+    },
+    "governor_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rounds_used",
+        "rounds_remaining",
+        "artifact_budget_for_this_round",
+        "wall_clock_used_min",
+        "within_24h_cap"
+      ],
+      "properties": {
+        "rounds_used": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "rounds_remaining": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "artifact_budget_for_this_round": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Round 2 <=50, Round 3 <=25, Round 4 <=12, Round 5 <=6."
+        },
+        "wall_clock_used_min": { "type": "integer", "minimum": 0 },
+        "within_24h_cap": { "type": "boolean" }
+      }
+    },
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["hypothesis_id", "current_status", "gap"],
+        "properties": {
+          "hypothesis_id": { "type": "string", "pattern": "^H[0-9]+(\\.[0-9]+)?$" },
+          "current_status": {
+            "type": "string",
+            "enum": ["CONFIRMED", "LIKELY", "UNLIKELY", "FALSIFIED", "INCONCLUSIVE"]
+          },
+          "gap": { "type": "string" }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_family",
+          "command",
+          "hypothesis_served",
+          "why_prior_insufficient",
+          "staleness_deadline",
+          "estimated_size"
+        ],
+        "properties": {
+          "source_family": {
+            "type": "string",
+            "enum": ["control_plane", "nodes", "observability", "storage", "network", "app_layer", "security", "platform"]
+          },
+          "command": { "type": "string", "minLength": 1 },
+          "hypothesis_served": { "type": "string", "pattern": "^H[0-9]+(\\.[0-9]+)?$" },
+          "why_prior_insufficient": { "type": "string", "minLength": 1 },
+          "staleness_deadline": { "type": "string" },
+          "estimated_size": { "type": "string" }
+        }
+      }
+    },
+    "human_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["pending", "approved", "denied", "edited"]
+        },
+        "approver": { "type": "string" },
+        "approved_at_utc": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+        },
+        "edits": { "type": "string" },
+        "denial_reason": { "type": "string" }
+      }
+    }
+  }
+}
