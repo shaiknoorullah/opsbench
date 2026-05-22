@@ -1,200 +1,199 @@
-# Kubernetes Incident Response Skills
+<!--
+  opsbench — multi-team agent toolkit for DevOps / SRE / Platform / Infra / IT / Security / Network teams.
+  Repository: https://github.com/shaiknoorullah/opsbench
+-->
 
-> **v2.0** — DAG-of-DAGs multi-agent architecture: **11 chained skills** + **33 specialized subagents** across **8 teams** + JSON Schema enforcement + Cedar policy gating + per-subagent tool/MCP scoping + 4 hook scripts + 13 MCP install recipes.
->
-> Looking for the simpler v1? See the [`v1.0`](https://github.com/shaiknoorullah/k8s-incident-response-skills/tree/v1.0) tag — same incident response philosophy, flat skill chain, no specialized agents.
+<p align="center">
+  <!-- Replace with a real banner once design is ready -->
+  <a href="https://github.com/shaiknoorullah/opsbench">
+    <img src="https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/docs/assets/banner.svg"
+         alt="opsbench — agent toolkit for operations teams"
+         width="720"
+         onerror="this.style.display='none'" />
+  </a>
+</p>
 
-A complete, evidence-driven, multi-agent incident response framework for Claude Code — for K8s / SRE / DevOps / infrastructure operators who need their AI assistant to behave like a real forensic investigator instead of guessing.
+<h1 align="center">opsbench</h1>
 
-Built and battle-tested against a real production incident: a Longhorn-backed PostgreSQL/ClickHouse cluster on OVH + Contabo, hit by ext4 journal abort + JBD2 D-state cascade. Resolved via the chain documented here.
+<p align="center">
+  <strong>A multi-team agent toolkit for DevOps, SRE, Platform, Infra, IT, Security, and Network teams using Claude Code and Codex CLI.</strong>
+</p>
 
-## Why this exists
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/shaiknoorullah/opsbench" alt="License: MIT"></a>
+  <a href="https://github.com/shaiknoorullah/opsbench/releases"><img src="https://img.shields.io/github/v/release/shaiknoorullah/opsbench?include_prereleases" alt="Latest release"></a>
+  <a href="https://github.com/shaiknoorullah/opsbench/actions/workflows/ci.yml"><img src="https://github.com/shaiknoorullah/opsbench/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/shaiknoorullah/opsbench/stargazers"><img src="https://img.shields.io/github/stars/shaiknoorullah/opsbench?style=social" alt="Stars"></a>
+  <br>
+  <a href="https://www.conventionalcommits.org/"><img src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg" alt="Conventional Commits"></a>
+  <a href="https://docs.claude.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude%20Code-compatible-blue" alt="Claude Code compatible"></a>
+  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex%20CLI-compatible-orange" alt="Codex CLI compatible"></a>
+  <a href="GOVERNANCE.md"><img src="https://img.shields.io/badge/governance-open-brightgreen" alt="Open governance"></a>
+</p>
 
-Most AI-assisted infrastructure debugging falls into the same traps:
+---
 
-- **"Probable" root cause.** Surface-level pattern matching that picks a winner before evidence is complete.
-- **Single-agent megaprompt.** One agent investigating "the storage issue" — wanders, gets biased, produces shallow work.
-- **No quarantine.** New writes contaminate the evidence while you're still trying to understand it.
-- **No chain of custody.** Claims have no traceable backing files.
-- **No iteration discipline.** Either gives up after the first pass or loops forever.
-- **No tool gating.** Every agent can do everything — least-privilege violated.
-- **No schema/tone enforcement.** Artifacts are inconsistent; "probable" leaks into RCAs.
-- **No post-incident artifacts.** No RCA, no SLA breach report, no customer comm.
+## Table of contents
 
-v2 fixes all of that with a DAG-of-DAGs of specialized agents — each with a single goal, scoped tool/MCP access, schema-validated output, and tone-reviewed for the forbidden words.
+- [What is opsbench?](#what-is-opsbench)
+- [Quick install](#quick-install)
+- [What's in the box](#whats-in-the-box)
+- [Architecture](#architecture)
+- [Teams](#teams)
+- [Quickstart](#quickstart)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [Standards & inspirations](#standards--inspirations)
+- [License](#license)
 
-## Architecture: DAG-of-DAGs
+---
 
-The outer DAG is **8 teams**. Each team contains an inner DAG of **specialized subagents** (33 total). Every subagent has narrow tools, narrow MCP access, and schema-validated output. Cedar policy gates every mutation via PreToolUse hook.
+## What is opsbench?
 
-```
-Phase 0:   Team 1 — Command           (incident-commander, timeline-keeper, quarantine-coordinator)
-Phase 1:   Team 1 (quarantine-coordinator)
-Phase 2:   Team 2 — Evidence Collection (evidence-source-discoverer)
-Phase 3.N: Team 2 (7 parallel collectors)
-Phase 4.N: Team 3 — Cataloging          (evidence-cataloger, evidence-witness)
-Phase 5.N: Team 4 — Analysis             (hypothesis-generator → 4 parallel investigators → forensic-synthesizer)
-           Team 5 — Enforcement gates every artifact (schema → tone → citation → redaction)
-           Team 8 — Loop Control          (verdict-arbiter, evidence-requester, human-escalation)
-Phase 6:   Team 7 — Recovery             (planner → human gate → executor with Cedar gating → verifier)
-Phase 7:   Team 6 — Authoring            (5 parallel authors: incident-report, RCA, mitigations, investigation, customer-comms)
-```
+`opsbench` is an **agent toolkit** — a curated set of skills, subagents, JSON schemas, Cedar policies, hooks, and MCP recipes — for operations teams who use AI coding agents (Claude Code, Codex CLI) on production infrastructure.
 
-### Parallelism — typical incident wall-time
+It is organized as a **monorepo of teams**. Each team is a self-contained package targeting one operations discipline (incident response, platform engineering, security, network, etc.). The first shipped team — `team-incident-response` — packages **11 chained skills + 33 specialized subagents** into a forensic-grade incident-response workflow grounded in NIST SP 800-86 and NIST SP 800-61r2.
 
-- 7-way parallel evidence collection (Phase 3)
-- 4-way parallel hypothesis investigation (Phase 5)
-- 5-way parallel artifact authoring (Phase 7)
-- **~30 min total vs ~2h sequential**
+Most AI assistants on infrastructure fall into the same traps: "probable" root cause guessing, single-agent megaprompts, no quarantine, no chain of custody, no iteration discipline, no tool gating. opsbench is the opposite — verdict-blind investigation, SHA-256 evidence sealing, per-agent least-privilege tool scoping, schema-validated outputs, and Cedar-gated mutations.
 
-## The 33 subagents
+## Quick install
 
-### Team 1 — Command / coordination (3)
-- `incident-commander` — Outer-DAG orchestrator; never mutates
-- `timeline-keeper` — Append-only UTC timeline with sha256 evidence
-- `quarantine-coordinator` — Phase 1 isolation (scale clients, delete agg Service, default-deny NetPol)
-
-### Team 2 — Evidence collection (7)
-- `evidence-source-discoverer` — read-only inventory; emits collection-plan.yaml
-- `controlplane-collector` — etcd, kube-apiserver audit
-- `node-collector` — dmesg, journalctl, /proc, smartctl per node
-- `observability-collector` — Prometheus TSDB, Loki LogQL, Tempo traces
-- `storage-collector` — Longhorn engine/replica, volume CRDs, ceph-mgr
-- `network-collector` — Calico/Cilium, NetworkPolicy, WireGuard, tcpdump
-- `app-layer-collector` — pg_stat_*, ClickHouse system.*
-
-### Team 3 — Cataloging / chain of custody (2)
-- `evidence-cataloger` — SHA-256 manifest + custody.log per NIST SP 800-86
-- `evidence-witness` — independent git witness + RFC 3161 timestamp
-
-### Team 4 — Analysis / hypothesis (6)
-- `hypothesis-generator` — emits 3-5 ranked hypotheses with CONFIRM/FALSIFY
-- `hypothesis-storage` — storage-layer investigator
-- `hypothesis-network` — network-layer investigator
-- `hypothesis-control-plane` — etcd/apiserver investigator
-- `hypothesis-app` — Postgres/ClickHouse/Patroni/Keeper investigator
-- `forensic-synthesizer` — single NIST 800-86 narrative per round
-
-### Team 5 — Schema + tone enforcement (4)
-- `schema-validator` — Pydantic + JSON Schema against committed schemas
-- `tone-reviewer` — Constitutional review (forbids "probable", emojis, etc.)
-- `evidence-citation-checker` — verifies sha256 + file ref resolves in catalog
-- `redaction-checker` — PII / secrets / internal hostnames scanner
-
-### Team 6 — Authoring (post-incident suite) (5)
-- `incident-report-author` — NIST SP 800-61r2 cover
-- `rca-author` — 5-Whys + Apollo cause-effect
-- `mitigations-author` — CAPA action plan
-- `investigation-report-author` — NIST SP 800-86 methodology
-- `customer-comms-author` — plain English customer + internal Slack
-
-### Team 7 — Recovery (3)
-- `recovery-planner` — drafts plan; requires human approval
-- `recovery-executor` — runs approved plan with Cedar gating every mutation
-- `recovery-verifier` — SLO / replication / backup health post-recovery
-
-### Team 8 — Loop control (3)
-- `verdict-arbiter` — verdict-blind per round: CONFIRMED / NEED_MORE / INCONCLUSIVE
-- `evidence-requester` — round-(N+1) request with per-artifact justification
-- `human-escalation` — opens PagerDuty + Slack + Linear; awaits decision
-
-## The 11 chained skills (carries forward from v1)
-
-| Skill | Purpose |
-|---|---|
-| [`storage-incident-response`](skills/storage-incident-response/SKILL.md) | Master orchestrator |
-| [`incident-timeline`](skills/incident-timeline/SKILL.md) | Append-only chronology |
-| [`incident-quarantine`](skills/incident-quarantine/SKILL.md) | Workload isolation |
-| [`evidence-source-discovery`](skills/evidence-source-discovery/SKILL.md) | 9-layer source enumeration |
-| [`evidence-collection-orchestrator`](skills/evidence-collection-orchestrator/SKILL.md) | Parallel collector dispatch |
-| [`evidence-cataloger`](skills/evidence-cataloger/SKILL.md) | SHA-256 sealing |
-| [`evidence-analyze`](skills/evidence-analyze/SKILL.md) | Verdict-blind round analysis |
-| [`evidence-request`](skills/evidence-request/SKILL.md) | Loop trigger with governors |
-| [`forensic-synthesis`](skills/forensic-synthesis/SKILL.md) | NIST 800-86 narrative |
-| [`parallel-hypothesis-debug`](skills/parallel-hypothesis-debug/SKILL.md) | One subagent per hypothesis |
-| [`post-incident-artifact-generator`](skills/post-incident-artifact-generator/SKILL.md) | NIST 4-doc suite |
-
-## Installation
-
-### Full v2 install
+> Requires `git`, `curl`, `jq`, `tar`, and an existing Claude Code install at `~/.claude/`.
 
 ```bash
-git clone https://github.com/shaiknoorullah/k8s-incident-response-skills.git
-cd k8s-incident-response-skills
-
-# Install skills (v1 carry-over)
-mkdir -p ~/.claude/skills
-cp -r skills/* ~/.claude/skills/
-
-# Install team-skills (v2)
-cp teams/*.md ~/.claude/skills/  # team skills are also Claude skills
-
-# Install subagents (v2)
-mkdir -p ~/.claude/agents
-cp -r agents/team-*/*.md ~/.claude/agents/
-
-# Install schemas
-mkdir -p ~/.claude/schemas
-cp schemas/*.json ~/.claude/schemas/
-
-# Install Cedar policies
-mkdir -p ~/.claude/policies
-cp policies/*.cedar ~/.claude/policies/
-cp policies/constitution.md ~/.claude/policies/
-
-# Install hooks (review hooks/*.sh first; then add to ~/.claude/settings.json — see hooks/README.md)
-cp hooks/*.sh ~/.claude/hooks/
-# Then patch settings.json per hooks/README.md
+curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash
 ```
 
-### MCP servers (recommended)
-
-See `mcp-recipes/` for install instructions for each. Recommended baseline:
+Preview without writing anything:
 
 ```bash
-# Install per recipe in mcp-recipes/
-# Then patch ~/.claude/settings.json under mcpServers
+curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash -s -- --dry-run
 ```
 
-### v1-only install (no agents/teams/schemas)
+Install a specific team only:
 
 ```bash
-git clone -b v1.0 https://github.com/shaiknoorullah/k8s-incident-response-skills.git
-mkdir -p ~/.claude/skills
-cp -r k8s-incident-response-skills/skills/* ~/.claude/skills/
+curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh \
+  | bash -s -- --teams team-incident-response
 ```
 
-## Quick start
+After install, finish the wiring by patching `~/.claude/settings.json` to register the hooks (the installer prints the exact snippet).
 
-For any storage / EIO / data-corruption signal:
+## What's in the box
 
+The bootstrap release ships exactly one team — **`team-incident-response`** — covering K8s / SRE / DevOps forensic incident response:
+
+| Layer | Count | Examples |
+| ----- | ----- | -------- |
+| **Skills (chained)** | 11 | `storage-incident-response`, `incident-quarantine`, `evidence-collection-orchestrator`, `forensic-synthesis`, `parallel-hypothesis-debug`, `post-incident-artifact-generator` |
+| **Subagents** | 33 | `incident-commander`, `evidence-cataloger`, `hypothesis-storage`, `forensic-synthesizer`, `recovery-planner`, `rca-author` |
+| **JSON Schemas** | 9 | `incident-report`, `rca`, `collection-plan`, `round-verdict`, `custody-entry`, `recovery-plan` |
+| **Cedar policies** | 2 | `tools.cedar` (per-agent tool allowlists), `governors.cedar` (loop caps) |
+| **Hook scripts** | 4 | `PreToolUse`, `PostToolUse`, `SessionStart`, `SubagentStop` |
+| **MCP recipes** | 17 | k8s, Grafana, ClickHouse, Postgres, Slack, PagerDuty, GitHub, Azure, AWS, OpenTelemetry, Velociraptor, eBPF, Longhorn (custom), Contabo (custom), WireGuard (custom) |
+
+Full breakdown: [`packages/team-incident-response/README.md`](packages/team-incident-response/README.md).
+
+## Architecture
+
+```mermaid
+flowchart TB
+  user([User / Operator]) --> cc{{Claude Code / Codex CLI}}
+  cc --> ob[opsbench teams]
+
+  subgraph ob_pkg [packages/team-incident-response]
+    direction TB
+    sk[Skills<br/>11 chained] --> ag[Subagents<br/>33 specialized]
+    ag --> sch[(JSON Schemas)]
+    ag --> ced[(Cedar Policies)]
+    hk[Hooks<br/>Pre/Post/Stop] -.gates.-> ag
+  end
+
+  ob --> ob_pkg
+  ob_pkg --> mcp[(MCP Servers)]
+  mcp --> infra[(Infrastructure:<br/>K8s, DBs, Cloud APIs,<br/>Observability stacks)]
+
+  classDef pkg fill:#0b3d91,stroke:#fff,color:#fff
+  classDef ext fill:#444,stroke:#fff,color:#fff
+  class ob_pkg pkg
+  class infra,mcp ext
 ```
-/storage-incident-response
+
+Concept docs:
+
+- [Skill format](docs/concepts/skill-format.md)
+- [Agent format](docs/concepts/agent-format.md)
+- [Team orchestration](docs/concepts/team-orchestration.md)
+- [Schemas & validation](docs/concepts/schemas-and-validation.md)
+- [Cedar policies](docs/concepts/cedar-policies.md)
+- [Hooks](docs/concepts/hooks.md)
+- [Tone & constitution](docs/concepts/tone-and-constitution.md)
+- [MCP integration](docs/concepts/mcp-integration.md)
+
+## Teams
+
+| Team | Status | Discipline | Skills | Subagents |
+| ---- | ------ | ---------- | ------ | --------- |
+| [`team-incident-response`](packages/team-incident-response/) | **Stable** | K8s / SRE forensic incident response | 11 | 33 |
+| `team-platform-engineering` | Planned ([Roadmap](ROADMAP.md)) | Cluster lifecycle, IaC, GitOps | — | — |
+| `team-security-response` | Planned ([Roadmap](ROADMAP.md)) | Detection, triage, IR | — | — |
+| `team-network-operations` | Planned ([Roadmap](ROADMAP.md)) | BGP, mesh VPN, edge | — | — |
+| `team-it-helpdesk` | Planned ([Roadmap](ROADMAP.md)) | Identity, endpoint, M365 | — | — |
+
+Proposing a new team? Open a [new-team proposal issue](.github/ISSUE_TEMPLATE/new-team-proposal.yml) and see [`docs/contributing/adding-a-team.md`](docs/contributing/adding-a-team.md).
+
+## Quickstart
+
+After installing the toolkit, trigger the incident-response chain from Claude Code:
+
+```text
+> /storage-incident-response
 ```
 
-This invokes the master skill, which now dispatches the Team-1 `incident-commander` agent, which orchestrates the full 8-team DAG.
+Claude Code will:
 
-## Design principles
+1. Spawn `incident-commander` as the outer-DAG orchestrator.
+2. Run `quarantine-coordinator` (scale clients to 0, default-deny NetPol).
+3. Discover and collect evidence in parallel across 7 layers.
+4. Seal evidence with SHA-256 manifests + custody log.
+5. Run **verdict-blind** hypothesis investigation (one subagent per hypothesis).
+6. Synthesize forensic narrative; loop up to 5 rounds if not CONFIRMED.
+7. Author the post-incident suite (NIST 800-61 Incident Report + 5-Whys RCA + CAPA Mitigations + NIST 800-86 Investigation Report).
 
-These are the rules baked into the chain. They come from real-world forensic methodology — not internet folklore.
+No mutation happens without explicit human approval at each round boundary and Cedar policy authorization at each tool call.
 
-1. **No recovery before forensic synthesis returns CONFIRMED.** Recovery on a wrong root cause compounds the damage.
-2. **Evidence has chain of custody.** SHA-256 only. MD5 and SHA-1 are NIST-deprecated for forensic use.
-3. **Verdict-blind per round.** Anti-confirmation-bias.
-4. **One hypothesis per agent.** Parallel investigation with explicit CONFIRM/FALSIFY upfront.
-5. **Falsification quota.** Every round must include ≥1 falsification artifact.
-6. **Human approval at every round boundary.** No autonomous round 2+.
-7. **Loop governors are hard caps.** Max 5 rounds. Decreasing artifact budget. 24h wall-clock.
-8. **The word "probable" is forbidden** in forensic reports without explicit user permission.
-9. **Timeline is mandatory at every action.** No silent operations during an incident.
-10. **Schema-validated artifacts.** Every output validates against committed JSON Schema.
-11. **Tone-enforced artifacts.** Forbidden words denied at write time via tone-reviewer + PostToolUse hook.
-12. **Cedar-policy gated mutations.** No agent mutates without explicit per-action allow.
-13. **Per-subagent least privilege.** Each agent's tools/MCPs are an allowlist, not "give everything."
+## Documentation
 
-## Standards and citations
+- **Getting started:** [`docs/getting-started/`](docs/getting-started/)
+- **Concepts:** [`docs/concepts/`](docs/concepts/)
+- **Reference architectures:** [`docs/reference-architectures/hybrid-k8s-mesh.md`](docs/reference-architectures/hybrid-k8s-mesh.md)
+- **Contributing:** [`docs/contributing/`](docs/contributing/)
 
-The framework is grounded in:
+A docs site (VitePress) is built and deployed automatically on every push to `main` via [`.github/workflows/docs-deploy.yml`](.github/workflows/docs-deploy.yml).
+
+## Contributing
+
+PRs are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first.
+
+- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/). Enforced by `commitlint` via lefthook.
+- **Local hooks:** `npm install` installs lefthook (markdownlint, yamllint, shellcheck, cspell, cedar-validate, frontmatter validators).
+- **CI:** PRs are validated by [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+- **Adding a team:** see [`docs/contributing/adding-a-team.md`](docs/contributing/adding-a-team.md) or run `bash scripts/new-team.sh team-<name>`.
+
+Governance: [`GOVERNANCE.md`](GOVERNANCE.md). Code of Conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Security disclosures: [`SECURITY.md`](SECURITY.md).
+
+## Roadmap
+
+See [`ROADMAP.md`](ROADMAP.md) for the full list. Highlights:
+
+- **Q3:** `team-platform-engineering` (Terraform / Pulumi / Crossplane / ArgoCD agents)
+- **Q4:** `team-security-response` (Falco / OpenCTI / TheHive / Velociraptor agents)
+- **Future:** `team-network-operations`, `team-it-helpdesk`, `team-data-platform`
+
+## Standards & inspirations
+
+The incident-response team is grounded in:
 
 - **NIST SP 800-86** — Forensic Techniques for Incident Response (SHA-256 mandate, chain of custody)
 - **NIST SP 800-61r2** — Computer Security Incident Handling Guide (report structure)
@@ -202,65 +201,9 @@ The framework is grounded in:
 - **NTSB party-process** — multi-party iterative investigation (round-N+1 model)
 - **MITRE ATT&CK** — pivot-from-indicator flow
 - **SANS DFIR** — Tier 1 / Tier 2 / Tier 3 evidence pivoting
-- **Anthropic Constitutional AI** — for tone-reviewer self-revision against principles
-- **Anthropic published multi-agent patterns** — orchestrator-worker (90.2% better than single-agent)
+- **Anthropic Constitutional AI** — tone-reviewer self-revision against principles
 - **Google SRE Workbook** — blameless post-mortem culture
 - **Atlassian Incident Management Handbook** — role definitions
-
-## Tools this framework wraps or composes
-
-- **[`replicatedhq/troubleshoot`](https://troubleshoot.sh)** — K8s + DB evidence collection (used by `storage-collector` + `app-layer-collector`)
-- **[`agent-teams:team-debugger`](https://github.com/anthropic/claude-plugins)** — hypothesis subagent pattern
-- **[`grafana/mcp-grafana`](https://github.com/grafana/mcp-grafana)** — unified Prometheus + Loki + Elasticsearch MCP
-- **[`alexei-led/k8s-mcp-server`](https://github.com/alexei-led/k8s-mcp-server)** — kubectl/helm/argocd MCP
-- **[`ClickHouse/mcp-clickhouse`](https://github.com/ClickHouse/mcp-clickhouse)** — ClickHouse MCP (read-only default)
-- **[`awslabs/mcp`](https://github.com/awslabs/mcp)** — 60+ AWS MCP servers
-- **[Cedar Policy](https://www.cedarpolicy.com/)** — tool gating + governor enforcement
-
-## Repository structure
-
-```
-k8s-incident-response-skills/
-├── README.md                      ← this file
-├── LICENSE                        ← MIT
-├── skills/                        ← 11 chained skills (v1 carry-over)
-├── teams/                         ← 8 team-orchestration skills (v2)
-├── agents/                        ← 33 specialized subagents (v2)
-│   ├── team-1-command/            (3)
-│   ├── team-2-evidence-collection/ (7)
-│   ├── team-3-cataloging/         (2)
-│   ├── team-4-analysis/           (6)
-│   ├── team-5-enforcement/        (4)
-│   ├── team-6-authoring/          (5)
-│   ├── team-7-recovery/           (3)
-│   └── team-8-loop-control/       (3)
-├── schemas/                       ← JSON Schema for every artifact type
-├── policies/                      ← Cedar policy + constitution
-│   ├── constitution.md
-│   ├── cedar/tools.cedar
-│   └── cedar/governors.cedar
-├── hooks/                         ← PreToolUse / PostToolUse / SessionStart / SubagentStop bash scripts
-└── mcp-recipes/                   ← MCP install instructions per server
-```
-
-## Version history
-
-- **v2.0** (2026-05-22) — DAG-of-DAGs: 33 subagents, 8 teams, schema/tone enforcement, Cedar gating, MCP integration
-- **v1.0** (2026-05-22) — 11 chained skills with iterative loops
-
-## Status
-
-Production-ready. v1.0 used in active incident response on a real K8s cluster (OVH Mumbai + Contabo + on-prem Proxmox + Azure Arc). v2.0 architecture forged from the same incident's re-analysis (which produced [`forensic-report-chi-audit-0-1.md`](https://github.com/shaiknoorullah/k8s-incident-response-skills/blob/main/docs/forensic-report-chi-audit-0-1.md) — to be added).
-
-## Contributing
-
-PRs welcome. Especially valuable:
-
-- Custom MCP wrappers for the gaps (Longhorn, Contabo/OVH, WireGuard, Falco-standalone)
-- Additional evidence-source-discoverer probes for EKS / GKE / AKS / OpenShift
-- Industry-specific post-incident templates (HIPAA, SOC 2, PCI DSS, FedRAMP)
-- Adapters for other agent runtimes (LangChain, Vercel AI SDK, OpenAI Assistants)
-- Cedar policy contributions for least-privilege patterns
 
 ## License
 
@@ -268,4 +211,8 @@ PRs welcome. Especially valuable:
 
 ## Author
 
-[Shaik Noorullah](https://github.com/shaiknoorullah) — built while running production K8s + designing infrastructure for ProficientNow.
+[Shaik Noorullah](https://github.com/shaiknoorullah) — built while running production Kubernetes + designing hybrid-cloud infrastructure.
+
+---
+
+<sub>opsbench was previously published as `k8s-incident-response-skills`. The v1.0 and v2.0 tags on this repo preserve that history. v3.0.0 is the rename + multi-team restructure.</sub>

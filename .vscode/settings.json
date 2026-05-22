@@ -1,0 +1,19 @@
+{
+  "editor.formatOnSave": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
+  },
+  "[shellscript]": {
+    "editor.tabSize": 4
+  },
+  "yaml.schemas": {
+    "https://json.schemastore.org/lefthook.json": "lefthook.yml",
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.{yml,yaml}"
+  },
+  "cSpell.enableFiletypes": ["markdown", "plaintext", "yaml"]
+}

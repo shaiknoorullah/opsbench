@@ -1,0 +1,14 @@
+# opsbench CODEOWNERS
+# Lines closer to the bottom take precedence.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner
+*                                       @shaiknoorullah
+
+# Tooling
+/.github/                               @shaiknoorullah
+/scripts/                               @shaiknoorullah
+/tools/                                 @shaiknoorullah
+
+# Teams — add team owners as they're nominated.
+/packages/team-incident-response/       @shaiknoorullah

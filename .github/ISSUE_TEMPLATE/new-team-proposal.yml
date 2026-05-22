@@ -1,0 +1,61 @@
+name: New team proposal
+description: Propose a new team package under packages/team-*.
+labels: [new-team, rfc]
+title: "[new-team] team-<slug>: <one-line mission>"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New team packages go through a lightweight RFC — see [GOVERNANCE.md](https://github.com/shaiknoorullah/opsbench/blob/main/GOVERNANCE.md).
+  - type: input
+    id: slug
+    attributes:
+      label: Team slug
+      description: Must start with `team-` and use kebab-case.
+      placeholder: team-platform-engineering
+    validations:
+      required: true
+  - type: textarea
+    id: mission
+    attributes:
+      label: One-line mission
+    validations:
+      required: true
+  - type: textarea
+    id: discipline
+    attributes:
+      label: Discipline & target users
+      description: Who is this team for? What workflows does it own?
+    validations:
+      required: true
+  - type: textarea
+    id: skills
+    attributes:
+      label: Initial skill list
+      description: Names + one-line purpose for each planned skill.
+    validations:
+      required: true
+  - type: textarea
+    id: agents
+    attributes:
+      label: Initial subagent list
+      description: Names + role + intended tool allowlist for each.
+  - type: textarea
+    id: standards
+    attributes:
+      label: Standards / frameworks this team follows
+      description: NIST, ISO, ITIL, OWASP, CIS, etc.
+  - type: textarea
+    id: owners
+    attributes:
+      label: Proposed owner(s)
+      description: GitHub handles. At least one required.
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's [Code of Conduct](https://github.com/shaiknoorullah/opsbench/blob/main/CODE_OF_CONDUCT.md).
+          required: true

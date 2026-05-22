@@ -1,0 +1,23 @@
+# yamllint config — relaxed for docs/config repo
+extends: default
+
+rules:
+  line-length:
+    max: 200
+    level: warning
+  document-start: disable
+  truthy:
+    allowed-values: ["true", "false", "on", "off"]
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+ignore: |
+  node_modules/
+  docs/.vitepress/cache/
+  docs/.vitepress/dist/
+  tools/plugin-build/output/

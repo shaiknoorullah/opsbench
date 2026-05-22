@@ -1,0 +1,64 @@
+# lefthook — git hooks runner
+# https://github.com/evilmartians/lefthook
+#
+# Install:  npm install   (runs `lefthook install` via prepare script)
+# Manual:   npx lefthook install
+#
+# Skip locally with:    LEFTHOOK=0 git commit ...
+# Skip a single hook:   LEFTHOOK_EXCLUDE=lint git commit ...
+
+min_version: 1.7.0
+
+pre-commit:
+  parallel: true
+  commands:
+    shellcheck:
+      glob: "*.sh"
+      run: shellcheck {staged_files}
+      skip:
+        - merge
+        - rebase
+    markdownlint:
+      glob: "*.md"
+      run: npx markdownlint-cli2 {staged_files}
+      skip:
+        - merge
+        - rebase
+    yamllint:
+      glob: "*.{yml,yaml}"
+      run: yamllint {staged_files}
+      skip:
+        - merge
+        - rebase
+    cspell:
+      glob: "*.{md,txt}"
+      run: npx cspell --no-progress --no-must-find-files {staged_files}
+      skip:
+        - merge
+        - rebase
+    cedar-validate:
+      glob: "*.cedar"
+      run: |
+        if command -v cedar >/dev/null 2>&1; then
+          cedar validate --policies {staged_files} || exit 1
+        else
+          echo "cedar CLI not installed — skipping policy validation (install: https://www.cedarpolicy.com/)"
+        fi
+      skip:
+        - merge
+        - rebase
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}
+
+pre-push:
+  parallel: true
+  commands:
+    validate-skills:
+      run: bash scripts/validate-skill.sh
+    validate-agents:
+      run: bash scripts/validate-agent.sh
+    install-syntax:
+      run: bash -n scripts/install.sh

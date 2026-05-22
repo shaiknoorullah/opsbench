@@ -1,0 +1,22 @@
+{
+  "name": "@opsbench/team-incident-response",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Forensic-grade K8s / SRE incident-response team for opsbench: 11 chained skills + 33 specialized subagents + Cedar policy gating + hook-based tone & schema enforcement.",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "incident-response",
+    "kubernetes",
+    "forensics",
+    "nist-800-86",
+    "nist-800-61",
+    "sre"
+  ],
+  "homepage": "https://github.com/shaiknoorullah/opsbench/tree/main/packages/team-incident-response",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaiknoorullah/opsbench.git",
+    "directory": "packages/team-incident-response"
+  }
+}

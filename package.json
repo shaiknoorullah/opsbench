@@ -1,0 +1,67 @@
+{
+  "name": "opsbench",
+  "version": "3.0.0",
+  "description": "Multi-team agent toolkit for DevOps, SRE, Platform, Infra, IT, Security and Network teams using Claude Code and Codex CLI.",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Shaik Noorullah",
+    "email": "snoorullah@proficientnow.com",
+    "url": "https://github.com/shaiknoorullah"
+  },
+  "homepage": "https://github.com/shaiknoorullah/opsbench#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaiknoorullah/opsbench.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shaiknoorullah/opsbench/issues"
+  },
+  "keywords": [
+    "claude-code",
+    "codex-cli",
+    "agent-toolkit",
+    "skills",
+    "subagents",
+    "devops",
+    "sre",
+    "platform-engineering",
+    "incident-response",
+    "kubernetes",
+    "forensics",
+    "nist-800-86"
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#CHANGELOG.md\"",
+    "lint:yaml": "yamllint .",
+    "lint:shell": "shellcheck scripts/*.sh tools/**/*.sh packages/**/hooks/*.sh",
+    "lint:spell": "cspell --no-progress \"**/*.md\"",
+    "lint": "npm-run-all -p lint:md lint:yaml lint:spell",
+    "validate:skills": "bash scripts/validate-skill.sh",
+    "validate:agents": "bash scripts/validate-agent.sh",
+    "validate:schemas": "ajv compile -s 'packages/**/schemas/*.json'",
+    "validate:install": "bash scripts/install.sh --dry-run",
+    "validate": "npm-run-all -s validate:skills validate:agents validate:schemas validate:install",
+    "plugin:build": "bash tools/plugin-build/build.sh",
+    "release": "release-it",
+    "release:dry": "release-it --dry-run",
+    "prepare": "lefthook install || true"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "ajv-cli": "^5.0.0",
+    "cspell": "^8.14.0",
+    "lefthook": "^1.7.18",
+    "markdownlint-cli2": "^0.14.0",
+    "npm-run-all": "^4.1.5",
+    "release-it": "^17.10.0",
+    "yaml-lint": "^1.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

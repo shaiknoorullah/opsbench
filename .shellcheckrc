@@ -1,0 +1,12 @@
+# shellcheck config
+# https://www.shellcheck.net/wiki/Ignore
+
+# SC1091 — sourced files not followed (we source dynamically in installers).
+disable=SC1091
+
+# SC2034 — unused variables (some are exported for sub-processes).
+disable=SC2034
+
+# Enforce POSIX compliance only where shebang says sh.
+# bash scripts get full bash analysis.
+external-sources=true

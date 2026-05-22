@@ -1,0 +1,46 @@
+{
+  "$schema": "https://unpkg.com/release-it@17/schema/release-it.json",
+  "git": {
+    "requireBranch": "main",
+    "requireCleanWorkingDir": true,
+    "commitMessage": "chore(release): v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "Release v${version}",
+    "push": true
+  },
+  "github": {
+    "release": true,
+    "releaseName": "opsbench v${version}",
+    "autoGenerate": true,
+    "assets": ["tools/plugin-build/output/opsbench-*.tar.gz"]
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          { "type": "feat", "section": "Features" },
+          { "type": "fix", "section": "Bug Fixes" },
+          { "type": "perf", "section": "Performance" },
+          { "type": "refactor", "section": "Refactors" },
+          { "type": "docs", "section": "Documentation" },
+          { "type": "test", "section": "Tests" },
+          { "type": "build", "section": "Build" },
+          { "type": "ci", "section": "Continuous Integration" },
+          { "type": "chore", "hidden": true },
+          { "type": "style", "hidden": true }
+        ]
+      },
+      "infile": "CHANGELOG.md",
+      "header": "# Changelog\n\nAll notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).\n"
+    }
+  },
+  "hooks": {
+    "before:init": ["bash -n scripts/install.sh"],
+    "after:bump": ["bash tools/plugin-build/build.sh ${version}"],
+    "after:release": "echo Released opsbench v${version} — https://github.com/shaiknoorullah/opsbench/releases/tag/v${version}"
+  }
+}

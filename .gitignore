@@ -1,13 +1,65 @@
+# =============================================================================
+# opsbench — .gitignore
+# =============================================================================
+
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+*~
 
-# Editors
-.vscode/
+# Editors / IDEs
 .idea/
 *.swp
 *.swo
+*.sublime-workspace
+*.sublime-project
+# Note: .vscode/settings.json is checked in for cross-contributor consistency.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 
-# Local work
+# Node tooling (release-it, lefthook, commitlint, cspell)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.yarn/
+.pnpm-store/
+.pnp.*
+
+# Python tooling (validators / schema generation)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Build / release artifacts
+dist/
+build/
+out/
+tools/plugin-build/output/
+*.tar.gz
+*.tgz
+*.zip
+
+# Docs site build output (VitePress)
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
+# Local scratch / handoffs
 .handoffs/
 *.local
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
