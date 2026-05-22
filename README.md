@@ -216,3 +216,41 @@ The incident-response team is grounded in:
 ---
 
 <sub>opsbench was previously published as `k8s-incident-response-skills`. The v1.0 and v2.0 tags on this repo preserve that history. v3.0.0 is the rename + multi-team restructure.</sub>
+
+## Contributors
+
+Thanks to everyone who has contributed to opsbench. ✨
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://github.com/shaiknoorullah">
+          <img src="https://avatars.githubusercontent.com/shaiknoorullah?s=100" width="100px;" alt="Shaik Noorullah"/>
+          <br /><sub><b>Shaik Noorullah</b></sub>
+        </a>
+        <br />
+        <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Code">💻</a>
+        <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Documentation">📖</a>
+        <a href="#design-shaiknoorullah" title="Design">🎨</a>
+        <a href="#ideas-shaiknoorullah" title="Ideas, Planning, & Feedback">🤔</a>
+        <a href="#infra-shaiknoorullah" title="Infrastructure">🚇</a>
+        <a href="#maintenance-shaiknoorullah" title="Maintenance">🚧</a>
+        <a href="#tool-shaiknoorullah" title="Tools">🔧</a>
+        <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Tests">⚠️</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+### Contributors visual (auto-updated via contrib.rocks)
+
+[![contrib.rocks](https://contrib.rocks/image?repo=shaiknoorullah/opsbench)](https://github.com/shaiknoorullah/opsbench/graphs/contributors)
+
+To add yourself: comment `@all-contributors please add @yourname for code, doc, design` on any PR you've contributed to.

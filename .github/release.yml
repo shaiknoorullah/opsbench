@@ -1,0 +1,63 @@
+# GitHub native "Generate release notes" categorization.
+# release-it has `github.autoGenerate: true`, which delegates to GitHub's API. That API reads THIS file
+# to group merged PRs into sections. PRs without labels fall under "Other Changes".
+
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+      - ignore-for-release
+    authors:
+      - dependabot
+      - dependabot[bot]
+      - github-actions
+      - github-actions[bot]
+  categories:
+    - title: "💥 Breaking Changes"
+      labels:
+        - "breaking-change"
+        - "breaking"
+    - title: "🚀 Features"
+      labels:
+        - "feature"
+        - "feat"
+        - "enhancement"
+    - title: "🐛 Bug Fixes"
+      labels:
+        - "fix"
+        - "bug"
+    - title: "🔒 Security"
+      labels:
+        - "security"
+    - title: "⚡ Performance"
+      labels:
+        - "performance"
+        - "perf"
+    - title: "📚 Documentation"
+      labels:
+        - "documentation"
+        - "docs"
+    - title: "🧪 Tests"
+      labels:
+        - "test"
+        - "tests"
+    - title: "♻️ Refactors"
+      labels:
+        - "refactor"
+        - "refactoring"
+    - title: "🛠️ Tooling"
+      labels:
+        - "tooling"
+        - "build"
+        - "ci"
+        - "chore"
+    - title: "🤝 New Contributors"
+      labels:
+        - "good-first-contribution"
+    - title: "📦 Dependencies"
+      labels:
+        - "dependencies"
+        - "deps"
+    - title: "Other Changes"
+      labels:
+        - "*"

@@ -1,0 +1,34 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "shaiknoorullah",
+      "name": "Shaik Noorullah",
+      "profile": "https://github.com/shaiknoorullah",
+      "contributions": [
+        "code",
+        "doc",
+        "design",
+        "ideas",
+        "infra",
+        "maintenance",
+        "review",
+        "tool",
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "opsbench",
+  "projectOwner": "shaiknoorullah",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true,
+  "linkToUsage": true,
+  "commitType": "docs"
+}

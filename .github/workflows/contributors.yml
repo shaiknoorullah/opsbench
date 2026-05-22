@@ -1,0 +1,53 @@
+name: contributors
+
+# Updates the Contributors section + contrib.rocks image in the README
+# whenever new contributors appear. Two mechanisms:
+#   1. all-contributors-cli refreshes the .all-contributorsrc block
+#   2. contrib.rocks image is live-rendered (no rebuild needed)
+#
+# This workflow is safe — it uses ONLY GitHub-controlled context values
+# (event_name, pull_request.merged boolean) in conditionals. No user input
+# is interpolated into `run:` blocks.
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch: {}
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh-contributors:
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Refresh all-contributors README section
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --yes all-contributors-cli@6 generate || true
+
+      - name: Commit if changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain README.md .all-contributorsrc)" ]; then
+            git add README.md .all-contributorsrc
+            git commit -m "docs(contributors): refresh contributors list [skip ci]"
+            git push
+          else
+            echo "No contributors changes."
+          fi
