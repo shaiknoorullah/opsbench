@@ -1,22 +1,11 @@
-# markdownlint-cli2 config
-# https://github.com/DavidAnson/markdownlint
+# https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
 default: true
-
-# Line length — disabled for prose-heavy docs.
-MD013: false
-
-# Allow inline HTML — used for banners, badges, mermaid wrappers.
-MD033: false
-
-# Allow duplicate headings under different parents.
-MD024:
-  siblings_only: true
-
-# Allow bare URLs (badges, citations).
-MD034: false
-
-# Allow first-line h1 to differ from filename slug.
-MD041: false
-
-# Permit punctuation in heading text (forensic terms, paths).
-MD026: false
+MD013: false   # line length — too restrictive for prose docs
+MD024: false   # duplicate headings — auto-changelogs need this
+MD025: false   # single H1 — auto-changelogs append multiple top-level
+MD004:
+  style: consistent   # allow either asterisk or dash, just be consistent within a file
+MD012:
+  maximum: 2   # allow 2 blank lines (auto-changelog formatting)
+MD041: false   # first line H1
+MD033: false   # inline HTML

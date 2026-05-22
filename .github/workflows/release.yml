@@ -91,6 +91,7 @@ jobs:
       - name: release-it (automated)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LEFTHOOK: "0"  # Skip git hooks for the bot's own commit
           INPUT_VERSION: ${{ inputs.version }}
           INPUT_DRY_RUN: ${{ inputs.dry-run }}
         run: |
