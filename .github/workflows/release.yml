@@ -1,23 +1,60 @@
 name: release
 
 on:
+  # Truly automated: trigger on push to main after PR merge.
+  push:
+    branches: [main]
+    # Skip if the only changes are docs-only or chore/non-releasable.
+    # release-it itself will no-op if there are no releasable Conventional Commits since the last tag.
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (leave blank to auto-detect from Conventional Commits)"
+        description: "Override version (leave blank to auto-detect from Conventional Commits)"
         required: false
         type: string
+      dry-run:
+        description: "Dry-run only (no tag/push/release)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 concurrency:
   group: release
   cancel-in-progress: false
 
 jobs:
+  # Guard: skip the release job entirely if the head commit is from the release bot itself.
+  # Avoids a release-bot → push → release-bot infinite loop.
+  guard:
+    name: skip-release-bot-commits
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.check.outputs.proceed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - id: check
+        run: |
+          AUTHOR=$(git log -1 --pretty='%an')
+          MSG=$(git log -1 --pretty='%s')
+          echo "Last commit author: $AUTHOR"
+          echo "Last commit message: $MSG"
+          if [[ "$AUTHOR" == "github-actions[bot]" ]] || [[ "$MSG" == chore\(release\):* ]]; then
+            echo "Skipping: head commit is from release bot."
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          else
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          fi
+
   release:
+    needs: guard
+    if: needs.guard.outputs.proceed == 'true'
     name: release-it
     runs-on: ubuntu-latest
     steps:
@@ -25,23 +62,46 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+
       - name: Install deps
         run: npm ci || npm install
-      - name: Configure git
+
+      - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      - name: release-it
+
+      - name: Build Claude Code plugin tarball (for release asset)
+        run: |
+          # release-it config attaches tools/plugin-build/output/opsbench-*.tar.gz as a release asset.
+          # Pre-build at the inferred next version. release-it computes the next version itself; we use
+          # `release-it --release-version` to ask for the computed version without releasing.
+          NEXT=$(npx release-it --release-version 2>/dev/null || true)
+          if [[ -n "$NEXT" ]]; then
+            echo "Building plugin tarball for v$NEXT"
+            bash tools/plugin-build/build.sh "$NEXT" || echo "(plugin build optional; continuing)"
+          else
+            echo "No releasable changes since last tag — skipping plugin build."
+          fi
+
+      - name: release-it (automated)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_VERSION: ${{ inputs.version }}
+          INPUT_DRY_RUN: ${{ inputs.dry-run }}
         run: |
-          if [[ -n "${INPUT_VERSION}" ]]; then
-            npx release-it "${INPUT_VERSION}" --ci
+          ARGS="--ci"
+          if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [[ -n "${INPUT_VERSION:-}" ]]; then
+            npx release-it "${INPUT_VERSION}" $ARGS
           else
-            npx release-it --ci
+            # Auto-detect from Conventional Commits. release-it is a no-op if no releasable commits found.
+            npx release-it $ARGS
           fi
