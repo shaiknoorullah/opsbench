@@ -227,26 +227,23 @@ Thanks to everyone who has contributed to opsbench. ✨
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%">
-        <a href="https://github.com/shaiknoorullah">
-          <img src="https://avatars.githubusercontent.com/shaiknoorullah?s=100" width="100px;" alt="Shaik Noorullah"/>
-          <br /><sub><b>Shaik Noorullah</b></sub>
-        </a>
-        <br />
-        <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Code">💻</a>
-        <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Documentation">📖</a>
-        <a href="#design-shaiknoorullah" title="Design">🎨</a>
-        <a href="#ideas-shaiknoorullah" title="Ideas, Planning, & Feedback">🤔</a>
-        <a href="#infra-shaiknoorullah" title="Infrastructure">🚇</a>
-        <a href="#maintenance-shaiknoorullah" title="Maintenance">🚧</a>
-        <a href="#tool-shaiknoorullah" title="Tools">🔧</a>
-        <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Tests">⚠️</a>
-      </td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/shaiknoorullah"><img src="?s=100" width="100px;" alt="Shaik Noorullah"/><br /><sub><b>Shaik Noorullah</b></sub></a><br /><a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Code">💻</a> <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Documentation">📖</a> <a href="#design-shaiknoorullah" title="Design">🎨</a> <a href="#ideas-shaiknoorullah" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-shaiknoorullah" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-shaiknoorullah" title="Maintenance">🚧</a> <a href="https://github.com/shaiknoorullah/opsbench/pulls?q=is%3Apr+reviewed-by%3Ashaiknoorullah" title="Reviewed Pull Requests">👀</a> <a href="#tool-shaiknoorullah" title="Tools">🔧</a> <a href="https://github.com/shaiknoorullah/opsbench/commits?author=shaiknoorullah" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
+  <tfoot>
+    <tr>
+      <td align="center" size="13px" colspan="7">
+        <img src="https://raw.githubusercontent.com/all-contributors/all-contributors-cli/1b8533af435da9854653492b1327a23a4dbd0a10/assets/logo-small.svg">
+          <a href="https://all-contributors.js.org/docs/en/bot/usage">Add your contributions</a>
+        </img>
+      </td>
+    </tr>
+  </tfoot>
 </table>
+
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ### Contributors visual (auto-updated via contrib.rocks)
