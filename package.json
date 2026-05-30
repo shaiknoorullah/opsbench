@@ -1,6 +1,6 @@
 {
   "name": "opsbench",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Multi-team agent toolkit for DevOps, SRE, Platform, Infra, IT, Security and Network teams using Claude Code and Codex CLI.",
   "private": true,
   "license": "MIT",
