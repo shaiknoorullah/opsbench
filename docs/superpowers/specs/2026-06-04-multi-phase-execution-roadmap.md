@@ -46,6 +46,10 @@ Same shape as P4 once that template is settled. Initial agent roster: backup ver
 
 Publish all schemas (9 today, more after P4/P5) to `schema.opsbench.io`. Seed `packages/cedar-library/` with a curated catalog of least-privilege policies for common agent shapes (read-only investigator, write-gated executor, human-approval-bound mutator, etc.).
 
+### P7 — Architectural evaluation: sympozium-ai/sympozium
+
+Evaluate `sympozium-ai/sympozium` — a Kubernetes multi-agent coordination layer by the k8sgpt author (MIT, 500+★, very active). It overlaps with opsbench in load-bearing ways (skill sidecars with ephemeral RBAC ≈ opsbench Cedar policies; shared SQLite workflow memory ≈ opsbench evidence ledger + custody log). But it's a different deployment model: K8s-native operator vs. file-based install into `~/.claude/`. Brainstorming pass should decide whether opsbench *integrates with*, *competes with*, or *layers on* sympozium. Output: a design doc with the chosen relationship + (if integration) a spec for that work. P7 deliberately follows P6 so we have the schema federation surface to align on.
+
 ## Dependency graph
 
 ```
@@ -56,6 +60,8 @@ P3 ──┘
 P4 ──► P5  (P5 reuses P4's team-package template)
 
 P4 + P5 ──► P6  (P6 federates schemas from both)
+
+P6 ──► P7  (P7 wants federation surface to evaluate against)
 ```
 
 ## Execution policy
