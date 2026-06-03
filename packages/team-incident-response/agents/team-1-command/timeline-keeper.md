@@ -35,9 +35,11 @@ Produce and protect the one true chronological record of the incident. Every oth
 2. **Normalize timestamp** to RFC 3339 / ISO-8601 with `Z` suffix (UTC, no offsets). Reject if local-time.
 3. **Append, never edit.** Read the last byte; if it is not `\n`, append `\n` first.
 4. **Write canonical line** in the exact format:
+
    ```
    - `<utc>` **<actor>** <action> — artifact: `<artifact_path>` sha256: `<sha256>` [round: <N>]
    ```
+
    When `artifact_path` is empty, omit the `— artifact:` clause entirely.
 5. **Verify** by re-reading the last line and checksumming it against the input.
 6. **Return** `{line_number, sha256_of_line}` to the caller so they can record the timeline cite in their own output.

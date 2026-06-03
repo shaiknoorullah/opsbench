@@ -4,7 +4,7 @@ Kubernetes MCP server with kubectl-equivalent read tools and gated write tools.
 
 ## Source
 
-- Repo: https://github.com/alexei-led/k8s-mcp-server
+- Repo: <https://github.com/alexei-led/k8s-mcp-server>
 - License: Apache-2.0
 - Maintainer: alexei-led (community)
 
@@ -57,6 +57,7 @@ Uses your existing kubeconfig. For incident response specifically:
 2. The systemd SSH tunnel (`ovh-kubeconfig.service`) must be running:
    `systemctl --user status ovh-kubeconfig.service`.
 3. Service-account approach for unattended runs:
+
    ```bash
    kubectl create sa incident-response -n kube-system
    kubectl create clusterrolebinding incident-response \

@@ -44,7 +44,7 @@ adapt_file() {
     local out="${out_dir}/SKILL.md"
 
     {
-        echo "<!-- codex-compat: auto-adapted from ${src#${ROOT}/} -->"
+        echo "<!-- codex-compat: auto-adapted from ${src#"${ROOT}"/} -->"
         echo "<!-- Hard cases (Agent, TaskCreate, Skill) annotated inline with TODO. -->"
         echo ""
         # Replace Claude-Code-specific tool invocations with TODO scaffolding.
@@ -54,7 +54,7 @@ adapt_file() {
             -e 's/\bSkill\b/TODO_SKILL_INVOKE/g' \
             "${src}"
     } > "${out}"
-    echo "Adapted ${src#${ROOT}/} -> ${out}"
+    echo "Adapted ${src#"${ROOT}"/} -> ${out}"
 }
 
 case "${mode}" in

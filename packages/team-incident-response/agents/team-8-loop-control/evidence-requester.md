@@ -47,6 +47,7 @@ human_approval: false                 # MUST be set true by human before collect
 ```
 
 Body:
+
   1. Verdict-N summary (why NEED_MORE_EVIDENCE)
   2. Per-artifact requests, each with:
      - `artifact_id`

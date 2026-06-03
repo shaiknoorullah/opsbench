@@ -38,11 +38,13 @@ Anchor the bundle hash in a system the investigation does not control, so chain-
 2. **Clone or fetch witness repo** to a scratch dir (`/tmp/witness-<incident-id>-<rand>`). Use a deploy key from Vault scoped to push-only on `attestations/*`.
 3. **Place manifest copy** at `attestations/<incident-id>/round-N/manifest.sha256` in the witness repo working tree.
 4. **Commit** with message:
+
    ```
    witness: <incident-id> round <N>
    seal: <full-seal-sha256>
    cataloged-at: <utc>
    ```
+
 5. **Tag** the commit `<incident-id>-r<N>-<seal[0:12]>` and push the commit + tag.
 6. **Capture commit SHA** from push output.
 7. **Optional RFC 3161**: send `seal.sha256` to TSA via `openssl ts -query -data ... | curl ... | openssl ts -reply`. Save the .tsr blob.

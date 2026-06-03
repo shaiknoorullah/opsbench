@@ -5,7 +5,7 @@ when AWS resources are part of the incident scope (currently: none in pnats infr
 
 ## Source
 
-- Repo: https://github.com/awslabs/mcp
+- Repo: <https://github.com/awslabs/mcp>
 - License: Apache-2.0
 - Maintainer: AWS (official)
 

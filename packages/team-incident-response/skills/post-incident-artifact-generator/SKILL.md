@@ -126,6 +126,7 @@ grep -q 'status: CONFIRMED' <handoff>/<id>/round-<final-N>/verdict.md || { echo 
 ### Step 2: Gather metadata
 
 Collect from operator (or pre-populated YAML):
+
 - Incident severity / priority
 - Customer-facing impact
 - Detected by (alert? customer report? proactive?)

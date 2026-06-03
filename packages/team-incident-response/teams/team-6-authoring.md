@@ -40,6 +40,7 @@ Each author's output routes through team-5-enforcement:
 ## Outputs
 
 All under `<incident_dir>/final/`:
+
 - `incident-report.md`
 - `rca.md`
 - `mitigations.md`

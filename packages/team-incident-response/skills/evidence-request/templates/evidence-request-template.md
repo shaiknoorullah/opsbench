@@ -42,6 +42,7 @@ Round <N>'s verdict was NEED-MORE-EVIDENCE because:
 Each artifact below must have all 6 fields populated.
 
 ### Artifact 1
+
 - **Source family:** node_level
 - **Specific command:** `journalctl -u containerd --since 'YYYY-MM-DD HH:MM' --until 'YYYY-MM-DD HH:MM'` on host <name>
 - **Hypothesis served:** falsifies H1
@@ -50,6 +51,7 @@ Each artifact below must have all 6 fields populated.
 - **Estimated size:** <10 MB
 
 ### Artifact 2
+
 - **Source family:** observability/prometheus
 - **Specific command:** `range_query node_memory_MemAvailable_bytes{instance=~"<filter>"} step=15s window=±10min`
 - **Hypothesis served:** confirms H5 (memory pressure)
@@ -58,6 +60,7 @@ Each artifact below must have all 6 fields populated.
 - **Estimated size:** ~50 KB
 
 ### Artifact 3
+
 - ...
 
 ## Anti-confirmation-bias check

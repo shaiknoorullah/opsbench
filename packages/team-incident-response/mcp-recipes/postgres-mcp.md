@@ -4,8 +4,8 @@ PostgreSQL MCP. Used for pg-tenant + pg-hyd inspection. Read-only by default, tr
 
 ## Source
 
-- Repo: https://github.com/crystaldba/postgres-mcp
-- Alt: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres
+- Repo: <https://github.com/crystaldba/postgres-mcp>
+- Alt: <https://github.com/modelcontextprotocol/servers/tree/main/src/postgres>
 - License: MIT (both)
 - Maintainer: Crystal DBA (community); MCP team (reference impl)
 
@@ -45,6 +45,7 @@ npx -y @modelcontextprotocol/server-postgres
 ## Auth setup
 
 1. Create the role on EACH cluster (NEVER `ALL PRIVILEGES`):
+
    ```sql
    CREATE ROLE incident_ro WITH LOGIN PASSWORD '<pw>';
    GRANT USAGE ON SCHEMA public, pg_catalog TO incident_ro;
@@ -55,6 +56,7 @@ npx -y @modelcontextprotocol/server-postgres
    ALTER ROLE incident_ro SET lock_timeout = '5s';
    ALTER ROLE incident_ro SET idle_in_transaction_session_timeout = '60s';
    ```
+
 2. Store passwords: `pg-tenant-incident-ro-pw`, `pg-hyd-incident-ro-pw` in Azure Key Vault.
 3. Connection routing: through pg-tenant-pooler (pgbouncer transaction mode) for tenant,
    direct for hyd (it's read-only-replica safe but production-live — see PG_HYD_PRODUCTION

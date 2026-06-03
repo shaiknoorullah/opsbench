@@ -5,8 +5,8 @@ deployment is not available or when raw OTel access is needed (e.g., self-hosted
 
 ## Source
 
-- Repo: https://github.com/open-telemetry/community/issues — official MCP not yet
-  released; community implementation: https://github.com/cyclotruc/otel-mcp-server
+- Repo: <https://github.com/open-telemetry/community/issues> — official MCP not yet
+  released; community implementation: <https://github.com/cyclotruc/otel-mcp-server>
 - License: MIT
 - Status: COMMUNITY (not officially maintained by OTel project)
 

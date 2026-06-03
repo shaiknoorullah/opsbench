@@ -23,9 +23,11 @@ New team packages go through a lightweight RFC:
    - Proposed owner(s)
 2. Maintainers respond within 7 days with one of: `accepted`, `needs-revision`, `out-of-scope`.
 3. On acceptance, scaffold the team:
+
    ```bash
    bash scripts/new-team.sh team-<slug>
    ```
+
 4. Add the new scope to `commitlint.config.cjs`.
 5. Add owners to `.github/CODEOWNERS`.
 6. Open the implementation PR.

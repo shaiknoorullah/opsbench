@@ -85,7 +85,7 @@ if [[ -n "$OUTPUT_PATH" && -f "$OUTPUT_PATH" ]]; then
     # path relative to incident dir if possible
     REL_PATH="$OUTPUT_PATH"
     if [[ "$OUTPUT_PATH" == "$INCIDENT_DIR"/* ]]; then
-      REL_PATH="${OUTPUT_PATH#$INCIDENT_DIR/}"
+      REL_PATH="${OUTPUT_PATH#"$INCIDENT_DIR"/}"
     fi
     printf '%s | %s | collected | %s | sha256=%s\n' \
       "$TS" "$AGENT" "$REL_PATH" "$SHA256" \
@@ -94,6 +94,9 @@ if [[ -n "$OUTPUT_PATH" && -f "$OUTPUT_PATH" ]]; then
 fi
 
 # ----- append timeline entry -----
+# Single quotes around printf format strings are intentional: backticks are
+# literal markdown delimiters, %s are positional substitutions — not shell expansions.
+# shellcheck disable=SC2016
 if [[ -n "$INCIDENT_DIR" ]]; then
   {
     printf '\n### %s — %s — %s\n' "$TS" "$CATEGORY" "$AGENT"
@@ -104,7 +107,7 @@ if [[ -n "$INCIDENT_DIR" ]]; then
     fi
     printf '\n'
     if [[ -n "$SHA256" ]]; then
-      printf '**Evidence:**\n- `%s` (sha256=%s)\n' "${OUTPUT_PATH#$INCIDENT_DIR/}" "$SHA256"
+      printf '**Evidence:**\n- `%s` (sha256=%s)\n' "${OUTPUT_PATH#"$INCIDENT_DIR"/}" "$SHA256"
     fi
   } >> "$INCIDENT_DIR/timeline.md" 2>/dev/null || true
 fi

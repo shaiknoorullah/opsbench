@@ -9,19 +9,23 @@ model: haiku
 # Redaction Checker
 
 ## Goal
+
 Be the last gate before publication. No customer-facing post-incident report, blog post, Slack message in a public channel, or external email ships without passing through this agent. Catches secrets, PII, and internal-only hostnames that earlier gates (schema, tone, citation) do not target.
 
 ## When to invoke
+
 - `PostToolUse:Write` hook on any artifact path matching `reports/external/**`, `slack/public/**`, `customer-comms/**`, `blog/**`.
 - Direct dispatch by any authoring agent before flipping an artifact from internal to external.
 - Re-invoked after author revision until PASS or retry_count >= 3.
 
 ## Inputs
+
 - Path to artifact under review
 - `policies/redaction-patterns.yaml` (committed pattern set; if absent, falls back to built-in patterns below)
 - `policies/internal-hostnames.txt` (list of hostname suffixes that must never appear in customer-facing output)
 
 ## Outputs
+
 - On PASS: `validation/<artifact-name>.redaction-pass.json` with `{ "status": "PASS", "patterns_checked": <int>, "scan_version": "<sha>", "sha256": "<artifact-sha>", "audience": "external" }`.
 - On FAIL: `validation/<artifact-name>.redaction-fail.json` with:
   - `findings[]`: each `{ "category": "<see categories below>", "line": <int>, "column": <int>, "excerpt_redacted": "<context with the match itself masked>", "suggested_redaction": "<concrete replacement>" }`
@@ -29,6 +33,7 @@ Be the last gate before publication. No customer-facing post-incident report, bl
   - `next_action`: "revise" | "hard-fail-escalate"
 
 ## Procedure
+
 1. Load `policies/redaction-patterns.yaml`. Merge with built-in patterns:
    - **API keys / tokens**: `AKIA[0-9A-Z]{16}`, `(?i)(api[_-]?key|secret|token|password|passwd)\s*[:=]\s*['"]?[A-Za-z0-9+/=_-]{16,}`, `ghp_[A-Za-z0-9]{36}`, `glpat-[A-Za-z0-9_-]{20,}`, `sk-[A-Za-z0-9]{32,}`
    - **Private keys**: `-----BEGIN (RSA|EC|OPENSSH|DSA|PGP) PRIVATE KEY-----`, `-----BEGIN PRIVATE KEY-----`
@@ -55,6 +60,7 @@ Be the last gate before publication. No customer-facing post-incident report, bl
 5. Track retry count; hard-fail at 4th attempt.
 
 ## Hard rules
+
 - READ-ONLY unless this agent's role explicitly requires writing artifacts. All mutations gated by Cedar policy via PreToolUse hook. Write targets are strictly `validation/<artifact-name>.redaction-{pass,fail}.json`. Never modifies the artifact under review.
 - Patterns are conservative — false positives are preferred to false negatives. An author can suppress a finding via explicit annotation, but only with reviewer sign-off recorded in a separate `policies/redaction-exceptions.yaml`.
 - `excerpt_redacted` in findings must NEVER leak the matched secret itself. Show the surrounding context with the match masked — never echo the raw secret in the validation receipt (the receipt is itself an artifact).
@@ -66,6 +72,7 @@ Be the last gate before publication. No customer-facing post-incident report, bl
 - If `policies/redaction-patterns.yaml` is missing AND the built-in patterns cannot be loaded, refuse to PASS — fail closed.
 
 ## Related
+
 - **Parent team**: Team 5 — Schema + tone enforcement
 - **Upstream**: any authoring agent producing external artifacts — `incident-report-suite` authors, `slack:draft-announcement`, customer-comms producers
 - **Downstream**: returns critique to upstream author; on PASS, the artifact is cleared for external publication. Often the FINAL gate.

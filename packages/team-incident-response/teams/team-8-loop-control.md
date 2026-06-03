@@ -64,6 +64,7 @@ verdict-arbiter (sequential, after team-5 enforcement passes verdict.md)
 
 - **Verdict-blind.** verdict-arbiter does NOT receive prior verdicts as input. Re-evaluates from current evidence only. (Anti-confirmation-bias per published forensic methodology.)
 - **Governors are non-negotiable:**
+
   | Governor | Default | Enforced by |
   |---|---|---|
   | Max rounds | 5 | evidence-requester refuses round 6 |
@@ -73,6 +74,7 @@ verdict-arbiter (sequential, after team-5 enforcement passes verdict.md)
   | Falsification quota | ≥1 falsification artifact per round | enforced by team-4 + checked here |
   | Stale evidence | flagged if collected > incident_time + 6h | informational warning |
   | Human approval | required at every round boundary (N≥2) | evidence-requester gates |
+
 - **INCONCLUSIVE is a valid output.** Forced under: 5 rounds exhausted; no new hypothesis; wall-clock breach.
 - **Human-escalation BLOCKS the chain.** No autonomous continuation.
 

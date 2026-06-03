@@ -15,7 +15,7 @@ checked=0
 
 while IFS= read -r -d '' skill; do
     checked=$((checked + 1))
-    rel="${skill#${ROOT}/}"
+    rel="${skill#"${ROOT}"/}"
 
     # First non-empty line must be ---
     first_line="$(head -n 1 "${skill}")"

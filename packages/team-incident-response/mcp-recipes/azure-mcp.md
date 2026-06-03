@@ -5,7 +5,7 @@ Key Vault secrets retrieval, Azure Monitor logs, and SP auth checks.
 
 ## Source
 
-- Repo: https://github.com/Azure/azure-mcp
+- Repo: <https://github.com/Azure/azure-mcp>
 - License: MIT
 - Maintainer: Microsoft Azure (official)
 
@@ -40,16 +40,19 @@ docker pull mcr.microsoft.com/azure/azure-mcp-server:latest
 ## Auth setup
 
 1. Create a dedicated SP with `Reader` on the subscription:
+
    ```bash
    az ad sp create-for-rbac \
      --name incident-response-readonly \
      --role Reader \
      --scopes /subscriptions/2428f345-68e3-44bb-a4f0-1d600a03caa5
    ```
+
 2. Grant `Key Vault Secrets User` on `pn-cluster-keyvault` (read-only to specific secrets).
 3. Grant `Azure Connected Machine Onboarding` is NOT needed — read-only Arc state via
    `Reader` is sufficient.
 4. Store the secret in 1Password; export to env at shell init:
+
    ```bash
    export AZURE_INCIDENT_SP_CLIENT_ID="..."
    export AZURE_INCIDENT_SP_SECRET="$(op read 'op://Private/azure-incident-sp/credential')"
@@ -61,6 +64,7 @@ docker pull mcr.microsoft.com/azure/azure-mcp-server:latest
 mutations. The SP itself has only `Reader` role — even without the flag, ARM rejects writes.
 
 To confirm:
+
 ```bash
 az role assignment list --assignee $AZURE_INCIDENT_SP_CLIENT_ID --output table
 # Should show ONLY Reader (or Key Vault Secrets User) — never Contributor.

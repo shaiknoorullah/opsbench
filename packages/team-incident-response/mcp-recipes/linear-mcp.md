@@ -4,7 +4,7 @@ Linear MCP for follow-up action items, post-incident issue creation, and trackin
 
 ## Source
 
-- Repo: https://github.com/linear/mcp-server-linear
+- Repo: <https://github.com/linear/mcp-server-linear>
 - Plugin: also available as Claude Code plugin (see `plugin_linear_linear__authenticate`)
 - License: MIT
 - Maintainer: Linear (official)
@@ -35,7 +35,7 @@ npm install -g @linear/mcp-server
 
 ## Auth setup
 
-1. Personal API key from https://linear.app/settings/api (NOT OAuth — OAuth requires
+1. Personal API key from <https://linear.app/settings/api> (NOT OAuth — OAuth requires
    per-user consent, not suitable for unattended agents).
 2. Or via the plugin's OAuth flow: invoke `plugin_linear_linear__authenticate`.
 3. Store: `linear-api-key` in Azure Key Vault.

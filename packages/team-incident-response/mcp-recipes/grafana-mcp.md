@@ -5,7 +5,7 @@ Read-only API access is the default; mutation tools (annotations, alert rules) a
 
 ## Source
 
-- Repo: https://github.com/grafana/mcp-grafana
+- Repo: <https://github.com/grafana/mcp-grafana>
 - License: AGPL-3.0
 - Maintainer: Grafana Labs (official)
 
@@ -47,6 +47,7 @@ chmod +x /usr/local/bin/mcp-grafana
 2. Generate an API key for the service account (NOT a user token — service accounts persist
    beyond user offboarding).
 3. Store the key in 1Password or Azure Key Vault. Reference via env var in shell init:
+
    ```bash
    export GRAFANA_API_KEY="$(az keyvault secret show \
      --vault-name pn-cluster-keyvault \
@@ -61,6 +62,7 @@ chmod +x /usr/local/bin/mcp-grafana
 `update_dashboard`, `delete_dashboard`. The agent receives only query tools.
 
 To verify after launch:
+
 ```bash
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | mcp-grafana --transport stdio --read-only \
   | jq '.result.tools[].name' | grep -v -E '(create|update|delete)' | wc -l

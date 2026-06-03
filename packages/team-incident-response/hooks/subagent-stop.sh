@@ -67,7 +67,7 @@ if [[ ! -f "$LEDGER" ]]; then
 fi
 
 TMP_LEDGER="$(mktemp)"
-jq --arg ts "$TS" \
+if jq --arg ts "$TS" \
    --arg agent "$AGENT" \
    --arg status "$STATUS" \
    --arg trace "$TRACE_FILE" \
@@ -81,7 +81,11 @@ jq --arg ts "$TS" \
      artifact_count: ($artifacts | length),
      runs: ((.agents[$agent].runs // 0) + 1)
    }
-   ' "$LEDGER" > "$TMP_LEDGER" 2>/dev/null && mv "$TMP_LEDGER" "$LEDGER" || rm -f "$TMP_LEDGER"
+   ' "$LEDGER" > "$TMP_LEDGER" 2>/dev/null; then
+  mv "$TMP_LEDGER" "$LEDGER"
+else
+  rm -f "$TMP_LEDGER"
+fi
 
 # ----- critique authored artifacts -----
 # Required-fields check, per agent class
