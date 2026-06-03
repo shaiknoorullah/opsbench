@@ -3,6 +3,12 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.0.5](https://github.com/shaiknoorullah/opsbench/compare/v1.0.4...v1.0.5) (2026-06-03)
+
+### Documentation
+
+* **repo:** add multi-phase execution roadmap (P1–P6) ([#16](https://github.com/shaiknoorullah/opsbench/issues/16)) ([8e542b6](https://github.com/shaiknoorullah/opsbench/commit/8e542b60129e5df2df7db7bc240bf0bfb0b4388b))
+
 ## [1.0.4](https://github.com/shaiknoorullah/opsbench/compare/v1.0.3...v1.0.4) (2026-06-03)
 
 ### Bug Fixes
