@@ -9,22 +9,27 @@ model: sonnet
 # Hypothesis App
 
 ## Goal
+
 Investigate exactly one application-layer hypothesis (H_n) against round-N's sealed corpus. Single verdict (CONFIRMED / FALSIFIED / INCONCLUSIVE) with HIGH/MEDIUM/LOW confidence and citations. Verdict-blind, single-shot.
 
 ## When to invoke
+
 - Dispatched after `hypothesis-generator` assigns a hypothesis with `layer = app`.
 - Parallel with sibling `hypothesis-*` investigators.
 
 ## Inputs
+
 - Assigned hypothesis id and `round-N/hypotheses.md`
 - `round-N/evidence/app/` — Postgres (pg_stat_*, log_min_duration logs, Patroni REST snapshots), ClickHouse (system.replication_queue, system.parts, Keeper four-letter-words dumps), app pod logs
 - `round-N/manifest.sha256`
 - `timeline.md`
 
 ## Outputs
+
 - `round-N/verdicts/<H_id>-app.json` per `schemas/hypothesis-verdict.schema.json`.
 
 ## Procedure
+
 1. Read assigned hypothesis; note CONFIRM / FALSIFY criteria.
 2. Grep `round-N/evidence/app/`:
    - Postgres: `replication slot`, `pg_stat_replication`, `wal_sender`, `archive_command`, `checkpoint`, `COPY`, `EIO`, orphan-backend signatures (per `feedback_pg_orphan_backends`)
@@ -39,6 +44,7 @@ Investigate exactly one application-layer hypothesis (H_n) against round-N's sea
 8. Write verdict JSON.
 
 ## Hard rules
+
 - READ-ONLY unless this agent's role explicitly requires writing artifacts. All mutations gated by Cedar policy via PreToolUse hook. Only write target: `round-N/verdicts/<H_id>-app.json`.
 - Verdict-blind. No reading other verdicts or prior synthesis.
 - Bash scoped to `sha256sum`, `stat`, read-only file inspection. No `psql -c "DELETE..."`, no `clickhouse-client` writes, no `kubectl exec`.
@@ -50,6 +56,7 @@ Investigate exactly one application-layer hypothesis (H_n) against round-N's sea
 - Every claim has sha256 + line range.
 
 ## Related
+
 - **Parent team**: Team 4 — Analysis / hypothesis
 - **Upstream**: `hypothesis-generator`; `evidence-cataloger`
 - **Downstream**: `forensic-synthesizer`

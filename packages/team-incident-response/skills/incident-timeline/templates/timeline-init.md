@@ -18,9 +18,11 @@
 ## Timeline entries
 
 ### <ISO8601> — DETECTED — <source>
+
 **Actor:** <alert | monitoring | customer | engineer>
 **Event:** <one-sentence description of what was first observed>
 **Evidence:**
+
 - `<path>` (sha256=<hash>)
 **Notes:** <optional>
 

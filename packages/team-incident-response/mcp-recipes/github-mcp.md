@@ -5,7 +5,7 @@ diff inspection, PR creation for post-incident remediations.
 
 ## Source
 
-- Repo: https://github.com/github/github-mcp-server
+- Repo: <https://github.com/github/github-mcp-server>
 - License: MIT
 - Maintainer: GitHub (official)
 
@@ -53,7 +53,7 @@ For write (post-incident PR creation):
 
 ## Auth setup
 
-1. Create a fine-grained PAT (NOT classic) at https://github.com/settings/personal-access-tokens.
+1. Create a fine-grained PAT (NOT classic) at <https://github.com/settings/personal-access-tokens>.
 2. Permissions (read-only token):
    - Repository → Contents: Read-only
    - Repository → Pull requests: Read-only

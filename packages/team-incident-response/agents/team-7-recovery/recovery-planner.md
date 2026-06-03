@@ -45,6 +45,7 @@ estimated_blast_radius: <scope>
 ```
 
 Body sections:
+
   1. Prerequisites (state assertions that MUST be true before step 1)
   2. Ordered Steps (numbered; each step has: command/operation, expected output, sha256 pre-state, sha256 post-state, risk, rollback, verification)
   3. Per-Step Risk Assessment (table)

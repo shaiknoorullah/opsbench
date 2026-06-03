@@ -25,6 +25,7 @@ Apply the per-round arbiter rule to the draft verdict produced by `forensic-synt
 - `incidents/<incident-id>/round-N/hypotheses/*.md` (per-hypothesis FOR/AGAINST evidence with confidence levels).
 
 **EXPLICITLY EXCLUDED from inputs:**
+
 - `incidents/<incident-id>/round-{1..N-1}/*` — the arbiter does NOT read prior rounds.
 - `incidents/<incident-id>/timeline.md` — the arbiter does NOT consult the full timeline.
 - `incidents/<incident-id>/ledger/*` — the arbiter does NOT consult ledger history.

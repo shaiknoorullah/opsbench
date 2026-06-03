@@ -22,21 +22,27 @@ The hypothesis you are investigating: **{{ONE_SENTENCE_MECHANISM_CLAIM}}**
 **Primary evidence sources** (commands ready to copy-paste):
 
 1. **{{SOURCE_NAME_1}}**:
+
 ```
 {{COMMAND_1}}
 ```
+
 Look for: {{WHAT_TO_LOOK_FOR_1}}
 
-2. **{{SOURCE_NAME_2}}**:
+1. **{{SOURCE_NAME_2}}**:
+
 ```
 {{COMMAND_2}}
 ```
+
 Look for: {{WHAT_TO_LOOK_FOR_2}}
 
-3. **{{SOURCE_NAME_3}}**:
+1. **{{SOURCE_NAME_3}}**:
+
 ```
 {{COMMAND_3}}
 ```
+
 Look for: {{WHAT_TO_LOOK_FOR_3}}
 
 ## What would CONFIRM this hypothesis

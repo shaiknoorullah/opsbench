@@ -35,7 +35,7 @@ INCIDENT_ID="$(basename "$INCIDENT_DIR")"
 [[ ! "$INCIDENT_ID" =~ ^INC- ]] && INCIDENT_ID="$(grep -oE 'INC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}' "$INCIDENT_DIR/timeline.md" 2>/dev/null | head -1)"
 
 # Current round = highest round-N directory present
-CURRENT_ROUND="$(ls -d "$INCIDENT_DIR"/round-* 2>/dev/null | sed 's/.*round-//' | sort -n | tail -1 || echo "")"
+CURRENT_ROUND="$(find "$INCIDENT_DIR" -maxdepth 1 -type d -name 'round-*' -printf '%f\n' 2>/dev/null | sed 's/^round-//' | sort -n | tail -1 || echo "")"
 [[ -z "$CURRENT_ROUND" ]] && CURRENT_ROUND="0 (no collection started)"
 
 # Timeline last-modified
@@ -84,7 +84,7 @@ cat <<EOF
 **Latest verdict status:** ${VERDICT_STATUS}
 
 **Timeline:**
-- Path: \`${TL_PATH#$INCIDENT_DIR/}\`
+- Path: \`${TL_PATH#"$INCIDENT_DIR"/}\`
 - Last modified (UTC): ${TL_MTIME}
 - Total lines: ${TL_LINES}
 - Last entry: ${TL_LAST_ENTRY}

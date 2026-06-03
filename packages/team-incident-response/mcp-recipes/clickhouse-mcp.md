@@ -4,7 +4,7 @@ ClickHouse MCP server. Defaults to read-only via the `readonly=1` setting profil
 
 ## Source
 
-- Repo: https://github.com/ClickHouse/mcp-clickhouse
+- Repo: <https://github.com/ClickHouse/mcp-clickhouse>
 - License: Apache-2.0
 - Maintainer: ClickHouse Inc (official)
 
@@ -41,11 +41,13 @@ uv tool install mcp-clickhouse
 ## Auth setup
 
 1. Create the read-only user in ClickHouse:
+
    ```sql
    CREATE USER incident_readonly IDENTIFIED WITH sha256_password BY '<pw>';
    GRANT SELECT, SHOW TABLES, SHOW COLUMNS ON audit.* TO incident_readonly;
    ALTER USER incident_readonly SETTINGS readonly = 1, max_execution_time = 60;
    ```
+
 2. Store the password in Azure Key Vault: `clickhouse-incident-readonly-pw`.
 3. The user has access only to `system.*` and `audit.*` (no `INSERT`, no `ALTER`,
    no `DROP`).
@@ -53,6 +55,7 @@ uv tool install mcp-clickhouse
 ## Read-only verification
 
 `CLICKHOUSE_READONLY=1` + `readonly=1` setting on the user means:
+
 - No `INSERT`, `UPDATE`, `ALTER`, `DROP`, `TRUNCATE`, `OPTIMIZE`.
 - No DDL of any kind.
 - `SELECT` plus `SHOW`/`DESCRIBE` only.

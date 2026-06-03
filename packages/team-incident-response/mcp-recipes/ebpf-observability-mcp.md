@@ -5,13 +5,14 @@ flow data is needed (DNS resolution, NetworkPolicy drops, L7 HTTP/gRPC visibilit
 
 ## Source
 
-- Hubble: https://github.com/cilium/hubble
+- Hubble: <https://github.com/cilium/hubble>
 - MCP wrapper: COMMUNITY / TO BE BUILT (no upstream MCP exists)
 - License: Apache-2.0 (Hubble itself)
 
 ## Status
 
 PARTIAL — pnats uses Calico, not Cilium. eBPF observability is currently provided via:
+
 - `tcpdump` on nodes (collector-nodes-network)
 - Calico Felix logs
 - NetworkPolicy event audit

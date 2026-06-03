@@ -32,6 +32,7 @@ kubectl --context $CTX get apiservices.apiregistration.k8s.io
 kubectl --context $CTX api-resources --verbs=list -o wide
 kubectl --context $CTX get crd -o custom-columns=NAME:.metadata.name,GROUP:.spec.group | head -50
 ```
+
 Record: K8s version, runtime, CNI plugin, every CRD group present.
 
 ### Layer 2 — Namespaces and operators

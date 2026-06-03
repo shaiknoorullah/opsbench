@@ -3,6 +3,7 @@
 > A reference network architecture for hybrid Kubernetes clusters spanning multiple cloud providers, commodity VPS, and on-premises hardware, connected by a WireGuard mesh under Calico VXLAN. Distilled from real production operations, sanitized for general use.
 
 This document describes:
+
 - The realistic *as-built* topology of a 4-zone hybrid Kubernetes cluster
 - The packet path through 4 encapsulation layers
 - Where the architecture breaks under load and why
@@ -65,6 +66,7 @@ Pod A (10.1.X.Y on node A in zone X)
 **Critical implication**: when a node is CPU-saturated (load1 > 4×cores), the kernel can't service VXLAN + WireGuard worker threads on schedule. Packets queue. 100-200 ms intra-zone jitter emerges — **not from the wire**, from the kernel scheduler.
 
 You cannot fix this jitter by changing transports. The fixes are:
+
 - Reducing the number of encap layers (e.g., `vxlanMode: CrossSubnet`)
 - Reducing CPU pressure on hot nodes
 - Tuning app-layer timeouts to absorb the variability
@@ -131,6 +133,7 @@ kubectl get node zone-b.node-1 -o jsonpath='{.status.addresses}'
 ```
 
 When the K8s `InternalIP` is the public address, several things misbehave:
+
 - `kube-proxy` SNAT rules use public IPs
 - NodePort/LoadBalancer Service endpoints are advertised on public IPs
 - Cross-node K8s control-plane traffic traverses the public internet
@@ -149,6 +152,7 @@ If most Zone-B peers correctly use private-VLAN endpoints for the WireGuard mesh
 Endpoint is an RFC1918 address (e.g., `172.17.0.X:51820`) that isn't routable from any other peer. Bidirectional `NO_HANDSHAKE`.
 
 **Fix options**:
+
 - Port-forward on the office router + dynamic DNS for the WAN IP
 - Use a relay (the Zone-C witness, with its stable public IP, as a WireGuard rendezvous)
 - Accept that the on-prem zone is read-only / management-only and exclude it from K8s data plane
@@ -177,6 +181,7 @@ CoreDNS deployment has insufficient `topologySpreadConstraints`, leading to all 
 Observation: same-zone pod-to-pod RTT can spike to **5-200 ms** on a private VLAN (where the physical wire is sub-millisecond). Root cause is kernel scheduler starvation on the saturated node — VXLAN + WG worker threads queue.
 
 **Fix**:
+
 - Eliminate the VXLAN layer with `vxlanMode: CrossSubnet` for same-subnet peers
 - Reduce CPU pressure on hot nodes (workload rebalancing)
 - Bump app-layer timeouts (storage replica timeouts, database heartbeats, RPC timeouts) to absorb the jitter

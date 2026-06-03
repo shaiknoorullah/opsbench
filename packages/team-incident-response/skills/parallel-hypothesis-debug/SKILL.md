@@ -30,6 +30,7 @@ Each agent works narrow and deep. The orchestrator (you) waits for ALL reports b
 Cap at 3-4 hypotheses. Cover orthogonal failure domains. Typical taxonomies:
 
 **Storage EIO incidents:**
+
 | H | Domain | Example |
 |---|---|---|
 | H1 | Replication / quorum | Longhorn quorum loss, Patroni leader split, RMT replica unreachable |
@@ -38,6 +39,7 @@ Cap at 3-4 hypotheses. Cover orthogonal failure domains. Typical taxonomies:
 | H4 | Resource saturation | CPU pressure, iowait, kernel hung-task, memory cgroup OOM |
 
 **Application crashes:**
+
 | H | Domain |
 |---|---|
 | H1 | Bad release / config change |
@@ -46,6 +48,7 @@ Cap at 3-4 hypotheses. Cover orthogonal failure domains. Typical taxonomies:
 | H4 | Data-shape change (input that triggered latent bug) |
 
 **Performance regressions:**
+
 | H | Domain |
 |---|---|
 | H1 | Query plan change |

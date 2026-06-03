@@ -92,7 +92,7 @@ Collection is not analysis. Collection captures the state of the world at incide
 
 ## Wrap existing tools where they fit
 
-For K8s + databases, use `replicatedhq/troubleshoot` (https://troubleshoot.sh):
+For K8s + databases, use `replicatedhq/troubleshoot` (<https://troubleshoot.sh>):
 
 ```bash
 # Generate support bundle via troubleshoot.sh
@@ -103,6 +103,7 @@ kubectl support-bundle https://kots.io/support-bundle/longhorn.yaml -o /tmp/sb.t
 For OpenShift clusters: use `oc adm must-gather`.
 
 Native collectors only for what those tools don't cover well:
+
 - Node-level (`journalctl`, `dmesg`, `iostat`, `smartctl`) — too host-specific for SDK
 - CNI-specific (Felix log, Cilium status, WireGuard handshake) — varies per cluster
 - Observability snapshots (Prometheus range queries, Loki labels) — needs specific PromQL/LogQL
@@ -124,6 +125,7 @@ One collector subagent per source family in `collection-plan.yaml`. Run in paral
 ```
 
 Each collector receives:
+
 - Its slice of `collection-plan.yaml`
 - The exact output directory it must write to
 - A handoff manifest writer to log "STARTED <cmd>" / "DONE <file> <sha256>" entries to `custody.log`

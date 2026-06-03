@@ -14,7 +14,7 @@ checked=0
 
 while IFS= read -r -d '' agent; do
     checked=$((checked + 1))
-    rel="${agent#${ROOT}/}"
+    rel="${agent#"${ROOT}"/}"
 
     first_line="$(head -n 1 "${agent}")"
     if [[ "${first_line}" != "---" ]]; then

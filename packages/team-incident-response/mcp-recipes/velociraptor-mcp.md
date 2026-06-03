@@ -6,7 +6,7 @@ timeline, registry-like artifacts on Linux).
 
 ## Source
 
-- Project: https://docs.velociraptor.app/
+- Project: <https://docs.velociraptor.app/>
 - MCP wrapper: COMMUNITY / TO BE BUILT (no upstream MCP exists as of 2026-05-22)
 - License: AGPL-3.0 (Velociraptor itself)
 

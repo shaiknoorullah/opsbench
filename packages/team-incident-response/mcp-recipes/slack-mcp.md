@@ -5,7 +5,7 @@ channel history). Mutation tools are explicitly disabled — drafts go to the lo
 
 ## Source
 
-- Repo: https://github.com/modelcontextprotocol/servers/tree/main/src/slack
+- Repo: <https://github.com/modelcontextprotocol/servers/tree/main/src/slack>
 - License: MIT
 - Maintainer: MCP team (reference impl)
 
@@ -35,7 +35,7 @@ npx -y @modelcontextprotocol/server-slack
 
 ## Auth setup
 
-1. Create a Slack app `pnats-incident-bot` at https://api.slack.com/apps.
+1. Create a Slack app `pnats-incident-bot` at <https://api.slack.com/apps>.
 2. OAuth scopes (BOT token, NOT user token):
    - `channels:history`     — read public channel messages
    - `channels:read`        — list channels

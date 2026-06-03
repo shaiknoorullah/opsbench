@@ -4,7 +4,7 @@ PagerDuty MCP for incident-state lookup, on-call rotation queries, and incident 
 
 ## Source
 
-- Repo: https://github.com/PagerDuty/pagerduty-mcp-server
+- Repo: <https://github.com/PagerDuty/pagerduty-mcp-server>
 - License: MIT
 - Maintainer: PagerDuty (official)
 
