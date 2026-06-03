@@ -3,6 +3,12 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.0.4](https://github.com/shaiknoorullah/opsbench/compare/v1.0.3...v1.0.4) (2026-06-03)
+
+### Bug Fixes
+
+* **ci:** unblock chronic lint failures on main ([#15](https://github.com/shaiknoorullah/opsbench/issues/15)) ([03cf8e2](https://github.com/shaiknoorullah/opsbench/commit/03cf8e29c922bb3707d33624f26665c52005c9d8))
+
 ## [1.0.3](https://github.com/shaiknoorullah/opsbench/compare/v1.0.2...v1.0.3) (2026-06-03)
 
 ## [1.0.2](https://github.com/shaiknoorullah/opsbench/compare/v1.0.1...v1.0.2) (2026-05-31)
