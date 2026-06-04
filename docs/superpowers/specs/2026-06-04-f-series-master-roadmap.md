@@ -47,11 +47,12 @@ F0 ──► F1 ──► F2 ──► F3 ──► F4 (5 teams in parallel) ─
 
 ## Cross-cutting principles (apply to every F)
 
-1. **Vendor MCPs > custom code.** When a vendor ships a real MCP, opsbench points at it. We do not re-implement what `hashicorp`, `microsoft`, `awslabs`, `grafana`, `argoproj`, `aquasecurity` etc. have already shipped.
-2. **Policy + evidence are non-negotiable.** Every recipe and skill specifies a Cedar policy posture. Every artifact gets SHA-256 (F3+: Ed25519) sealed.
-3. **Read-only by default; writes are gated.** Any MCP tool with mutation potential ships with Cedar `Deny` plus an explicit `Allow` per agent class.
-4. **Standalone PRs.** No PR bundles unrelated phases. Each F-phase ships as one or more PRs, each independently revertable.
-5. **Tests / lint clean** on every commit. Pre-existing main lint failures got fixed in PR #15; we keep main green going forward.
+1. **Pi-first multi-host.** opsbench's primary agent host is **Pi**. Every recipe, skill, and agent ships a Pi-flavored variant first, with Claude Code / Codex CLI / GitHub Copilot / Cursor / Gemini / OpenCode as secondary parity targets. Documentation leads with Pi examples; "also supports …" sections cover the others. The installer privileges Pi (default install path, primary plugin marketplace registration). Other hosts get parity via `tools/<host>-compat-layer/` adapters.
+2. **Vendor MCPs > custom code.** When a vendor ships a real MCP, opsbench points at it. We do not re-implement what `hashicorp`, `microsoft`, `awslabs`, `grafana`, `argoproj`, `aquasecurity` etc. have already shipped.
+3. **Policy + evidence are non-negotiable.** Every recipe and skill specifies a Cedar policy posture. Every artifact gets SHA-256 (F3+: Ed25519) sealed.
+4. **Read-only by default; writes are gated.** Any MCP tool with mutation potential ships with Cedar `Deny` plus an explicit `Allow` per agent class.
+5. **Standalone PRs.** No PR bundles unrelated phases. Each F-phase ships as one or more PRs, each independently revertable.
+6. **Tests / lint clean** on every commit. Pre-existing main lint failures got fixed in PR #15; we keep main green going forward.
 
 ---
 
@@ -301,29 +302,59 @@ Full spec doc: TBD.
 
 ---
 
-## F5 — Distribution + Codex parity
+## F5 — Pi-first multi-host parity + installer matrix
 
-**Goal:** Every Claude Code skill ships a Codex CLI variant; opsbench installs via every major package manager.
+**Goal:** Establish Pi as the primary opsbench host with first-class skill + agent + recipe support, then bring all other coding agents (Claude Code, Codex CLI, GitHub Copilot, Cursor, Gemini, OpenCode) to parity. Ship distro-packaged installers.
 
-### Codex parity (first)
+### Host priority order
+
+1. **Pi** — primary. Default install path. Skills authored against Pi's manifest first; other hosts derive from the Pi version.
+2. **Claude Code** — secondary parity (it's opsbench's bootstrap host; we keep parity tight).
+3. **Codex CLI** — secondary parity.
+4. **GitHub Copilot CLI / VS Code Chat** — tertiary parity.
+5. **Cursor**, **Gemini**, **OpenCode**, **Qodercli** — tertiary parity (best-effort, community-maintained adapters welcome).
+
+### Pi-first work (substantial — the headline phase)
+
+- New top-level dir `tools/pi-compat-layer/` mirroring the existing `tools/codex-compat-layer/`. Generator script `tools/pi-compat-layer/adapt.sh` reads opsbench SKILL.md and emits Pi-native skill manifests.
+- Author the **canonical Pi distribution** of every existing skill in `team-incident-response` (11 skills + 33 agents). Pi gets the primary install path; Claude Code becomes the derived form.
+- Pi-specific safety hooks: Pi's invocation surface has its own conventions; `tools/pi-compat-layer/hooks/` adapts opsbench's `PreToolUse`/`PostToolUse`/`SubagentStop` to Pi's equivalent hooks. Custody.log emission stays identical.
+- Pi marketplace registration — opsbench appears as the recommended ops/SRE plugin in Pi's plugin marketplace.
+- New CI job: `pi-validate` runs the Pi adapter and validates the generated manifests.
+
+### Other-host parity (after Pi lands)
 
 - Strengthen `tools/codex-compat-layer/adapt.sh` to handle Agent / TaskCreate / Skill semantics properly (today they're TODO placeholders).
-- Auto-emit Codex variants for every skill + agent in every team package.
-- New CI job: `codex-validate`.
+- Auto-emit Codex / Copilot / Cursor / Gemini / OpenCode variants for every skill + agent.
+- One CI job per host adapter (`codex-validate`, `copilot-validate`, etc.).
+- Each host gets its own short README (`tools/<host>-compat-layer/README.md`) explaining the install flow.
 
-### Installer matrix (second)
+### Installer matrix (last in F5)
 
-- Homebrew formula + tap setup
-- AUR PKGBUILD
-- `flake.nix` for Nix
-- CI matrix that builds each on tag push
+- Homebrew formula + tap setup. Brew install defaults to **Pi-first** layout; user can pass `--host claude-code` to switch.
+- AUR PKGBUILD with same default + override.
+- `flake.nix` for Nix.
+- CI matrix that builds each on tag push.
 
 ### Acceptance criteria
 
+- `pi-validate` CI passes for all 11 skills + 33 agents
+- Pi marketplace listing live (or a clear PR/registration path open with the Pi team)
 - `codex-validate` CI passes
-- `brew install shaiknoorullah/opsbench/opsbench` works on macOS + Linux
+- `brew install shaiknoorullah/opsbench/opsbench` works on macOS + Linux (defaults to Pi)
 - `yay -S opsbench` works on Arch
 - `nix run github:shaiknoorullah/opsbench` works
+- Every team package's README lists supported hosts in priority order
+
+### Why Pi-first changes scope of F0–F4
+
+- **F0** — recipe config snippets must include a Pi block first, then a Claude Code block. Recipe template (in the F0 plan) needs an update before bulk-ship begins.
+- **F1** — Cedar-for-agents output must work with Pi's agent manifest format (verify upstream support; if absent, add a Pi-emitter to opsbench's generator).
+- **F2** — `opsbench-gateway` exposes a Pi-native transport (likely the same MCP stdio/HTTP transport, but documentation leads with Pi connection examples).
+- **F3** — Signed-receipt flow integrates with whatever audit surface Pi exposes; if Pi has a built-in receipt hook, use it.
+- **F4** — Each team package's skills get authored as Pi-first; the existing team-incident-response is retrofitted in F5 (so F4 teams ship Pi-native from day one).
+
+This pivot is acknowledged as a **scope multiplier on F0–F4** — every recipe and skill needs Pi-native primary docs. The cost is offset by the strategic positioning win: opsbench becomes the de facto ops toolkit for Pi users.
 
 ---
 

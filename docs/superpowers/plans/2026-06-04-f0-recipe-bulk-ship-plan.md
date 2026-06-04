@@ -77,6 +77,20 @@ Commits grouped by recipe family (vault, github, cloud, argo, k8s, crossplane, I
 
 ---
 
+## Pi-first prerequisite (added 2026-06-04 — must complete before any recipe authoring)
+
+Per the F-series cross-cutting principle update: opsbench is Pi-first. Every F0 recipe must lead with a **Pi configuration block** before the Claude Code block. Before bulk-ship begins:
+
+- [ ] **Step P1: Verify Pi's MCP configuration format**
+
+  Confirm the user means Pi the coding-agent host referenced by `HKUDS/CLI-Anything`'s plugin list (the most likely interpretation given prior session context). Capture the exact MCP config file path, JSON schema, and any Pi-specific transport conventions. If Pi uses a non-MCP plugin interface, document the equivalent plugin manifest format.
+
+- [ ] **Step P2: Lock the Pi-first recipe template**
+
+  Update the template below to include a Pi block first, Claude Code block second, with documented anchor sections. The template stub below is a placeholder; Step P1 fills in the Pi syntax.
+
+The remaining tasks (T1–T20) execute against the Pi-first template once Steps P1–P2 are done.
+
 ## Recipe template (apply to every recipe)
 
 ````markdown
@@ -96,7 +110,13 @@ Commits grouped by recipe family (vault, github, cloud, argo, k8s, crossplane, I
 <exact install command — prefer release binaries or container images over source builds>
 ```
 
-## Configuration
+## Configuration — Pi (primary)
+
+```<format determined by Pi research — likely JSON or YAML>
+<Pi-native MCP server entry. Anchor section name and format pending Step P1.>
+```
+
+## Configuration — Claude Code (secondary)
 
 ```jsonc
 {
@@ -111,6 +131,10 @@ Commits grouped by recipe family (vault, github, cloud, argo, k8s, crossplane, I
   }
 }
 ```
+
+## Configuration — other hosts
+
+Codex CLI, Cursor, Copilot CLI, Gemini, OpenCode — link to `tools/<host>-compat-layer/README.md` for the host-specific install + config flow. F0 ships the link; the adapters themselves arrive in F5.
 
 ## Auth setup
 
