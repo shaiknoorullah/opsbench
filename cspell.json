@@ -7,6 +7,7 @@
     ".git/**",
     "docs/.vitepress/cache/**",
     "docs/.vitepress/dist/**",
+    "docs/superpowers/research/**",
     "tools/plugin-build/output/**",
     "**/*.svg",
     "**/*.lock",
