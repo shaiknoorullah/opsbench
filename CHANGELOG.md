@@ -3,6 +3,12 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.0.6](https://github.com/shaiknoorullah/opsbench/compare/v1.0.5...v1.0.6) (2026-06-04)
+
+### Documentation
+
+* **repo:** ecosystem research catalog + F-series roadmap pivot ([#18](https://github.com/shaiknoorullah/opsbench/issues/18)) ([55ee133](https://github.com/shaiknoorullah/opsbench/commit/55ee133b73ef267bcef7c01223997def4d9302f4))
+
 ## [1.0.5](https://github.com/shaiknoorullah/opsbench/compare/v1.0.4...v1.0.5) (2026-06-03)
 
 ### Documentation
