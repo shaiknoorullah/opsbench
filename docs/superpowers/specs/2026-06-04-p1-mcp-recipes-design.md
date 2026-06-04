@@ -1,6 +1,10 @@
 # P1 Spec — v3.x MCP recipes + reference integrations
 
-**Status:** draft 2026-06-04
+> ⚠️ **SUPERSEDED 2026-06-04** by [`2026-06-04-f0-recipe-bulk-ship-design.md`](./2026-06-04-f0-recipe-bulk-ship-design.md).
+>
+> This P1 specced 5 hand-curated recipes. The ecosystem research catalog generated later the same day surfaced ~30 vendor-official MCPs that warrant inclusion; F0 bulk-ships them all in one PR. The TheHive + OpenCTI + azure-skills + k8sgpt + CLI-Anything-framework picks here are inherited by F0; the Falco substitution skill stays valid. Treat this doc as historical context.
+
+**Status:** SUPERSEDED 2026-06-04
 **Parent:** `docs/superpowers/specs/2026-06-04-multi-phase-execution-roadmap.md`
 **Scope:** Five new MCP recipes plus one skill, all under `packages/team-incident-response/`. Updates the existing `azure-mcp.md` to cross-link the Microsoft `azure-skills` plugin. Adds a `docs/integrations.md` index that catalogs every external project opsbench references or wraps.
 

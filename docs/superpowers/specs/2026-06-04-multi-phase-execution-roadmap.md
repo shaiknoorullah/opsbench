@@ -1,6 +1,10 @@
 # Multi-Phase Execution Roadmap
 
-**Status:** approved 2026-06-04
+> ⚠️ **SUPERSEDED 2026-06-04** by [`2026-06-04-f-series-master-roadmap.md`](./2026-06-04-f-series-master-roadmap.md).
+>
+> This P1–P7 roadmap was approved earlier the same day, then a 25-domain ecosystem research workflow (367 candidates surveyed) revealed the original team-package-first ordering was wrong. The F-series replaces it with a foundation-first shape (policy + evidence layer → recipes → teams). Kept in tree as historical record; do not act on the P-numbered items.
+
+**Status:** SUPERSEDED 2026-06-04 (was: approved 2026-06-04)
 **Author:** Claude Code session (Shaik Noorullah, driver)
 **Scope:** Track the sequence of sub-projects between v3.x polish and v4.x team-package work, integrating insights from external repos.
 

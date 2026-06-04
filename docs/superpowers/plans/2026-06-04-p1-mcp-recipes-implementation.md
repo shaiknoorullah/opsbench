@@ -1,6 +1,8 @@
 # P1 — MCP Recipes + Falco Skill Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> ⚠️ **SUPERSEDED 2026-06-04** by [`2026-06-04-f0-recipe-bulk-ship-plan.md`](./2026-06-04-f0-recipe-bulk-ship-plan.md). P1's five-recipe scope was replaced by F0's catalog-driven bulk-ship of ~30 recipes. The TheHive / OpenCTI / azure-skills / k8sgpt / CLI-Anything-framework recipe content drafted here is inherited verbatim by F0; the Falco-via-CLI-Anything skill is also inherited. Do NOT execute the tasks below — use the F0 plan instead.
+>
+> **For agentic workers (historical):** Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax. SUPERSEDED — do not act on the tasks.
 
 **Goal:** Ship five new MCP recipes (TheHive, OpenCTI, azure-skills, k8sgpt, CLI-Anything) and one new skill (`falco-event-ingest`) under `packages/team-incident-response/`, plus a standing `docs/integrations.md` index.
 
