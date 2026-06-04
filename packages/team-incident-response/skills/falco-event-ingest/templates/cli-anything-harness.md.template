@@ -1,0 +1,36 @@
+# Falco wrapper — HARNESS.md template
+
+Fed to CLI-Anything to generate a `falco-events` CLI that the `falco-event-ingest`
+skill calls. Replace placeholders before running `/cli-anything`.
+
+## Target
+
+- Tool: `falcosidekick` webhook sink + local SQLite ring buffer
+- Source: this template's sibling `webhook-server.py` (a small FastAPI app — write
+  this yourself; CLI-Anything analyzes it to generate the CLI).
+- Output format: JSON lines, one event per line, schema = Falco's standard event.
+
+## Generated command surface (target shape)
+
+```text
+falco-events list   --since DURATION [--rule REGEX] [--namespace NS] [--json|--yaml]
+falco-events latest --rule REGEX
+falco-events stats  [--by rule|namespace|priority]
+falco-events tail   [--follow]
+```
+
+All commands MUST emit JSON to stdout when `--json` is set (the default in our
+skill). Non-JSON output is for interactive humans only.
+
+## Install path
+
+Generated harness installs to `/usr/local/bin/falco-events` via `setup.py` →
+`python3 -m pip install ./agent-harness/`.
+
+## Validation
+
+After generation:
+
+```bash
+falco-events list --since 1m --json | jq -e 'type=="array"' && echo ok
+```

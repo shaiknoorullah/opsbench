@@ -14,7 +14,9 @@ This package was formerly the entire `k8s-incident-response-skills` repository (
 | JSON Schemas             | 9  | [`schemas/`](schemas/) |
 | Cedar policies           | 2  | [`policies/`](policies/) |
 | Hook scripts             | 4  | [`hooks/`](hooks/) |
-| MCP recipes              | 17 | [`mcp-recipes/`](mcp-recipes/) |
+| MCP recipes              | 50 | [`mcp-recipes/`](mcp-recipes/) |
+
+The recipe set spans HashiCorp Vault, GitHub, AWS (awslabs monorepo), GCP, Azure (raw + skills + Microsoft monorepo), Argo CD (Argo Labs + Akuity), Argo Workflows, Kubernetes (containers/kubernetes-mcp-server + kubectl bridge), Helm, Talos, Inspektor Gadget, Kubeshark, Crossplane (community + Upbound control-plane + marketplace), Terraform (HashiCorp), Ansible (Red Hat Dev Tools), Docker (MCP gateway), Grafana, Prometheus, Loki, VictoriaMetrics, SigNoz, OpenTelemetry (Traceloop + placeholder), Alertmanager, Trivy, Kubescape, CrowdStrike Falcon, Kyverno (Nirmata), Flux (ControlPlane), k8sgpt, TheHive (EXPERIMENTAL), OpenCTI, Velociraptor, Cilium Hubble, ClickHouse, Postgres, Slack, PagerDuty, Linear, the `cli-anything-framework` (Pi-first via CLI-Anything wrap pattern), the `cedar-for-agents-reference`, plus the three CUSTOM specs (Longhorn, Contabo, WireGuard). See [`../../docs/integrations.md`](../../docs/integrations.md) for the standing inventory of every external project opsbench references — recipe, skill, custom-spec, or pure cross-link — including license and integration status.
 
 ## Architecture
 

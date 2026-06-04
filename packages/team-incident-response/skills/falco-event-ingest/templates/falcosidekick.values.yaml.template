@@ -1,0 +1,29 @@
+# Helm values for falcosidekick that wire events into a local webhook sink
+# that CLI-Anything's generated wrapper reads from.
+#
+# Install:
+#   helm upgrade --install falcosidekick falcosecurity/falcosidekick \
+#     -n falco -f falcosidekick.values.yaml
+#
+# Replace OPSBENCH_WEBHOOK_URL with the URL your CLI-Anything wrapper exposes
+# (default: http://<agent-host>:9988/falco-events).
+
+config:
+  debug: false
+  customfields: "incident_capable=true"
+  webhook:
+    address: "OPSBENCH_WEBHOOK_URL"
+    method: "POST"
+    minimumpriority: "informational"
+    checkcert: true
+    customheaders: "X-OpsBench-Source: falcosidekick"
+
+  # Spill to S3 for incident retention > 24h
+  s3:
+    bucket: "opsbench-falco-events"
+    prefix: "incidents/"
+    region: "ap-south-1"
+    minimumpriority: "notice"
+
+webui:
+  enabled: false   # opsbench does not need the falcosidekick UI
