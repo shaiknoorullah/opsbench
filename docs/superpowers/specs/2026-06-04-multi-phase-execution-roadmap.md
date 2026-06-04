@@ -1,6 +1,10 @@
 # Multi-Phase Execution Roadmap
 
-**Status:** approved 2026-06-04
+> ⚠️ **SUPERSEDED 2026-06-04** by [`2026-06-04-f-series-master-roadmap.md`](./2026-06-04-f-series-master-roadmap.md).
+>
+> This P1–P7 roadmap was approved earlier the same day, then a 25-domain ecosystem research workflow (367 candidates surveyed) revealed the original team-package-first ordering was wrong. The F-series replaces it with a foundation-first shape (policy + evidence layer → recipes → teams). Kept in tree as historical record; do not act on the P-numbered items.
+
+**Status:** SUPERSEDED 2026-06-04 (was: approved 2026-06-04)
 **Author:** Claude Code session (Shaik Noorullah, driver)
 **Scope:** Track the sequence of sub-projects between v3.x polish and v4.x team-package work, integrating insights from external repos.
 
@@ -46,6 +50,10 @@ Same shape as P4 once that template is settled. Initial agent roster: backup ver
 
 Publish all schemas (9 today, more after P4/P5) to `schema.opsbench.io`. Seed `packages/cedar-library/` with a curated catalog of least-privilege policies for common agent shapes (read-only investigator, write-gated executor, human-approval-bound mutator, etc.).
 
+### P7 — Architectural evaluation: sympozium-ai/sympozium
+
+Evaluate `sympozium-ai/sympozium` — a Kubernetes multi-agent coordination layer by the k8sgpt author (MIT, 500+★, very active). It overlaps with opsbench in load-bearing ways (skill sidecars with ephemeral RBAC ≈ opsbench Cedar policies; shared SQLite workflow memory ≈ opsbench evidence ledger + custody log). But it's a different deployment model: K8s-native operator vs. file-based install into `~/.claude/`. Brainstorming pass should decide whether opsbench *integrates with*, *competes with*, or *layers on* sympozium. Output: a design doc with the chosen relationship + (if integration) a spec for that work. P7 deliberately follows P6 so we have the schema federation surface to align on.
+
 ## Dependency graph
 
 ```
@@ -56,6 +64,8 @@ P3 ──┘
 P4 ──► P5  (P5 reuses P4's team-package template)
 
 P4 + P5 ──► P6  (P6 federates schemas from both)
+
+P6 ──► P7  (P7 wants federation surface to evaluate against)
 ```
 
 ## Execution policy
