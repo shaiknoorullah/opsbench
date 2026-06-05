@@ -3,6 +3,12 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.1.1](https://github.com/shaiknoorullah/opsbench/compare/v1.1.0...v1.1.1) (2026-06-05)
+
+### Documentation
+
+* **repo:** F1-F6 specs + plans + scaffolds (megaroll rollout) ([#20](https://github.com/shaiknoorullah/opsbench/issues/20)) ([96aa098](https://github.com/shaiknoorullah/opsbench/commit/96aa098ebe59a8bf1c56336c5597bb71c517dfbe))
+
 ## [1.1.0](https://github.com/shaiknoorullah/opsbench/compare/v1.0.6...v1.1.0) (2026-06-05)
 
 ### Features
