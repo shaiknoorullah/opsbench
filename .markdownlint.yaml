@@ -11,3 +11,4 @@ MD041: false   # first line H1
 MD033: false   # inline HTML
 MD040: false   # fenced code language — many ASCII diagrams and prose code blocks don't have a language
 MD060: false   # table column style — repo uses compact tables, not enforcing a style
+MD056: false   # table column count — false-positive on backtick-quoted cells containing pipes
