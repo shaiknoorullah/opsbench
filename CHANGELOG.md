@@ -3,6 +3,12 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.1.0](https://github.com/shaiknoorullah/opsbench/compare/v1.0.6...v1.1.0) (2026-06-05)
+
+### Features
+
+* **team-incident-response:** F0 bulk-ship MCP recipes (Pi-first) ([#19](https://github.com/shaiknoorullah/opsbench/issues/19)) ([305cd14](https://github.com/shaiknoorullah/opsbench/commit/305cd14e1d470147bc701de532ba2c16461b00ad))
+
 ## [1.0.6](https://github.com/shaiknoorullah/opsbench/compare/v1.0.5...v1.0.6) (2026-06-04)
 
 ### Documentation
