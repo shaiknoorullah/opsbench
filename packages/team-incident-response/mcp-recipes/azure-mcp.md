@@ -79,3 +79,15 @@ az role assignment list --assignee $AZURE_INCIDENT_SP_CLIENT_ID --output table
 - The Azure MCP does not handle Entra ID (use Graph MCP separately if needed).
 - Two RGs in scope: `pn-cluster-ap-south-1` (infra) and `pn-terraform-state` (TF state).
   Pin via `AZURE_DEFAULT_RG`.
+
+## See also
+
+- `azure-skills-mcp.md` — Microsoft's higher-level Azure plugin. It bundles
+  workflow skills (deployment, diagnostics, RBAC, cost) with two MCP servers
+  underneath (Azure MCP and Foundry MCP, ~200 tools across 40+ services).
+  Use `azure-skills` when you want the skills layer; use this `azure-mcp`
+  recipe when you only need the raw ARM/Monitor/Key Vault surface and want
+  tighter control over the JSON config.
+- `k8sgpt-mcp.md` — pair with this recipe when the workload is on AKS;
+  `azure-mcp` covers the cluster's surrounding ARM resources, `k8sgpt-mcp`
+  covers the in-cluster analyzers.
