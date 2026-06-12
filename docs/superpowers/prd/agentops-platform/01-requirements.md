@@ -1,8 +1,8 @@
 ---
 id: PRD-AGENTOPS-001
 title: "Enterprise AgentOps Platform"
-version: 0.1.0
-status: draft
+version: 1.0.0
+status: approved
 part: 1
 part_title: "Requirements"
 author: "Shaik Noorullah <shaiknooru247@gmail.com>"
