@@ -1,8 +1,8 @@
 ---
 id: PRD-OPSBENCH-001
 title: "Opsbench Platform"
-version: 0.1.0
-status: draft
+version: 1.0.0
+status: approved
 part: 0
 part_title: "Overview"
 author: "Shaik Noorullah <shaiknooru247@gmail.com>"
