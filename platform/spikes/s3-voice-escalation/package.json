@@ -1,0 +1,17 @@
+{
+  "name": "s3-voice-escalation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Design spike S3 — Voice Escalation Loop. Standalone, runnable prototype of the platform-owned escalation-ladder state machine with simulated chat/push/sms/voice channels, a Twilio-shaped outbound-call + DTMF-ack simulation, virtual-time rung timeouts, and a PIN-no-persist DTMF webhook handler. Vendors are interchangeable delivery channels; ladder state is the single source of truth.",
+  "scripts": {
+    "test": "node --import tsx --test test/*.test.ts",
+    "demo": "node --import tsx src/demo.ts"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
