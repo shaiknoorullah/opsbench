@@ -124,3 +124,19 @@ jobs:
             echo "Validating $f"
             cedar validate --policies "$f" --schema /dev/null || true
           done
+
+  go:
+    name: go (control-plane services)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: platform/go.mod
+          cache-dependency-path: platform/go.sum
+      - run: go vet ./...
+      - run: go build ./...
+      - run: go test -timeout 120s ./...
