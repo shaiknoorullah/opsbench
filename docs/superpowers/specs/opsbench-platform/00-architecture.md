@@ -1,13 +1,13 @@
 ---
 id: SPEC-OPSBENCH-001
 title: "Opsbench Platform — Technical Specification"
-version: 0.2.0
+version: 0.2.1
 status: draft
 part: 0
 part_title: "Architecture"
 author: "Shaik Noorullah <shaiknooru247@gmail.com>"
 created: 2026-06-13
-last_updated: 2026-06-16
+last_updated: 2026-06-17
 consumes: "PRD-OPSBENCH-001 v1.0.0 (approved) — docs/superpowers/prd/opsbench-platform/"
 ---
 
@@ -75,7 +75,7 @@ Selections honor PRD §5.4 constraints. Each carries rationale and the spike (Pa
 
 | Decision | Selection | Rationale | Risk / spike |
 |---|---|---|---|
-| Monorepo & primary language | TypeScript (Node ≥ 22) workspaces inside opsbench under `platform/` | Repo is already an npm monorepo; one toolchain for services + web; team velocity | Hot paths re-evaluated post-MVP; perf budget NF-004 enforced by benchmark CI |
+| Languages (polyglot, by tier) | **v0.2.1 (decision 2026-06-17): Go** for all control-plane services + the TUI; **TypeScript** only where the ecosystem forces it (Astro content site, the Claude Agent SDK agent runtime). JSON Schema is the neutral contract; Go and TS types generate from it. (Was: TypeScript everywhere.) | Control-plane perf/ops profile — no-GC tail latency for NF-003/NF-004, single static binaries for self-hosted/air-gap, Go-native pgx/SPIFFE/OTel/cedar-go — plus one backend+TUI toolchain; the failed-to-surface TS default was revised at the C5 build boundary | Multiple toolchains accepted; the contract stays language-neutral via JSON Schema codegen |
 | Policy engine | **Cedar** (in-process WASM bindings) behind a `PolicyEngine` interface; Rego/CEL pluggable later. **v0.2 (S1): preparsed policy set (`preparsePolicySet` + `statefulIsAuthorized`) + minimal per-call entity slice is NORMATIVE** for the enforcement path — naive `isAuthorized` re-parses every call (~140 ms, fails NF-004). `isAuthorizedPartial` has no stateful variant, so tool-list filtering uses N cheap per-tool stateful calls (cache `tools/list` per agent-scope × policy-version), not Cedar partial eval. Evaluate the native Cedar (Rust) crate for the gateway. | Default-deny, deterministic, formal analysis (GOV-002); AWS AgentCore precedent | **S1: PASS** — per-call P99 0.764 ms, 200-tool listing P99 91.1 ms (Part 3 §2.2) |
 | Tool-call gateway | **EMBED agentgateway** (Apache-2.0, Rust, MCP-native; `ext_authz`/ExtProc + per-tool MCP authz + CEL RBAC + OTel audit). Custom MCP-aware proxy is the documented fallback (~2–3 eng-months) only if extension points regress. | Research: "do not rebuild the gateway layer"; we own the control plane above it; license MIT-compatible | **S1: resolved EMBED** (Part 3 §2.1) |
 | Agent runtime | **Claude Agent SDK** for first-party teams; **MCP** for tools; **A2A** for third-party agent registration | Orchestrator-executor-reviewer support, hooks for TEAM-004 gates; MCP-first posture (PRD §5.4); DP-10 interop | A2A maturity watched; third-party governance works at gateway level regardless |
@@ -84,8 +84,8 @@ Selections honor PRD §5.4 constraints. Each carries rationale and the spike (Pa
 | Audit ledger | Append-only Postgres table with per-tenant **sha256 hash chain**; **Merkle checkpoint every 1024 records** (depth 10, 320-byte proof, 7.2 ms off-path build) exported to customer object storage; offline verification CLI | IDN-001 independent verifiability without standing infra; Rekor-style pattern without operating Trillian | **S1: PASS** — chain append P99 0.016 ms (negligible on-path); NF-003 ≤25 ms budget restated against the **durable Postgres insert** (unmeasured — no DB in env; ~24.9 ms headroom) |
 | Memory engine | **redis/agent-memory-server, pinned version**, fronted by our **memory-rbac-proxy** | PRD §5.4 constraint; proxy is mandatory (engine lacks org-hierarchy RBAC; default-namespace hazard MEM-002) | S2 spike validates proxy enforcement + forgetting/compaction behavior on the pinned version |
 | Agent identity | SPIFFE-style URIs (`spiffe://<tenant>/agent/<id>`), short-lived workload credentials; **platform as OIDC issuer** federated to AWS STS / GCP WIF / Azure Entra | IDN-003, INT-009; attribution tags via session tags / attribute mappings (IDN-006) | Broker is custom; cloud federation per provider tested in S1-adjacent integration tests |
-| Web app | Next.js + SSE consumers of the event stream | Standard; SSE matches append-only stream rendering | — |
-| TUI | **Rust + Ratatui**, single static binary | Research: Codex CLI's TS→Rust rewrite precedent; jump-host/air-gap distribution (SUR-006) | Separate toolchain accepted; schemas shared via JSON Schema codegen |
+| Web console | **Go `html/template` + HTMX + SSE** (Datastar under evaluation for realtime-heavy views); server-renders the canonical event stream + approval object. **Astro** for the public content/status site. | Surfaces are thin renderers (DP-5); server-side approval rendering keeps the trusted hash-pinned payload off the client; stays in the Go toolchain | Rich client-side trace viz embeds the vendor UI or a focused JS island |
+| TUI | **Go + Bubble Tea**, single static binary | Unifies with the Go services toolchain; static binary for jump-host/air-gap (SUR-006) | — |
 | ChatOps | Slack Block Kit (launch), Teams Adaptive Cards (P1) via a `Channel` interface | SUR-004/005; 3s ack via pre-ack + async update queue | — |
 | Voice | Twilio (ConversationRelay + `<Gather>` DTMF) behind the same `Channel` interface | ESC-002 research; vendor-pluggable; consent modes per NF-012 | S3 spike closes the full call→ack→ladder loop |
 | Telemetry | OpenTelemetry (GenAI semantic conventions), OTLP in/out, pluggable trace storage | INT-013; differentiate above the trace layer | — |
@@ -96,26 +96,27 @@ Selections honor PRD §5.4 constraints. Each carries rationale and the spike (Pa
 
 ```
 platform/
+  go.mod                  # Go module (control-plane services + TUI), go 1.23
   apps/
-    web/                  # Next.js system of record (SUR-002, SUR-003)
-    api/                  # Public platform API (REST + SSE), authn/z edge
-    tui/                  # Rust/Ratatui fleet monitor (SUR-006) — own toolchain, schema-codegen consumer
-  services/
+    console/              # Go html/template + HTMX + SSE operator console (SUR-002, SUR-003)
+    web/                  # Astro public content/status site (TypeScript)
+    tui/                  # Go + Bubble Tea fleet monitor (SUR-006), single static binary
+  services/               # Go control-plane services
     policy-gateway/       # C1 — Cedar PDP, tool-list filtering, decision records
     gatekeeper/           # C2 — dry-run, freeze/conflict checks, execution, rollback handles
     approvals/            # C3 — approval objects, tiers, TTL, cross-surface propagation
     credential-broker/    # C4 — OIDC issuer, cloud federation, JIT minting, inventory
-    audit-ledger/         # C5 — hash chain, checkpoints, SIEM streaming, verification API
+    audit-ledger/         # C5 (Go, IMPLEMENTED) — hash chain, batched appender, checkpoints, verify CLI; mem + Postgres stores
     identity-registry/    # C7 — NHI registry, delegation graph (ReBAC store), posture scans
     memory-proxy/         # C8 — claims→namespace compiler, scope RBAC, recall fan-out
     context-store/        # C9 — incident ledger, fact layers, topology reconciliation
     connector-hub/        # C10 — capability schema router, per-vendor adapters, sync workers, rate budgets
     escalation/           # C11 — ladder state machine, channel adapters (chat/push/SMS/voice)
-    agent-runtime/        # C12 — team orchestration, task ledger, budget breakers
+    agent-runtime/        # C12 — TypeScript (Claude Agent SDK): team orchestration, task ledger, budget breakers
     eval-harness/         # C13 — time-travel replay, grading, certificate evidence
     reporting/            # C14 — cost attribution, SLOs, toil analytics
   packages/
-    schemas/              # JSON Schemas (Part 1) + generated TS/Rust types
+    schemas/              # JSON Schemas (Part 1, neutral contract) + generated TS + Go types
     sdk/                  # internal TS SDK: event stream client, approval client, ledger writer
     policies/             # Cedar policy templates, freeze-calendar compiler, analysis tooling
     channel-kit/          # shared Channel interface (Slack/Teams/Twilio/APNs/FCM adapters)
