@@ -38,7 +38,7 @@
     "platform/apps/*"
   ],
   "scripts": {
-    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#CHANGELOG.md\"",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#CHANGELOG.md\" \"#platform/spikes\"",
     "lint:yaml": "yamllint .",
     "lint:shell": "shellcheck scripts/*.sh tools/**/*.sh packages/**/hooks/*.sh",
     "lint:spell": "cspell --no-progress \"**/*.md\"",
