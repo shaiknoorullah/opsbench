@@ -31,11 +31,20 @@ import type {
   WriteAnnotationParams,
 } from "../verbs.ts";
 
+// Escape a value for an NRQL single-quoted string literal. Backslash MUST be
+// escaped first, otherwise a literal backslash in the input can break out of the
+// quoting (incomplete-sanitization). Then escape the single quote.
+const nrqlStr = (v: string): string => v.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+
+// Escape an already-built query for embedding in a GraphQL double-quoted string.
+// Same rule: backslash first, then the double quote.
+const gqlStr = (s: string): string => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
 const NRQL_OP: Record<Filter["op"], (k: string, v: string) => string> = {
-  eq: (k, v) => `${k} = '${v}'`,
-  neq: (k, v) => `${k} != '${v}'`,
-  regex: (k, v) => `${k} RLIKE '${v}'`,
-  not_regex: (k, v) => `NOT ${k} RLIKE '${v}'`,
+  eq: (k, v) => `${k} = '${nrqlStr(v)}'`,
+  neq: (k, v) => `${k} != '${nrqlStr(v)}'`,
+  regex: (k, v) => `${k} RLIKE '${nrqlStr(v)}'`,
+  not_regex: (k, v) => `NOT ${k} RLIKE '${nrqlStr(v)}'`,
 };
 
 function whereClause(filters: Filter[] = []): string {
@@ -109,7 +118,7 @@ export const newrelicAdapter: ConnectorAdapter = {
           language: "nrql",
           endpoint: { method: "POST", path: "/graphql" },
           request: {
-            graphql: `{ actor { account(id: $acct) { nrql(query: "${query.replace(/"/g, '\\"')}") { results } } } }`,
+            graphql: `{ actor { account(id: $acct) { nrql(query: "${gqlStr(query)}") { results } } } }`,
           },
           passthrough: dimensional
             ? {
@@ -123,7 +132,7 @@ export const newrelicAdapter: ConnectorAdapter = {
       case "search_logs": {
         const p = params as SearchLogsParams;
         const preds: string[] = (p.filters ?? []).map((f) => NRQL_OP[f.op](f.key, f.value));
-        if (p.contains) preds.push(`message LIKE '%${p.contains}%'`);
+        if (p.contains) preds.push(`message LIKE '%${nrqlStr(p.contains)}%'`);
         const where = preds.length ? ` WHERE ${preds.join(" AND ")}` : "";
         const since = sinceClause(p.time);
         const limit = ` LIMIT ${p.limit ?? 100}`;
@@ -134,7 +143,7 @@ export const newrelicAdapter: ConnectorAdapter = {
           language: "nrql",
           endpoint: { method: "POST", path: "/graphql" },
           request: {
-            graphql: `{ actor { account(id: $acct) { nrql(query: "${query.replace(/"/g, '\\"')}") { results } } } }`,
+            graphql: `{ actor { account(id: $acct) { nrql(query: "${gqlStr(query)}") { results } } } }`,
           },
           passthrough: null,
         };
@@ -143,14 +152,14 @@ export const newrelicAdapter: ConnectorAdapter = {
         const p = params as GetTraceParams;
         // Distributed trace spans live in the Span event, keyed by trace.id.
         const since = p.time ? sinceClause(p.time) : " SINCE 1 hour ago";
-        const query = `SELECT * FROM Span WHERE trace.id = '${p.trace_id}'${since} LIMIT MAX`;
+        const query = `SELECT * FROM Span WHERE trace.id = '${nrqlStr(p.trace_id)}'${since} LIMIT MAX`;
         return {
           vendor: "newrelic",
           query,
           language: "nrql",
           endpoint: { method: "POST", path: "/graphql" },
           request: {
-            graphql: `{ actor { account(id: $acct) { nrql(query: "${query.replace(/"/g, '\\"')}") { results } } } }`,
+            graphql: `{ actor { account(id: $acct) { nrql(query: "${gqlStr(query)}") { results } } } }`,
           },
           passthrough: null,
         };
@@ -159,7 +168,7 @@ export const newrelicAdapter: ConnectorAdapter = {
         // NRQL cannot enumerate alert conditions; that is NerdGraph entity search.
         const p = params as ListMonitorsParams;
         const tagPreds = (p.filters ?? [])
-          .map((f) => `tags.${f.key} ${f.op === "neq" ? "!=" : "="} '${f.value}'`)
+          .map((f) => `tags.${f.key} ${f.op === "neq" ? "!=" : "="} '${nrqlStr(f.value)}'`)
           .join(" AND ");
         return {
           vendor: "newrelic",
@@ -183,7 +192,7 @@ export const newrelicAdapter: ConnectorAdapter = {
       case "write_annotation": {
         const p = params as WriteAnnotationParams;
         // Deployment marker via NerdGraph changeTracking mutation ("cleanest API").
-        const query = `mutation { changeTrackingCreateDeployment(deployment: { entityGuid: "${p.target?.service ?? ""}", version: "annotation", description: "${p.text.replace(/"/g, '\\"')}" }) { deploymentId } }`;
+        const query = `mutation { changeTrackingCreateDeployment(deployment: { entityGuid: "${gqlStr(p.target?.service ?? "")}", version: "annotation", description: "${gqlStr(p.text)}" }) { deploymentId } }`;
         return {
           vendor: "newrelic",
           query,
