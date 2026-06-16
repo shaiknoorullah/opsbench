@@ -1,0 +1,9 @@
+{
+  "id": "esc_01JBKQ4Z9N8X7Y6W5V4T3S2R2B",
+  "tenant_id": "t_acme",
+  "subject_ref": "apr_01JBKQ4Z9N8X7Y6W5V4T3S2R1Q",
+  "target": { "resolved_human": "usr_oncall", "roster_source": "pagerduty:schedule/P123", "resolved_at": "2026-06-16T10:00:02Z" },
+  "rungs": [{ "n": 1, "channel": "slack", "timeout_s": 120 }],
+  "state": "running",
+  "on_exhausted": []
+}

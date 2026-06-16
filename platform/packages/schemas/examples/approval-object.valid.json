@@ -1,0 +1,16 @@
+{
+  "id": "apr_01JBKQ4Z9N8X7Y6W5V4T3S2R1Q",
+  "tenant_id": "t_acme",
+  "action_ref": "act_01JBKQ4Z9N8X7Y6W5V4T3S2R20",
+  "tier": 2,
+  "payload_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "idempotency_key": "idk_01JBKQ4Z9N8X7Y6W5V4T3S2R21",
+  "diff": { "format": "unified", "body": "@@ deploy/checkout @@\n-replicas: 3\n+replicas: 6" },
+  "dry_run_ref": "led_01JBKQ4Z9N8X7Y6W5V4T3S2R22",
+  "risk": { "irreversible": false, "blast_radius": "1 deployment, prod-eu", "policy_refs": ["pol_sre-scale"] },
+  "reviewers": { "required": 1, "eligible": ["usr_alice", "grp_sre-oncall"], "second_must_differ": false },
+  "expires_at": "2026-06-16T12:00:00Z",
+  "state": "pending",
+  "decisions": [],
+  "ledger_refs": ["led_01JBKQ4Z9N8X7Y6W5V4T3S2R23"]
+}

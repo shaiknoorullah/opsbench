@@ -1,0 +1,14 @@
+{
+  "id": "apr_01JBKQ4Z9N8X7Y6W5V4T3S2R1Q",
+  "tenant_id": "t_acme",
+  "action_ref": "act_01JBKQ4Z9N8X7Y6W5V4T3S2R20",
+  "tier": 2,
+  "payload_hash": "deadbeef",
+  "idempotency_key": "idk_01JBKQ4Z9N8X7Y6W5V4T3S2R21",
+  "diff": { "format": "unified", "body": "x" },
+  "risk": { "irreversible": false, "policy_refs": [] },
+  "reviewers": { "required": 1, "eligible": ["usr_alice"], "second_must_differ": false },
+  "expires_at": "2026-06-16T12:00:00Z",
+  "state": "pending",
+  "decisions": []
+}

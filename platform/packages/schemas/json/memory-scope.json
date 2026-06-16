@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/memory-scope.json",
+  "title": "MemoryScope",
+  "description": "Compiled hierarchical memory namespace and a scoped memory operation (PRD MEM-001..MEM-005; spec 01-schemas §5). The engine never sees free-form namespaces; the proxy compiles and enforces them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tenant_id", "namespace", "tier"],
+  "properties": {
+    "tenant_id": { "$ref": "common.json#/$defs/tenantId" },
+    "namespace": {
+      "type": "string",
+      "description": "Compiled namespace per the grammar. Must begin with org/<org_id> and never be blank (MEM-002).",
+      "pattern": "^org/[a-zA-Z0-9._-]+(/dept/[a-zA-Z0-9._-]+(/team/[a-zA-Z0-9._-]+(/agent/[a-zA-Z0-9._-]+)?)?|/account/[a-zA-Z0-9._-]+)?$",
+      "minLength": 5
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["org", "department", "team", "agent", "account"],
+      "description": "Deepest scope tier represented by namespace."
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "caller_namespace"],
+      "description": "Optional: a memory op evaluated by the RBAC proxy.",
+      "properties": {
+        "kind": { "type": "string", "enum": ["write", "read", "recall", "promote", "delete", "correct"] },
+        "caller_namespace": {
+          "type": "string",
+          "description": "Caller's compiled namespace, derived from identity-registry claims (never agent-supplied)."
+        },
+        "trust_label": { "type": "string", "enum": ["verified_fact", "runbook", "feedback_memory"] }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Attached to recalled memories (MEM-004).",
+      "properties": {
+        "source_event": { "type": "string", "description": "Incident or feedback event that taught this memory." },
+        "written_by": { "$ref": "common.json#/$defs/spiffeId" },
+        "ledger_ref": { "$ref": "common.json#/$defs/ledgerRef" }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ttl_seconds": { "type": "integer", "minimum": 0, "description": "Per-scope-tier retention (MEM-005)." },
+        "erasable": { "type": "boolean" }
+      }
+    }
+  }
+}

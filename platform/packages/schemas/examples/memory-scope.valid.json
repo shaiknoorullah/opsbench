@@ -1,0 +1,8 @@
+{
+  "tenant_id": "t_acme",
+  "namespace": "org/acme/dept/platform/team/sre/agent/inv-7",
+  "tier": "agent",
+  "operation": { "kind": "recall", "caller_namespace": "org/acme/dept/platform/team/sre/agent/inv-7", "trust_label": "feedback_memory" },
+  "provenance": { "source_event": "inc_01JBKQ4Z9N8X7Y6W5V4T3S2R26", "written_by": "spiffe://t_acme/agent/inv-7", "ledger_ref": "led_01JBKQ4Z9N8X7Y6W5V4T3S2R22" },
+  "retention": { "ttl_seconds": 2592000, "erasable": true }
+}

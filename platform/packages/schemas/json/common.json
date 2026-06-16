@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/common.json",
+  "title": "Opsbench Common Definitions",
+  "description": "Shared primitive definitions referenced by all Opsbench schemas. Registered before sibling schemas in the validator.",
+  "$defs": {
+    "ulid": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "Crockford base32 ULID."
+    },
+    "prefixedId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*_[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "Domain-prefixed ULID, e.g. apr_01J... / led_01J... / cert_01J..."
+    },
+    "tenantId": {
+      "type": "string",
+      "pattern": "^t_[a-z0-9][a-z0-9_-]*$",
+      "description": "Tenant identifier; mandatory on every top-level object (PRD NF-006)."
+    },
+    "spiffeId": {
+      "type": "string",
+      "pattern": "^spiffe://[a-z0-9._-]+/agent/[a-zA-Z0-9._-]+$",
+      "description": "SPIFFE-style agent workload identity (spec Part 0 §3)."
+    },
+    "principal": {
+      "description": "An authenticated actor: a human user id, a group id, or a SPIFFE agent id.",
+      "oneOf": [
+        { "type": "string", "pattern": "^usr_[a-zA-Z0-9._-]+$" },
+        { "type": "string", "pattern": "^grp_[a-zA-Z0-9._-]+$" },
+        { "$ref": "common.json#/$defs/spiffeId" }
+      ]
+    },
+    "userId": { "type": "string", "pattern": "^usr_[a-zA-Z0-9._-]+$" },
+    "groupId": { "type": "string", "pattern": "^grp_[a-zA-Z0-9._-]+$" },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Lowercase hex SHA-256 digest with algorithm prefix."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 UTC timestamp."
+    },
+    "scopeUri": {
+      "type": "string",
+      "pattern": "^scope://t_[a-z0-9_-]+(/[a-zA-Z0-9._-]+)*$",
+      "description": "Resource scope, e.g. scope://t_x/env/prod/service/checkout."
+    },
+    "surface": {
+      "type": "string",
+      "enum": ["slack", "teams", "web", "tui", "mobile", "desktop", "voice_dtmf", "api"],
+      "description": "Rendering/decision surface (PRD SUR-*)."
+    },
+    "ledgerRef": {
+      "type": "string",
+      "pattern": "^led_[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "Reference to an AuditRecord (audit-record.json)."
+    },
+    "policyRef": {
+      "type": "string",
+      "pattern": "^pol_[a-zA-Z0-9._-]+$",
+      "description": "Reference to a governing policy."
+    }
+  }
+}

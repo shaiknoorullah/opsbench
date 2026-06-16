@@ -246,7 +246,26 @@
     "zekker",
     "zstd",
     "zxzinn",
-    "Zxid"
+    "Zxid",
+    "AgentOps",
+    "agentgateway",
+    "ConversationRelay",
+    "Crockford",
+    "DTMF",
+    "idempotency",
+    "Langfuse",
+    "NerdGraph",
+    "NRQL",
+    "OTLP",
+    "pgvector",
+    "Ratatui",
+    "SPIFFE",
+    "SPIRE",
+    "Tauri",
+    "Twilio",
+    "tsx",
+    "ULID",
+    "ULIDs"
   ],
   "allowCompoundWords": true
 }

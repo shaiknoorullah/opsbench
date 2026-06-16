@@ -46,6 +46,8 @@ module.exports = {
         "policies",
         "hooks",
         "deps",
+        // Platform (Opsbench product under platform/)
+        "platform",
         // Repo-wide
         "repo",
       ],

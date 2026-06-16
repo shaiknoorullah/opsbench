@@ -1,0 +1,12 @@
+{
+  "id": "evt_01JBKQ4Z9N8X7Y6W5V4T3S2R2A",
+  "tenant_id": "t_acme",
+  "stream": "t_acme/incident/inc_01JBKQ4Z9N8X7Y6W5V4T3S2R26",
+  "ts": "2026-06-16T10:00:01Z",
+  "actor": { "type": "agent", "id": "spiffe://t_acme/agent/inv-7" },
+  "kind": "investigation.hypothesis",
+  "disclosure": 1,
+  "payload": { "hypothesis": "checkout p99 regression from deploy abc123", "verdict": "validated", "confidence": 0.82 },
+  "ledger_ref": "led_01JBKQ4Z9N8X7Y6W5V4T3S2R22",
+  "schema": "opsbench.event/1"
+}

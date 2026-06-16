@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/canonical-event.json",
+  "title": "CanonicalEvent",
+  "description": "Single ordered event envelope rendered by every surface (PRD SUR-001; spec 01-schemas §6). Every displayed event resolves to a ledger record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "tenant_id", "stream", "ts", "actor", "kind", "disclosure", "payload", "schema"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^evt_[0-9A-HJKMNP-TV-Z]{26}$", "description": "ULID-bearing, stream-ordered." },
+    "tenant_id": { "$ref": "common.json#/$defs/tenantId" },
+    "stream": {
+      "type": "string",
+      "pattern": "^t_[a-z0-9_-]+/[a-z]+/[a-zA-Z0-9._-]+$",
+      "description": "Tenant-scoped stream key, e.g. t_x/incident/inc_42."
+    },
+    "ts": { "$ref": "common.json#/$defs/timestamp" },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "type": "string", "enum": ["agent", "human", "system"] },
+        "id": { "type": "string" }
+      }
+    },
+    "kind": {
+      "type": "string",
+      "description": "Dotted event kind, e.g. investigation.hypothesis, approval.requested, approval.decided, escalation.rung, action.executed, abstention.",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+    },
+    "disclosure": {
+      "type": "integer",
+      "enum": [0, 1, 2],
+      "description": "Progressive disclosure: 0 headline · 1 detail · 2 raw tool I/O."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Kind-specific, schema-versioned. Agent-derived strings here are sanitized per surface before rendering."
+    },
+    "ledger_ref": {
+      "oneOf": [
+        { "$ref": "common.json#/$defs/ledgerRef" },
+        { "type": "null" }
+      ],
+      "description": "Resolves the event to its audit record (SUR-001)."
+    },
+    "schema": {
+      "type": "string",
+      "pattern": "^opsbench\\.event/[0-9]+$",
+      "description": "Envelope schema version, e.g. opsbench.event/1."
+    }
+  }
+}

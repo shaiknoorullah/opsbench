@@ -1,0 +1,14 @@
+{
+  "id": "pdr_01JBKQ4Z9N8X7Y6W5V4T3S2R24",
+  "tenant_id": "t_acme",
+  "principal": "spiffe://t_acme/agent/inv-7",
+  "action": "connector:datadog:query_metrics",
+  "resource": "scope://t_acme/env/prod/service/checkout",
+  "context_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "effect": "permit",
+  "engine": { "kind": "cedar", "version": "4.2.0" },
+  "policy_refs": ["pol_sre-readonly"],
+  "evaluated_at": "2026-06-16T10:00:00Z",
+  "latency_ms": 4,
+  "phase": "invocation"
+}

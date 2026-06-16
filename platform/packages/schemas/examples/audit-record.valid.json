@@ -1,0 +1,15 @@
+{
+  "seq": 1842,
+  "id": "led_01JBKQ4Z9N8X7Y6W5V4T3S2R22",
+  "tenant_id": "t_acme",
+  "ts": "2026-06-16T10:00:00Z",
+  "agent": { "id": "spiffe://t_acme/agent/inv-7", "version": "1.4.0" },
+  "delegation_chain": ["usr_alice", "spiffe://t_acme/agent/orchestrator-2", "spiffe://t_acme/agent/inv-7"],
+  "resources": [{ "system": "k8s:prod-eu", "ref": "deploy/checkout", "data_class": "config" }],
+  "operation": { "kind": "tool_call", "name": "kubernetes:scale", "payload_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+  "decision": { "effect": "permit", "policy_refs": ["pol_sre-scale"], "decision_record": "pdr_01JBKQ4Z9N8X7Y6W5V4T3S2R24" },
+  "outcome": { "status": "ok" },
+  "context": { "task_id": "tsk_01JBKQ4Z9N8X7Y6W5V4T3S2R25", "incident_id": "inc_01JBKQ4Z9N8X7Y6W5V4T3S2R26", "approval_ref": "apr_01JBKQ4Z9N8X7Y6W5V4T3S2R1Q", "on_behalf_of": "usr_alice", "time_source": "ntp:pool.ntp.org" },
+  "prev_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+}
