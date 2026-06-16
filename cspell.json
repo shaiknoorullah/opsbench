@@ -266,7 +266,19 @@
     "Twilio",
     "tsx",
     "ULID",
-    "ULIDs"
+    "ULIDs",
+    "acked",
+    "acks",
+    "expressibility",
+    "itsm",
+    "ITSM",
+    "Merkle",
+    "PCRE",
+    "Rekor",
+    "remed",
+    "SFDC",
+    "SIEM",
+    "unrepresentable"
   ],
   "allowCompoundWords": true
 }

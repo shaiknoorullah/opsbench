@@ -1,13 +1,13 @@
 ---
 id: SPEC-OPSBENCH-001
 title: "Opsbench Platform — Technical Specification"
-version: 0.1.0
+version: 0.2.0
 status: draft
 part: 2
 part_title: "Design Spikes & MVP Cut"
 author: "Shaik Noorullah <shaiknooru247@gmail.com>"
 created: 2026-06-13
-last_updated: 2026-06-13
+last_updated: 2026-06-16
 consumes: "PRD-OPSBENCH-001 v1.0.0 (approved)"
 ---
 
@@ -24,6 +24,7 @@ Five spikes de-risk the architecture's load-bearing bets before MVP build. Each 
 **Build.** A minimal vertical slice of flow §5.1 (Part 0): MCP tool call → Cedar decision (both phases: tool-list filtering via partial evaluation + per-call) → dry-run → ApprovalObject → hash-revalidated execution against a sandbox K8s namespace → chained AuditRecords with one Merkle checkpoint → offline verification CLI pass.
 
 **Exit criteria (verdict must answer each):**
+
 - Cedar P99 ≤ 100 ms (NF-004) at a reference policy set (≥ 200 policies, ≥ 5k entities); partial-eval tool filtering works for MCP tool listings.
 - Ledger write on the mutation path adds ≤ 25 ms P99; checkpoint cadence chosen with proof-size data.
 - agentgateway embed verdict: license compatible, extension points sufficient for decision-record injection — or documented fallback to custom proxy with cost estimate.
@@ -36,6 +37,7 @@ Five spikes de-risk the architecture's load-bearing bets before MVP build. Each 
 **Build.** memory-proxy prototype in front of pinned agent-memory-server: namespace grammar (Part 1 §5), JWT-claims enforcement, multi-tier recall fan-out with merge, adversarial isolation tests (sibling-scope denial, default-namespace canary, tenant-merge attempts).
 
 **Exit criteria.**
+
 - All adversarial isolation tests pass (NF-006 class); the engine's default-namespace fallback is provably unreachable.
 - Forgetting/compaction behavior on the pinned version documented against its docs; divergences listed.
 - Recall fan-out P95 ≤ 500 ms across 4 tiers at 100k-memory corpus; partial-degradation path verified.
@@ -47,6 +49,7 @@ Five spikes de-risk the architecture's load-bearing bets before MVP build. Each 
 **Build.** Escalation service prototype: ladder state machine, Slack + push rungs stubbed, real outbound call (TTS summary, DTMF ack, optional PIN), ack cancellation fan-out, ledger evidence record; consent-mode and metadata-only recording paths.
 
 **Exit criteria.**
+
 - Timed-out approval escalates to a real phone; DTMF ack cancels all pending rungs ≤ 5 s (NF-001) end-to-end.
 - PIN flow works without PIN persistence; evidence record matches Part 1 §7.
 - Unanswered/failed-call path advances the ladder; exhausted path fires fallback (ESC-003).
@@ -59,6 +62,7 @@ Five spikes de-risk the architecture's load-bearing bets before MVP build. Each 
 **Build.** Eval-harness prototype: ingest one real (or high-fidelity synthetic) closed incident into the incident-ledger schema; replay an investigation agent against evidence-as-of the incident window (post-incident evidence provably inaccessible); grade detection/localization/RCA/mitigation against the recorded resolution; emit an evidence record suitable for an AutonomyCertificate.
 
 **Exit criteria.**
+
 - Temporal isolation verified (attempted post-window reads fail and are logged).
 - Grading rubric produces stable scores across 3 reruns (variance documented).
 - The run's evidence record satisfies Part 1 §4's `evidence` block.
@@ -70,6 +74,7 @@ Five spikes de-risk the architecture's load-bearing bets before MVP build. Each 
 **Build.** Connector-hub prototype routing `query_metrics` / `search_logs` / `get_trace` to Datadog, Grafana(+Prometheus/Loki), and one more backend; the same scripted investigation runs against each; freshness/cache envelope honored.
 
 **Exit criteria.**
+
 - ≥ 90% of a sampled real investigation's queries expressible in the schema per backend; the inexpressible remainder catalogued with an escape-hatch design (vendor-native passthrough, policy-visible).
 - Swapping backends requires zero agent-prompt changes (INT-001 acceptance).
 - Vendor-quota budget accounting demonstrated on at least one backend.

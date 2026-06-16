@@ -1,13 +1,13 @@
 ---
 id: SPEC-OPSBENCH-001
 title: "Opsbench Platform — Technical Specification"
-version: 0.1.0
+version: 0.2.0
 status: draft
 part: 1
 part_title: "Normative Schemas"
 author: "Shaik Noorullah <shaiknooru247@gmail.com>"
 created: 2026-06-13
-last_updated: 2026-06-13
+last_updated: 2026-06-16
 consumes: "PRD-OPSBENCH-001 v1.0.0 (approved)"
 ---
 

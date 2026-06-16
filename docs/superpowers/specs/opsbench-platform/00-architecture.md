@@ -1,13 +1,13 @@
 ---
 id: SPEC-OPSBENCH-001
 title: "Opsbench Platform — Technical Specification"
-version: 0.1.0
+version: 0.2.0
 status: draft
 part: 0
 part_title: "Architecture"
 author: "Shaik Noorullah <shaiknooru247@gmail.com>"
 created: 2026-06-13
-last_updated: 2026-06-13
+last_updated: 2026-06-16
 consumes: "PRD-OPSBENCH-001 v1.0.0 (approved) — docs/superpowers/prd/opsbench-platform/"
 ---
 
@@ -76,12 +76,12 @@ Selections honor PRD §5.4 constraints. Each carries rationale and the spike (Pa
 | Decision | Selection | Rationale | Risk / spike |
 |---|---|---|---|
 | Monorepo & primary language | TypeScript (Node ≥ 22) workspaces inside opsbench under `platform/` | Repo is already an npm monorepo; one toolchain for services + web; team velocity | Hot paths re-evaluated post-MVP; perf budget NF-004 enforced by benchmark CI |
-| Policy engine | **Cedar** (in-process WASM bindings) behind a `PolicyEngine` interface; Rego/CEL pluggable later | Default-deny, deterministic, formal analysis, partial evaluation for tool-list filtering (GOV-002); AWS AgentCore precedent | S1 spike validates latency (NF-004) and partial-eval tool filtering |
-| Tool-call gateway | Embed **agentgateway-class OSS** if license/roadmap fit; else thin custom MCP-aware proxy | Research: "do not rebuild the gateway layer"; we own the control plane above it | S1 spike includes license + extension-point evaluation; fallback path costed |
+| Policy engine | **Cedar** (in-process WASM bindings) behind a `PolicyEngine` interface; Rego/CEL pluggable later. **v0.2 (S1): preparsed policy set (`preparsePolicySet` + `statefulIsAuthorized`) + minimal per-call entity slice is NORMATIVE** for the enforcement path — naive `isAuthorized` re-parses every call (~140 ms, fails NF-004). `isAuthorizedPartial` has no stateful variant, so tool-list filtering uses N cheap per-tool stateful calls (cache `tools/list` per agent-scope × policy-version), not Cedar partial eval. Evaluate the native Cedar (Rust) crate for the gateway. | Default-deny, deterministic, formal analysis (GOV-002); AWS AgentCore precedent | **S1: PASS** — per-call P99 0.764 ms, 200-tool listing P99 91.1 ms (Part 3 §2.2) |
+| Tool-call gateway | **EMBED agentgateway** (Apache-2.0, Rust, MCP-native; `ext_authz`/ExtProc + per-tool MCP authz + CEL RBAC + OTel audit). Custom MCP-aware proxy is the documented fallback (~2–3 eng-months) only if extension points regress. | Research: "do not rebuild the gateway layer"; we own the control plane above it; license MIT-compatible | **S1: resolved EMBED** (Part 3 §2.1) |
 | Agent runtime | **Claude Agent SDK** for first-party teams; **MCP** for tools; **A2A** for third-party agent registration | Orchestrator-executor-reviewer support, hooks for TEAM-004 gates; MCP-first posture (PRD §5.4); DP-10 interop | A2A maturity watched; third-party governance works at gateway level regardless |
 | System of record | **PostgreSQL** (approvals, certificates, registry, task ledger, incident ledger, policy metadata) | Transactional integrity for approval state machines and certificates | — |
 | Event stream | **Redis Streams** (tenant-scoped streams, consumer groups) | Redis already mandated for memory; ordered, replayable, NF-008 floor is comfortably in range | Re-evaluate NATS/Kafka past 10× floor |
-| Audit ledger | Append-only Postgres table with per-tenant **sha256 hash chain**; periodic **Merkle checkpoint roots** exported to customer object storage; offline verification CLI | IDN-001 independent verifiability without standing infra; Rekor-style pattern without operating Trillian | Checkpoint cadence vs. proof size tuned in S1 (ledger writes are on the gatekeeper path) |
+| Audit ledger | Append-only Postgres table with per-tenant **sha256 hash chain**; **Merkle checkpoint every 1024 records** (depth 10, 320-byte proof, 7.2 ms off-path build) exported to customer object storage; offline verification CLI | IDN-001 independent verifiability without standing infra; Rekor-style pattern without operating Trillian | **S1: PASS** — chain append P99 0.016 ms (negligible on-path); NF-003 ≤25 ms budget restated against the **durable Postgres insert** (unmeasured — no DB in env; ~24.9 ms headroom) |
 | Memory engine | **redis/agent-memory-server, pinned version**, fronted by our **memory-rbac-proxy** | PRD §5.4 constraint; proxy is mandatory (engine lacks org-hierarchy RBAC; default-namespace hazard MEM-002) | S2 spike validates proxy enforcement + forgetting/compaction behavior on the pinned version |
 | Agent identity | SPIFFE-style URIs (`spiffe://<tenant>/agent/<id>`), short-lived workload credentials; **platform as OIDC issuer** federated to AWS STS / GCP WIF / Azure Entra | IDN-003, INT-009; attribution tags via session tags / attribute mappings (IDN-006) | Broker is custom; cloud federation per provider tested in S1-adjacent integration tests |
 | Web app | Next.js + SSE consumers of the event stream | Standard; SSE matches append-only stream rendering | — |
@@ -160,11 +160,13 @@ One command fans out to three independent enforcement layers, each sufficient al
 
 Tenant ID is structural in: every service API (typed, non-optional), Postgres row-level security policies, Redis key/stream prefixes, memory namespaces (MEM-002), Cedar entity store partitions, cache keys, and ledger chains (per-tenant chains; per-tenant checkpoint roots). A missing tenant context is a thrown error, never a default (IDN-008, NF-006). The adversarial isolation suite (NF-006) is a release gate in CI from the first MVP release.
 
-## 7. Open Questions Carried to Spikes
+## 7. Open Questions Carried to Spikes — RESOLVED (v0.2)
 
-1. agentgateway embed vs. custom proxy (license, extension points) — **S1**.
-2. Cedar policy-set scale: P99 ≤ 100 ms at reference size with partial evaluation — **S1**.
-3. agent-memory-server pinned-version behavior: forgetting defaults, compaction workers, namespace fallback — **S2**.
-4. Voice identity assurance UX: PIN friction vs. assurance tiers — **S3**.
-5. Capability-schema coverage: can one schema express Datadog/Grafana/Prometheus metric queries without lowest-common-denominator loss — **S5**.
-6. Ledger checkpoint cadence vs. gatekeeper write latency — **S1** (measured alongside policy latency).
+All six were answered by the spikes. Full verdicts and amendment dispositions are in Part 3 (`03-spike-verdicts.md`); summary:
+
+1. agentgateway embed vs. custom proxy — **RESOLVED: EMBED** (Apache-2.0, sufficient `ext_authz`/ExtProc extension points). Custom proxy is the documented fallback.
+2. Cedar policy-set scale — **RESOLVED: PASS** (per-call P99 0.764 ms) **with preparse + entity-slicing made normative** (naive `isAuthorized` is ~140 ms; `isAuthorizedPartial` has no stateful variant).
+3. agent-memory-server pinned behavior — **RESOLVED: documented (v0.15.2)** — forgetting OFF by default; default-namespace tenant-merge hazard mitigated (namespace required); live round-trip deferred to MVP.
+4. Voice identity assurance UX — **RESOLVED: per-incident DTMF PIN** (salted hash, never persisted; strong evidence, not a signature).
+5. Capability-schema coverage — **RESOLVED: 92.3%/backend** with a policy-visible `passthrough` escape hatch; split `list_monitors`/`get_alert_state` → ~100%.
+6. Ledger checkpoint cadence — **RESOLVED: 1024 records** (depth 10, 320-byte proof, 7.2 ms off-path); NF-003 budget restated against the DB insert.
