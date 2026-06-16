@@ -1,0 +1,7 @@
+{
+  "as_of": "2026-06-16T10:05:03Z",
+  "series": [
+    { "metric": "http_request_duration_seconds", "pointlist": [[1718530800000, 0.842]], "scope": "service:checkout" }
+  ],
+  "status": "ok"
+}
