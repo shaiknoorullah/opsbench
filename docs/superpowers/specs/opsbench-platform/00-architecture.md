@@ -56,7 +56,7 @@ This spec consumes the approved PRD (PRD-OPSBENCH-001). PRD requirement IDs (`GO
 | C2 | **Actuation Gatekeeper** | GOV-001, GOV-003, GOV-008, GOV-015, GOV-017 | Control | Unavailable → all mutations denied |
 | C3 | **Approval Service** | GOV-004, GOV-005, GOV-011 | Control | Unavailable → no tiered action proceeds; ladders pause with alert |
 | C4 | **Credential Broker** | INT-009, IDN-004, IDN-006, NF-007 | Control | Unavailable → no new task credentials |
-| C5 | **Audit Ledger** | IDN-001, IDN-002, NF-003 | Control | Write-unavailable → gated mutations blocked |
+| C5 | **Audit Ledger** ([design](components/C5-audit-ledger.md)) | IDN-001, IDN-002, NF-003 | Control | Write-unavailable → gated mutations blocked |
 | C6 | **Event Stream** | SUR-001, NF-008 | Control | Lag visible per consumer; never interpolated |
 | C7 | **Identity Registry** | IDN-003, IDN-005, IDN-011 | Control | Unknown identity → deny (TEAM-003) |
 | C8 | **Memory Proxy + Engine** | MEM-001..MEM-005, MEM-012 | Control | Engine down → reduced-context flag (UC-012); unsafe config → writes blocked |

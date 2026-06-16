@@ -299,7 +299,7 @@
     "unfavourable", "ungated", "unioned", "unledgered", "Unmarshal", "unpermitted",
     "unresumable", "unreviewed", "unscoreable", "unscored", "unvetted", "Unvetted",
     "unviable", "upstreamed", "uuidgen", "vaporise", "Veeam", "wiremcp", "wrappable",
-    "XSOAR", "Yubi", "ztunnel"
+    "XSOAR", "Yubi", "ztunnel", "seqs"
   ],
   "allowCompoundWords": true
 }
