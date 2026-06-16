@@ -1,0 +1,19 @@
+{
+  "name": "s4-eval-replay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Design spike S4 — Time-Travel Eval Replay. Standalone prototype proving temporal isolation, stable grading, and AutonomyCertificate evidence emission for replayed closed incidents.",
+  "license": "MIT",
+  "scripts": {
+    "demo": "tsx src/demo.ts",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
