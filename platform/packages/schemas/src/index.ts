@@ -4,8 +4,17 @@
 //
 // JSON imports use import attributes (Node >= 20.10 / tsx). Consumers run under tsx
 // or a bundler with JSON module support.
-import Ajv2020, { type ValidateFunction } from "ajv/dist/2020.js";
-import addFormats from "ajv-formats";
+// ajv's 2020 entry and ajv-formats are CommonJS default exports. Use namespace
+// imports + runtime default-unwrap so this module type-checks under any consumer
+// tsconfig (no esModuleInterop requirement) while staying runtime-equivalent.
+import type { ValidateFunction } from "ajv";
+import * as AjvNs from "ajv/dist/2020.js";
+import * as AddFormatsNs from "ajv-formats";
+
+const Ajv2020 = ((AjvNs as { default?: unknown }).default ?? AjvNs) as typeof import("ajv/dist/2020.js").default;
+const addFormats = ((AddFormatsNs as { default?: unknown }).default ?? AddFormatsNs) as (ajv: unknown, opts?: unknown) => unknown;
+
+type AjvInstance = InstanceType<typeof import("ajv/dist/2020.js").default>;
 
 import common from "../json/common.json" with { type: "json" };
 import approvalObject from "../json/approval-object.json" with { type: "json" };
@@ -37,7 +46,7 @@ export type SchemaName = Exclude<keyof typeof schemas, "common">;
  * Build a single Ajv instance with all Opsbench schemas registered.
  * `common.json` is added first so sibling `$ref`s resolve.
  */
-export function buildAjv(): Ajv2020 {
+export function buildAjv(): AjvInstance {
   const ajv = new Ajv2020({ allErrors: true, strict: true });
   addFormats(ajv);
   ajv.addSchema(common as object, (common as { $id: string }).$id);
