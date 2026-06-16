@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "20"
-      - run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#CHANGELOG.md"
+      - run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#CHANGELOG.md" "#platform/spikes" "#tools/plugin-build/output"
 
   cspell:
     name: cspell
