@@ -1,0 +1,10 @@
+{
+  "as_of": "2026-06-16T10:05:03Z",
+  "data": {
+    "resultType": "matrix",
+    "result": [
+      { "metric": { "service": "checkout" }, "values": [[1718530800, "0.838"]] }
+    ]
+  },
+  "status": "success"
+}

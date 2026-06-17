@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/approval-object.json",
+  "title": "ApprovalObject",
+  "description": "Cross-surface approval object (PRD GOV-004, GOV-005; spec 01-schemas §1). Hash-pinned payload with pre-minted idempotency key, TTL, named reviewers, and an append-only decision log.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "tenant_id", "action_ref", "tier", "payload_hash", "idempotency_key",
+    "diff", "risk", "reviewers", "expires_at", "state", "decisions"
+  ],
+  "properties": {
+    "id": { "$ref": "common.json#/$defs/prefixedId" },
+    "tenant_id": { "$ref": "common.json#/$defs/tenantId" },
+    "action_ref": {
+      "type": "string",
+      "pattern": "^act_[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "The proposed action held by the gatekeeper."
+    },
+    "tier": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "0 auto-read · 1 notify · 2 single approval · 3 two-person (irreversible)."
+    },
+    "payload_hash": {
+      "$ref": "common.json#/$defs/sha256",
+      "description": "Canonical-JSON hash of the EXACT execution payload. Execution must match this."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^idk_[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "Minted before the first human interrupt; survives retries (GOV-004)."
+    },
+    "diff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "body"],
+      "properties": {
+        "format": { "type": "string", "enum": ["unified", "structured"] },
+        "body": { "type": "string" }
+      }
+    },
+    "dry_run_ref": {
+      "description": "Ledger ref to dry-run output (GOV-003). Null only when tier was force-escalated to max for a tool lacking dry-run.",
+      "oneOf": [
+        { "$ref": "common.json#/$defs/ledgerRef" },
+        { "type": "null" }
+      ]
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["irreversible", "policy_refs"],
+      "properties": {
+        "irreversible": { "type": "boolean" },
+        "blast_radius": { "type": "string" },
+        "policy_refs": {
+          "type": "array",
+          "items": { "$ref": "common.json#/$defs/policyRef" }
+        }
+      }
+    },
+    "reviewers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "eligible", "second_must_differ"],
+      "properties": {
+        "required": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "eligible": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "$ref": "common.json#/$defs/userId" },
+              { "$ref": "common.json#/$defs/groupId" }
+            ]
+          }
+        },
+        "second_must_differ": {
+          "type": "boolean",
+          "description": "For tier 3: the two approvers must be distinct identities."
+        }
+      }
+    },
+    "expires_at": { "$ref": "common.json#/$defs/timestamp" },
+    "state": {
+      "type": "string",
+      "enum": ["pending", "approved", "executing", "executed", "rejected", "invalidated", "failed", "expired"],
+      "description": "See state machine in spec 01-schemas §1."
+    },
+    "decisions": {
+      "type": "array",
+      "description": "Append-only decision log.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["decision", "by", "surface", "at", "payload_hash_seen"],
+        "properties": {
+          "decision": { "type": "string", "enum": ["approved", "rejected", "rejected_with_edits"] },
+          "by": { "$ref": "common.json#/$defs/userId" },
+          "surface": { "$ref": "common.json#/$defs/surface" },
+          "at": { "$ref": "common.json#/$defs/timestamp" },
+          "payload_hash_seen": {
+            "$ref": "common.json#/$defs/sha256",
+            "description": "What the approver saw; MUST equal payload_hash for execution to proceed."
+          },
+          "edits": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "ledger_refs": {
+      "type": "array",
+      "items": { "$ref": "common.json#/$defs/ledgerRef" }
+    }
+  }
+}

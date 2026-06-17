@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/capability-envelope.json",
+  "title": "CapabilityEnvelope",
+  "description": "Vendor-neutral connector capability invocation (PRD INT-001, INT-005; spec 01-schemas §8). Adding a vendor adds an adapter, never an agent-visible schema change.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tenant_id", "capability", "scope", "params", "routing"],
+  "properties": {
+    "tenant_id": { "$ref": "common.json#/$defs/tenantId" },
+    "capability": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*/[0-9]+:[a-z][a-z0-9_]*$",
+      "description": "Domain/version:verb, e.g. observability/1:query_metrics."
+    },
+    "scope": { "$ref": "common.json#/$defs/scopeUri" },
+    "params": {
+      "type": "object",
+      "description": "Schema-versioned, vendor-neutral parameters for the verb."
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector"],
+      "properties": {
+        "connector": { "type": "string", "pattern": "^con_[a-zA-Z0-9._-]+$" },
+        "fallback": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^con_[a-zA-Z0-9._-]+$" }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vendor_quota_class": { "type": "string", "description": "e.g. datadog.mcp." },
+        "cost_attribution": { "type": "string", "pattern": "^tsk_[0-9A-HJKMNP-TV-Z]{26}$" }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_staleness_s": { "type": "integer", "minimum": 0 },
+        "served_from": { "type": "string", "enum": ["live", "cache"] },
+        "as_of": { "$ref": "common.json#/$defs/timestamp" }
+      }
+    }
+  }
+}

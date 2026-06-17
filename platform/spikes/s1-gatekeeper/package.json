@@ -1,0 +1,22 @@
+{
+  "name": "@opsbench/spike-s1-gatekeeper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "S1 Design Spike — Gatekeeper & Policy Spine. Standalone prototype: Cedar (WASM) governed-mutation flow + chained audit ledger + Merkle checkpoint + offline verification. NOT a workspace member.",
+  "license": "MIT",
+  "scripts": {
+    "flow": "tsx src/demo-flow.ts",
+    "bench": "tsx src/bench.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@cedar-policy/cedar-wasm": "4.11.1",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

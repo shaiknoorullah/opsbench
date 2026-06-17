@@ -1,0 +1,20 @@
+{
+  "id": "esc_01JBKQ4Z9N8X7Y6W5V4T3S2R2B",
+  "tenant_id": "t_acme",
+  "subject_ref": "apr_01JBKQ4Z9N8X7Y6W5V4T3S2R1Q",
+  "target": { "resolved_human": "usr_oncall", "roster_source": "pagerduty:schedule/P123", "resolved_at": "2026-06-16T10:00:02Z" },
+  "rungs": [
+    { "n": 1, "channel": "slack", "timeout_s": 120, "state": "timeout", "fired_at": "2026-06-16T10:00:02Z" },
+    { "n": 2, "channel": "push", "timeout_s": 120, "state": "timeout", "fired_at": "2026-06-16T10:02:02Z" },
+    { "n": 3, "channel": "sms", "timeout_s": 180, "state": "timeout", "fired_at": "2026-06-16T10:04:02Z" },
+    { "n": 4, "channel": "voice", "timeout_s": 240, "state": "acked", "fired_at": "2026-06-16T10:07:02Z", "identity_assurance": "pin" }
+  ],
+  "ack": {
+    "by": "usr_oncall",
+    "channel": "voice_dtmf",
+    "at": "2026-06-16T10:07:35Z",
+    "evidence": { "call_sid": "CA1234567890", "digits_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "pin_verified": true, "attestation": "A" }
+  },
+  "state": "acked",
+  "on_exhausted": ["usr_fallback1", "grp_exec"]
+}

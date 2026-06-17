@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/observability-v1.json",
+  "title": "observability/1 verb params",
+  "description": "Vendor-neutral params for the observability/1 verb set (query_metrics, search_logs, get_trace, list_monitors, write_annotation). PROPOSED for promotion into packages/schemas per S5 verdict. The CapabilityEnvelope.params field is validated against the matching $def by verb.",
+  "$defs": {
+    "timeRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "description": "Relative (now-5m) or RFC3339 absolute." },
+        "to": { "type": "string" }
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "op", "value"],
+      "properties": {
+        "key": { "type": "string" },
+        "op": { "type": "string", "enum": ["eq", "neq", "regex", "not_regex"] },
+        "value": { "type": "string" }
+      }
+    },
+    "aggregation": {
+      "oneOf": [
+        { "type": "string", "enum": ["avg", "sum", "min", "max", "count", "rate"] },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["percentile"],
+          "properties": { "percentile": { "type": "number", "minimum": 0, "maximum": 100 } }
+        }
+      ]
+    },
+    "query_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paramsVersion", "metric", "aggregation", "time"],
+      "properties": {
+        "paramsVersion": { "const": 1 },
+        "metric": { "type": "string" },
+        "aggregation": { "$ref": "#/$defs/aggregation" },
+        "filters": { "type": "array", "items": { "$ref": "#/$defs/filter" } },
+        "group_by": { "type": "array", "items": { "type": "string" } },
+        "time": { "$ref": "#/$defs/timeRange" },
+        "ratio_over": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["metric"],
+          "properties": {
+            "metric": { "type": "string" },
+            "filters": { "type": "array", "items": { "$ref": "#/$defs/filter" } }
+          }
+        }
+      }
+    },
+    "search_logs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paramsVersion", "time"],
+      "properties": {
+        "paramsVersion": { "const": 1 },
+        "filters": { "type": "array", "items": { "$ref": "#/$defs/filter" } },
+        "contains": { "type": "string" },
+        "time": { "$ref": "#/$defs/timeRange" },
+        "limit": { "type": "integer", "minimum": 1, "maximum": 10000 }
+      }
+    },
+    "get_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paramsVersion", "trace_id"],
+      "properties": {
+        "paramsVersion": { "const": 1 },
+        "trace_id": { "type": "string" },
+        "time": { "$ref": "#/$defs/timeRange" }
+      }
+    },
+    "list_monitors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paramsVersion"],
+      "properties": {
+        "paramsVersion": { "const": 1 },
+        "filters": { "type": "array", "items": { "$ref": "#/$defs/filter" } },
+        "state": { "type": "string", "enum": ["alert", "ok", "warn", "no_data", "all"] }
+      }
+    },
+    "write_annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paramsVersion", "text"],
+      "properties": {
+        "paramsVersion": { "const": 1 },
+        "text": { "type": "string" },
+        "at": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "service": { "type": "string" },
+            "dashboard": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -32,10 +32,13 @@
     "nist-800-86"
   ],
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "platform/packages/*",
+    "platform/services/*",
+    "platform/apps/*"
   ],
   "scripts": {
-    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#CHANGELOG.md\"",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#CHANGELOG.md\" \"#platform/spikes\" \"#tools/plugin-build/output\"",
     "lint:yaml": "yamllint .",
     "lint:shell": "shellcheck scripts/*.sh tools/**/*.sh packages/**/hooks/*.sh",
     "lint:spell": "cspell --no-progress \"**/*.md\"",
@@ -44,6 +47,7 @@
     "validate:agents": "bash scripts/validate-agent.sh",
     "validate:schemas": "ajv compile --spec=draft2020 -c ajv-formats -s 'packages/**/schemas/*.json'",
     "validate:install": "bash scripts/install.sh --dry-run",
+    "validate:platform-schemas": "npm run validate --workspace @opsbench/schemas",
     "validate": "npm-run-all -s validate:skills validate:agents validate:schemas validate:install",
     "plugin:build": "bash tools/plugin-build/build.sh",
     "release": "release-it",

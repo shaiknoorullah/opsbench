@@ -1,0 +1,9 @@
+{
+  "tenant_id": "t_acme",
+  "capability": "observability/1:query_metrics",
+  "scope": "scope://t_acme/env/prod/service/checkout",
+  "params": { "metric": "request.p99", "window": "30m", "filters": { "env": "prod", "service": "checkout" } },
+  "routing": { "connector": "con_datadog_1", "fallback": ["con_grafana_1"] },
+  "budget": { "vendor_quota_class": "datadog.mcp", "cost_attribution": "tsk_01JBKQ4Z9N8X7Y6W5V4T3S2R25" },
+  "freshness": { "max_staleness_s": 300, "served_from": "cache", "as_of": "2026-06-16T09:58:00Z" }
+}

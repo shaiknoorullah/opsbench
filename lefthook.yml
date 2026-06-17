@@ -20,6 +20,9 @@ pre-commit:
         - rebase
     markdownlint:
       glob: "*.md"
+      # Throwaway spike artifacts under platform/spikes/** are exempt from doc
+      # linting (same policy as generated docs/superpowers/research/**).
+      exclude: "platform/spikes/"
       run: npx markdownlint-cli2 {staged_files}
       skip:
         - merge

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/audit-record.json",
+  "title": "AuditRecord",
+  "description": "Tamper-evident audit ledger record (PRD IDN-001, NF-003; spec 01-schemas §2). Six mandatory evidence fields plus per-tenant hash chaining. Denials are first-class records.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "seq", "id", "tenant_id", "ts", "agent", "delegation_chain",
+    "resources", "operation", "decision", "outcome", "prev_hash", "hash"
+  ],
+  "properties": {
+    "seq": { "type": "integer", "minimum": 0, "description": "Per-tenant monotonic sequence number." },
+    "id": { "$ref": "common.json#/$defs/ledgerRef" },
+    "tenant_id": { "$ref": "common.json#/$defs/tenantId" },
+    "ts": {
+      "$ref": "common.json#/$defs/timestamp",
+      "description": "Trusted, NTP-disciplined time. Source recorded in context.time_source."
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "common.json#/$defs/spiffeId", "description": "Field 1: agent identity." },
+        "version": { "type": "string" }
+      }
+    },
+    "delegation_chain": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Field 2: human authorizer -> agent -> sub-agent chain (IDN-005). First element resolves to a human origin.",
+      "items": { "type": "string" }
+    },
+    "resources": {
+      "type": "array",
+      "description": "Field 3: resources/data touched.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["system", "ref"],
+        "properties": {
+          "system": { "type": "string", "description": "e.g. k8s:prod-eu, datadog:org-1." },
+          "ref": { "type": "string" },
+          "data_class": { "type": "string", "enum": ["config", "metric", "log", "trace", "secret_redacted", "customer", "metadata"] }
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name"],
+      "description": "Field 4: operation.",
+      "properties": {
+        "kind": { "type": "string", "enum": ["tool_call", "approval", "policy_decision", "escalation", "memory_op", "admin"] },
+        "name": { "type": "string" },
+        "payload_hash": { "$ref": "common.json#/$defs/sha256" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["effect"],
+      "description": "Field 5: policy decision + governing policy.",
+      "properties": {
+        "effect": { "type": "string", "enum": ["permit", "deny"] },
+        "policy_refs": { "type": "array", "items": { "$ref": "common.json#/$defs/policyRef" } },
+        "decision_record": { "type": "string", "pattern": "^pdr_[0-9A-HJKMNP-TV-Z]{26}$" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string", "enum": ["ok", "error", "denied"] },
+        "detail_ref": { "type": "string" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "task_id": { "type": "string", "pattern": "^tsk_[0-9A-HJKMNP-TV-Z]{26}$" },
+        "incident_id": { "type": "string", "pattern": "^inc_[0-9A-HJKMNP-TV-Z]{26}$" },
+        "approval_ref": { "type": "string", "pattern": "^apr_[0-9A-HJKMNP-TV-Z]{26}$" },
+        "on_behalf_of": { "$ref": "common.json#/$defs/userId" },
+        "time_source": { "type": "string" }
+      }
+    },
+    "prev_hash": {
+      "$ref": "common.json#/$defs/sha256",
+      "description": "Field 6 (chain): hash of the previous record in this tenant's chain. Genesis uses the zero digest."
+    },
+    "hash": {
+      "$ref": "common.json#/$defs/sha256",
+      "description": "sha256(canonical(record without hash) || prev_hash)."
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@opsbench/schemas",
+  "version": "0.1.0",
+  "description": "Normative data contracts for the Opsbench platform (JSON Schema 2020-12) with TypeScript types and a validator. Source of truth per SPEC-OPSBENCH-001 Part 1.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./json/*": "./json/*"
+  },
+  "files": ["json", "src"],
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "test": "node scripts/validate.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

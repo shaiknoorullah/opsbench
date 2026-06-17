@@ -1,0 +1,17 @@
+{
+  "name": "s5-capability-schema",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Spike S5 — Cross-Vendor Capability Schema. Standalone, throwaway prototype (SPEC-OPSBENCH-001 Part 1 §8, Part 2 §1 S5). Proves observability/1 expresses real investigation queries across Datadog, Grafana(Prometheus/Loki) and New Relic with zero agent-facing schema change on backend swap.",
+  "scripts": {
+    "test": "node --import tsx --test test/*.test.ts",
+    "investigation": "node --import tsx src/investigation.ts"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

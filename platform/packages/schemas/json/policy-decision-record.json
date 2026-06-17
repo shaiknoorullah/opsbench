@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opsbench.dev/schemas/policy-decision-record.json",
+  "title": "PolicyDecisionRecord",
+  "description": "Normalized policy decision record regardless of engine (PRD GOV-002; spec 01-schemas §3). Identical (principal, action, resource, context_hash) MUST yield identical effects.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "tenant_id", "principal", "action", "resource", "context_hash", "effect", "engine", "evaluated_at", "phase"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^pdr_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "tenant_id": { "$ref": "common.json#/$defs/tenantId" },
+    "principal": { "$ref": "common.json#/$defs/principal" },
+    "action": {
+      "type": "string",
+      "description": "Capability-schema verb, e.g. connector:datadog:query_metrics."
+    },
+    "resource": { "$ref": "common.json#/$defs/scopeUri" },
+    "context_hash": {
+      "$ref": "common.json#/$defs/sha256",
+      "description": "Canonical hash of evaluated context (freeze state, tier, autonomy level, certificate status)."
+    },
+    "effect": { "type": "string", "enum": ["permit", "deny"] },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "version"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["cedar", "rego", "cel"] },
+        "version": { "type": "string" }
+      }
+    },
+    "policy_refs": {
+      "type": "array",
+      "description": "Governing policies. An empty array with effect=deny denotes default-deny.",
+      "items": { "$ref": "common.json#/$defs/policyRef" }
+    },
+    "evaluated_at": { "$ref": "common.json#/$defs/timestamp" },
+    "latency_ms": { "type": "number", "minimum": 0 },
+    "phase": {
+      "type": "string",
+      "enum": ["tool_listing", "invocation"],
+      "description": "Dual enforcement points: tool-list filtering vs per-call authorization."
+    }
+  }
+}

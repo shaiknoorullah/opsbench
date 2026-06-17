@@ -1,0 +1,21 @@
+{
+  "id": "cert_01JBKQ4Z9N8X7Y6W5V4T3S2R27",
+  "tenant_id": "t_acme",
+  "subject": { "agent": "spiffe://t_acme/agent/remed-3", "scenario_class": "k8s.scale_out", "environment": "prod-eu" },
+  "level": "L3",
+  "evidence": {
+    "eval_runs": ["evr_01JBKQ4Z9N8X7Y6W5V4T3S2R28", "evr_01JBKQ4Z9N8X7Y6W5V4T3S2R29"],
+    "thresholds": { "rca_accuracy": ">=0.85", "false_remediation": "<=0.02", "abstention_correctness": ">=0.9" },
+    "window": { "from": "2026-05-01T00:00:00Z", "to": "2026-06-01T00:00:00Z", "sample_size": 47 }
+  },
+  "approved_by": "usr_em-vp",
+  "issued_at": "2026-06-16T10:00:00Z",
+  "expires_at": "2026-09-16T10:00:00Z",
+  "revocation": {
+    "conditions": ["error_budget_burn>1.0", "eval_regression", "manual"],
+    "status": "active",
+    "revoked_at": null,
+    "revoked_reason": null
+  },
+  "ledger_refs": ["led_01JBKQ4Z9N8X7Y6W5V4T3S2R22"]
+}
