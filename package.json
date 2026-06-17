@@ -34,7 +34,6 @@
   "workspaces": [
     "packages/*",
     "platform/packages/*",
-    "platform/services/*",
     "platform/apps/*"
   ],
   "scripts": {

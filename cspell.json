@@ -22,6 +22,7 @@
     "akuity",
     "Altinity",
     "anonymization",
+    "approvable",
     "ARMO",
     "Armo",
     "ASCQ",
@@ -299,7 +300,7 @@
     "unfavourable", "ungated", "unioned", "unledgered", "Unmarshal", "unpermitted",
     "unresumable", "unreviewed", "unscoreable", "unscored", "unvetted", "Unvetted",
     "unviable", "upstreamed", "uuidgen", "vaporise", "Veeam", "wiremcp", "wrappable",
-    "XSOAR", "Yubi", "ztunnel", "seqs"
+    "XSOAR", "Yubi", "ztunnel", "seqs", "HTMX", "Datastar", "Bubbletea", "goroutine", "goroutines"
   ],
   "allowCompoundWords": true
 }
