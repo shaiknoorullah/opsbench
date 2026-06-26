@@ -18,5 +18,14 @@
     "type": "git",
     "url": "git+https://github.com/shaiknoorullah/opsbench.git",
     "directory": "packages/team-incident-response"
+  },
+  "scripts": {
+    "test:policies": "node policies/cedar/validate.mjs",
+    "test:hooks": "bats hooks/tests/",
+    "test": "npm run test:policies && npm run test:hooks"
+  },
+  "devDependencies": {
+    "@cedar-policy/cedar-wasm": "4.11.1",
+    "bats": "^1.11.1"
   }
 }

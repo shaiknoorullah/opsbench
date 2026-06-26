@@ -33,21 +33,22 @@
   ],
   "workspaces": [
     "packages/*",
-    "platform/packages/*",
-    "platform/apps/*"
+    "platform/packages/*"
   ],
   "scripts": {
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#CHANGELOG.md\" \"#platform/spikes\" \"#tools/plugin-build/output\"",
     "lint:yaml": "yamllint .",
     "lint:shell": "shellcheck scripts/*.sh tools/**/*.sh packages/**/hooks/*.sh",
     "lint:spell": "cspell --no-progress \"**/*.md\"",
-    "lint": "npm-run-all -p lint:md lint:yaml lint:spell",
+    "lint": "npm-run-all -p lint:md lint:yaml lint:spell lint:shell",
     "validate:skills": "bash scripts/validate-skill.sh",
     "validate:agents": "bash scripts/validate-agent.sh",
     "validate:schemas": "ajv compile --spec=draft2020 -c ajv-formats -s 'packages/**/schemas/*.json'",
     "validate:install": "bash scripts/install.sh --dry-run",
     "validate:platform-schemas": "npm run validate --workspace @opsbench/schemas",
-    "validate": "npm-run-all -s validate:skills validate:agents validate:schemas validate:install",
+    "validate:cedar": "npm run test:policies --workspace @opsbench/team-incident-response",
+    "validate:hooks": "npm run test:hooks --workspace @opsbench/team-incident-response",
+    "validate": "npm-run-all -s validate:skills validate:agents validate:schemas validate:platform-schemas validate:cedar validate:hooks validate:install",
     "plugin:build": "bash tools/plugin-build/build.sh",
     "release": "release-it",
     "release:dry": "release-it --dry-run",

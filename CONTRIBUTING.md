@@ -47,7 +47,7 @@ npm install        # installs lefthook + linters
    - JSON Schema compilation (`ajv`)
    - skill + agent frontmatter validation
    - `install.sh --dry-run`
-   - Cedar validation (if `.cedar` files changed)
+   - Cedar policy gate (schema + `tools.cedar`/`governors.cedar` validation + a decision battery, via the real Cedar engine) and hook bats tests
 
 5. **Get review.** Maintainers will review against the conventions in [`docs/contributing/coding-standards.md`](docs/contributing/coding-standards.md).
 

@@ -16,8 +16,8 @@
 
 set -uo pipefail
 
-AUDIT_LOG="/tmp/k8s-incident-post-tool-use.jsonl"
-VALIDATION_QUEUE="/tmp/k8s-incident-schema-validate.queue"
+AUDIT_LOG="${OPSBENCH_POST_AUDIT_LOG:-/tmp/opsbench-post-tool-use.jsonl}"
+VALIDATION_QUEUE="${OPSBENCH_VALIDATION_QUEUE:-/tmp/opsbench-schema-validate.queue}"
 
 INPUT="$(cat)"
 [[ -z "$INPUT" ]] && exit 0
@@ -52,27 +52,27 @@ if [[ -z "$OUTPUT_PATH" && "$TOOL" == "Bash" ]]; then
 fi
 
 # ----- derive timeline category from agent + phase -----
+# Map the real 33 subagent names (frontmatter `name:`) to a valid timeline category
+# (enum from schemas/timeline-entry.schema.json).
 derive_category() {
-  local a="$1"
-  case "$a" in
-    incident-commander)          echo "RESPONSE_BEGAN" ;;
-    role-assigner)               echo "ROLE_ASSIGNED" ;;
-    scribe)                      echo "EXTERNAL_EVENT" ;;
-    comms-drafter)               echo "COMMS_SENT" ;;
-    quarantine-coordinator)      echo "QUARANTINE" ;;
-    evidence-source-discoverer)  echo "DISCOVERY" ;;
-    evidence-collection-orchestrator) echo "COLLECTION_STARTED" ;;
-    collector-*)                 echo "COLLECTION_COMPLETED" ;;
-    evidence-cataloger|custody-attester|manifest-sealer) echo "EXTERNAL_EVENT" ;;
-    hypothesis-*)                echo "HYPOTHESIS_VERDICT" ;;
-    forensic-synthesizer|verdict-arbiter) echo "ROUND_VERDICT" ;;
-    evidence-requester)          echo "EVIDENCE_REQUESTED" ;;
-    human-gate)                  echo "HUMAN_APPROVAL" ;;
-    recovery-planner)            echo "EXTERNAL_EVENT" ;;
-    recovery-executor)           echo "RECOVERY_STEP" ;;
-    recovery-verifier)           echo "RECOVERY_COMPLETED" ;;
-    rca-author|incident-report-author|mitigation-author|pdf-renderer) echo "EXTERNAL_EVENT" ;;
-    *)                           echo "EXTERNAL_EVENT" ;;
+  case "$1" in
+    incident-commander)                          echo "RESPONSE_BEGAN" ;;
+    quarantine-coordinator)                      echo "QUARANTINE" ;;
+    timeline-keeper)                             echo "EXTERNAL_EVENT" ;;
+    evidence-source-discoverer)                  echo "DISCOVERY" ;;
+    *-collector)                                 echo "COLLECTION_COMPLETED" ;;
+    evidence-cataloger|evidence-witness)         echo "EXTERNAL_EVENT" ;;
+    hypothesis-*)                                echo "HYPOTHESIS_VERDICT" ;;
+    forensic-synthesizer|verdict-arbiter)        echo "ROUND_VERDICT" ;;
+    schema-validator|tone-reviewer|evidence-citation-checker|redaction-checker) echo "EXTERNAL_EVENT" ;;
+    customer-comms-author)                       echo "COMMS_SENT" ;;
+    rca-author|incident-report-author|investigation-report-author|mitigations-author) echo "EXTERNAL_EVENT" ;;
+    recovery-planner)                            echo "EXTERNAL_EVENT" ;;
+    recovery-executor)                           echo "RECOVERY_STEP" ;;
+    recovery-verifier)                           echo "RECOVERY_COMPLETED" ;;
+    evidence-requester)                          echo "EVIDENCE_REQUESTED" ;;
+    human-escalation)                            echo "HUMAN_APPROVAL" ;;
+    *)                                           echo "EXTERNAL_EVENT" ;;
   esac
 }
 CATEGORY="$(derive_category "$AGENT")"
