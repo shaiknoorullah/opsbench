@@ -5,6 +5,7 @@ import "testing"
 // S1-style reference policy: per-team invoke permit (read-only anywhere, else
 // non-prod), plus a global forbid guard for dangerous prod tools (forbid overrides).
 const testPolicy = `
+@tier("2")
 permit (
     principal in Team::"team-a",
     action == Action::"invoke",
@@ -36,14 +37,14 @@ func TestDecide(t *testing.T) {
 		wantTier int
 	}{
 		{
-			name: "permit: team member, staging, non-danger",
+			name: "permit: team member, staging, non-danger (@tier 2)",
 			req: Request{Principal: "a1", PrincipalTeams: []string{"team-a"}, Action: "invoke",
 				Resource: "tool1", ResourceParents: []string{"team-a"},
 				ResourceAttrs: map[string]any{"env": "staging", "danger": false, "read_only": false}},
-			want: "permit", wantTier: 0,
+			want: "permit", wantTier: 2,
 		},
 		{
-			name: "permit: read-only prod tool (tier 2)",
+			name: "permit: read-only prod tool (@tier 2)",
 			req: Request{Principal: "a1", PrincipalTeams: []string{"team-a"}, Action: "invoke",
 				Resource: "tool4", ResourceParents: []string{"team-a"},
 				ResourceAttrs: map[string]any{"env": "prod", "danger": false, "read_only": true}},

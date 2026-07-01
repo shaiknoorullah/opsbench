@@ -17,7 +17,10 @@
 package policygateway
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	cedar "github.com/cedar-policy/cedar-go"
 	"github.com/cedar-policy/cedar-go/types"
@@ -62,8 +65,9 @@ type Request struct {
 // CedarEngine is a cedar-go PDP. The policy set is parsed once at construction
 // (preparse); each Decide builds only the entities the request needs.
 type CedarEngine struct {
-	ps      *cedar.PolicySet
-	version string
+	ps            *cedar.PolicySet
+	version       string
+	policyVersion string // short digest of the policy source; changes invalidate caches
 }
 
 // NewCedarEngine parses a Cedar policy document once (preparse). The parsed set is
@@ -73,11 +77,16 @@ func NewCedarEngine(policySrc []byte) (*CedarEngine, error) {
 	if err != nil {
 		return nil, fmt.Errorf("policygateway: parse policy set: %w", err)
 	}
-	return &CedarEngine{ps: ps, version: cedarGoVersion}, nil
+	sum := sha256.Sum256(policySrc)
+	return &CedarEngine{ps: ps, version: cedarGoVersion, policyVersion: hex.EncodeToString(sum[:6])}, nil
 }
 
 // Version reports the policy-engine version (recorded on PolicyDecisionRecords).
 func (e *CedarEngine) Version() string { return e.version }
+
+// PolicyVersion is a short digest of the loaded policy source. Tool-list caches key
+// on it so a policy change invalidates them (A1: cache per agent-scope × policy-version).
+func (e *CedarEngine) PolicyVersion() string { return e.policyVersion }
 
 // Decide authorizes the request against the preparsed policy set. Default is deny;
 // a forbid always overrides a permit (Cedar semantics). Evaluation is deterministic:
@@ -132,7 +141,38 @@ func (e *CedarEngine) Decide(r Request) Decision {
 	for _, reason := range diag.Reasons {
 		refs = append(refs, string(reason.PolicyID))
 	}
-	return Decision{Effect: effect, Tier: baseTier(effect, r), PolicyRefs: refs}
+	return Decision{Effect: effect, Tier: e.deriveTier(effect, diag), PolicyRefs: refs}
+}
+
+// deriveTier reads the approval tier from the @tier annotation of the matching permit
+// policies (the highest wins — most conservative). A permit with no @tier is tier 0.
+// Deny decisions carry tier 0 (C2 owns the deny path). Tiers clamp to 0..3.
+func (e *CedarEngine) deriveTier(effect string, diag types.Diagnostic) int {
+	if effect != "permit" {
+		return 0
+	}
+	tier := 0
+	for _, reason := range diag.Reasons {
+		p := e.ps.Get(reason.PolicyID)
+		if p == nil {
+			continue
+		}
+		v, ok := p.Annotations()[types.Ident("tier")]
+		if !ok {
+			continue
+		}
+		n, err := strconv.Atoi(string(v))
+		if err != nil {
+			continue
+		}
+		if n > tier {
+			tier = n
+		}
+	}
+	if tier > 3 {
+		tier = 3
+	}
+	return tier
 }
 
 func addBareEntity(m types.EntityMap, uid types.EntityUID) {
@@ -147,21 +187,6 @@ func teamUIDs(teams []string) []types.EntityUID {
 		uids = append(uids, cedar.NewEntityUID(teamType, types.String(t)))
 	}
 	return uids
-}
-
-// baseTier is C1's provisional tier. Slice 3 replaces this heuristic with tier
-// derivation from policy annotations.
-func baseTier(effect string, r Request) int {
-	if effect != "permit" {
-		return 0
-	}
-	if b, ok := r.ResourceAttrs["danger"].(bool); ok && b {
-		return 3
-	}
-	if env, ok := r.ResourceAttrs["env"].(string); ok && env == "prod" {
-		return 2
-	}
-	return 0
 }
 
 func recordFrom(m map[string]any) types.Record {
