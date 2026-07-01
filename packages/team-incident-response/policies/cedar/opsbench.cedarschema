@@ -1,0 +1,107 @@
+// opsbench — Cedar schema for the team-incident-response governance bundle.
+//
+// This schema is the CONTRACT between the runtime hook and the policies:
+//   - hooks/pre-tool-use.sh  builds requests in exactly this shape.
+//   - policies/cedar/tools.cedar + governors.cedar are validated against it in CI
+//     (`cedar validate`) and on commit (lefthook). A typo in an action name or a
+//     reference to an undeclared attribute now fails the build instead of silently
+//     causing skip-on-error (which historically made the gate a no-op).
+//
+// Canonical model (default / empty namespace):
+//   Principal : Agent::"<agent-name>"     one of the 33 subagents, or Agent::"human-operator"
+//   Action    : Action::"<ns>::<verb>"    tool actions (FS/Bash/k8s/...), or loop::*/recovery::* governors
+//   Resource  : Resource::"<tool|path>"   carries optional attrs populated by the hook from tool args
+//   Incident  : Incident::"<incident-id>" the subject of loop/governor decisions
+//
+// All Resource/context attributes are OPTIONAL: a given tool call only populates the
+// attributes that apply to it. Policies MUST guard every optional access with `has`
+// (e.g. `resource has path && resource.path like "..."`) so that an absent attribute
+// makes the rule fail safe (no permit -> default deny) instead of erroring.
+
+entity Agent;
+
+entity Resource {
+  "path"?: String,            // filesystem path (Read/Write/Edit, or Bash redirect target)
+  "namespace"?: String,       // k8s namespace
+  "read_only"?: Bool,         // collector/observability calls assert read-only access
+  "command_class"?: String,   // classified shell/ssh verb: journalctl|dmesg|rm|dd|mkfs|...
+  "exec_user"?: String,       // user for k8s exec (root is gated)
+  "repo"?: String,            // git remote target (e.g. "incident-witness")
+  "node_role"?: String,       // worker|control-plane for node SSH
+};
+
+entity Incident;
+
+// Context for per-tool-call authorization (pre-tool-use.sh).
+type ToolContext = {
+  "human_approval"?: Bool,
+  "verdict_status"?: String,        // ROOT_CAUSE_CONFIRMED | NEED_MORE_EVIDENCE | INCONCLUSIVE
+  "incident_round"?: Long,
+  "incident_phase"?: String,
+  "recovery_step_id"?: String,
+  "recovery_step_risk"?: String,    // destructive | non-destructive
+  "tone_review_passed"?: Bool,
+};
+
+// Context for loop / governor decisions (governor-check.sh).
+type LoopContext = {
+  "rounds_used"?: Long,
+  "wall_clock_used_min"?: Long,
+  "human_extension_granted"?: Bool,
+  "extension_minutes"?: Long,
+  "requesting_round"?: Long,
+  "artifact_count_requested"?: Long,
+  "new_hypotheses_this_round"?: Bool,
+  "evidence_gaps_count"?: Long,
+  "falsification_artifacts_requested"?: Long,
+  "human_approval_recorded"?: Bool,
+  "verdict_status"?: String,
+  "human_approval"?: Bool,
+  "tone_review_passed"?: Bool,
+  "citation_check_passed"?: Bool,
+  "schema_validation_passed"?: Bool,
+  "human_override_recorded"?: Bool,
+  "human_override_actor"?: String,
+  "now_utc"?: datetime,
+  "staleness_deadline_utc"?: datetime,
+};
+
+// ---- tool actions (per-tool-call, gated by tools.cedar) ----
+action "FS::read", "FS::write", "FS::append", "FS::delete", "FS::sha256",
+       "Bash::read", "Bash::exec", "Bash::ssh::readonly", "Bash::ssh::exec", "Bash::libreoffice",
+       "mcp::unknown",
+       "k8s::get", "k8s::list", "k8s::describe", "k8s::logs", "k8s::events", "k8s::audit-log",
+       "k8s::exec", "k8s::exec::readonly", "k8s::scale", "k8s::patch", "k8s::create",
+       "k8s::apply", "k8s::delete",
+       "prometheus::query", "prometheus::query_range",
+       "loki::query", "loki::query_range",
+       "tempo::search", "tempo::trace", "otel::query",
+       "postgres::query::readonly", "postgres::query::write",
+       "postgres::pg_terminate_backend", "postgres::truncate", "postgres::drop",
+       "clickhouse::query::readonly", "clickhouse::query::write", "clickhouse::truncate",
+       "redis::info",
+       "azure::list", "azure::describe", "azure::audit-log",
+       "aws::describe", "aws::cloudtrail::lookup",
+       "contabo::list", "contabo::describe", "ovh::describe",
+       "longhorn::backup-status", "longhorn::replica-list", "longhorn::volume-status",
+       "longhorn::salvage", "longhorn::detach", "longhorn::reattach",
+       "longhorn::delete-volume", "longhorn::delete-replica",
+       "ceph::status", "falco::events",
+       "slack::post", "email::send", "statuspage::publish",
+       "pagerduty::trigger", "linear::create",
+       "git::commit", "git::push", "rfc3161::timestamp",
+       "agent::dispatch"
+  appliesTo {
+    principal: [Agent],
+    resource: [Resource],
+    context: ToolContext
+  };
+
+// ---- loop / governor actions (round boundaries, gated by governors.cedar) ----
+action "loop::new_round", "loop::dispatch_collection", "loop::author_final",
+       "loop::extend_wall_clock", "loop::dispatch_recovery", "recovery::execute"
+  appliesTo {
+    principal: [Agent],
+    resource: [Incident],
+    context: LoopContext
+  };

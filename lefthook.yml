@@ -40,13 +40,18 @@ pre-commit:
         - merge
         - rebase
     cedar-validate:
-      glob: "*.cedar"
-      run: |
-        if command -v cedar >/dev/null 2>&1; then
-          cedar validate --policies {staged_files} || exit 1
-        else
-          echo "cedar CLI not installed — skipping policy validation (install: https://www.cedarpolicy.com/)"
-        fi
+      # Validates the Cedar schema + tools.cedar + governors.cedar and runs the decision
+      # battery against the real Cedar engine (policies/cedar/validate.mjs). Triggered when any
+      # Cedar policy/schema changes.
+      glob: "*.{cedar,cedarschema}"
+      run: npm run test:policies --workspace @opsbench/team-incident-response
+      skip:
+        - merge
+        - rebase
+    hook-tests:
+      # Runs the bats suite for the team hooks when a hook script changes.
+      glob: "packages/**/hooks/**/*.sh"
+      run: npm run test:hooks --workspace @opsbench/team-incident-response
       skip:
         - merge
         - rebase

@@ -95,35 +95,19 @@ jobs:
           OPSBENCH_PREFIX: /tmp/.claude-test
         run: bash scripts/install.sh --dry-run
 
-  cedar-validate:
-    name: cedar-validate
+  cedar-and-hooks:
+    name: cedar policy gate + hook tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Detect cedar files
-        id: detect
-        run: |
-          if find . -name "*.cedar" -not -path "./node_modules/*" | grep -q .; then
-            echo "found=yes" >> "$GITHUB_OUTPUT"
-          else
-            echo "found=no" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Install cedar-policy-cli
-        if: steps.detect.outputs.found == 'yes'
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-          # shellcheck disable=SC1091
-          . "$HOME/.cargo/env"
-          cargo install --locked cedar-policy-cli
-      - name: Validate cedar
-        if: steps.detect.outputs.found == 'yes'
-        run: |
-          # shellcheck disable=SC1091
-          . "$HOME/.cargo/env" || true
-          find . -name "*.cedar" -not -path "./node_modules/*" -print0 | while IFS= read -r -d '' f; do
-            echo "Validating $f"
-            cedar validate --policies "$f" --schema /dev/null || true
-          done
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - run: npm ci
+      - name: Cedar gate (schema + policy validation + decision battery)
+        run: npm run test:policies --workspace @opsbench/team-incident-response
+      - name: Hook tests (bats)
+        run: npm run test:hooks --workspace @opsbench/team-incident-response
 
   go:
     name: go (control-plane services)
