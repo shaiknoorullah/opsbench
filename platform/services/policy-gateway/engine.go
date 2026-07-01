@@ -40,9 +40,10 @@ const defaultResourceType = "Tool"
 // tier (0 auto · 1 notify · 2 single · 3 two-person); GOV-003's no-dry-run
 // auto-escalation is applied downstream by C2, not here.
 type Decision struct {
-	Effect     string
-	Tier       int
-	PolicyRefs []string
+	Effect           string
+	Tier             int
+	PolicyRefs       []string
+	DecisionRecordID string // set by Service.Authorize once the PDR is durably recorded
 }
 
 // Request is one authorization query. The engine builds the minimal Cedar entity
