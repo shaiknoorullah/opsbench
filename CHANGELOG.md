@@ -3,6 +3,12 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.1.4](https://github.com/shaiknoorullah/opsbench/compare/v1.1.3...v1.1.4) (2026-07-01)
+
+### Bug Fixes
+
+* **team-incident-response:** make the Cedar/hook authorization gate actually enforce ([#27](https://github.com/shaiknoorullah/opsbench/issues/27)) ([e7f17df](https://github.com/shaiknoorullah/opsbench/commit/e7f17df086fd43d5f433f8d87b4a2f15be23e840))
+
 ## [1.1.3](https://github.com/shaiknoorullah/opsbench/compare/v1.1.2...v1.1.3) (2026-06-17)
 
 ## [1.1.2](https://github.com/shaiknoorullah/opsbench/compare/v1.1.1...v1.1.2) (2026-06-17)
