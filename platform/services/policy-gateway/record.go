@@ -56,13 +56,17 @@ type Recorder interface {
 type Service struct {
 	engine   *CedarEngine
 	recorder Recorder
+	store    Store // entity metadata (agent -> teams, tool -> attrs); nil => default-deny
 	tenantID string
 	now      func() time.Time
 	newID    func() string
 }
 
-// Option configures a Service (clock/id injection for deterministic tests).
+// Option configures a Service (store/clock/id injection).
 type Option func(*Service)
+
+// WithStore attaches the entity store used by Evaluate to enrich thin ids.
+func WithStore(s Store) Option { return func(svc *Service) { svc.store = s } }
 
 // WithClock overrides the timestamp source.
 func WithClock(f func() time.Time) Option { return func(s *Service) { s.now = f } }

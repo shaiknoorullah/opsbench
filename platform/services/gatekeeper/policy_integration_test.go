@@ -33,7 +33,6 @@ func newC1(t *testing.T) (PolicyEngine, *policygateway.MemoryRecorder) {
 		t.Fatalf("NewCedarEngine: %v", err)
 	}
 	rec := &policygateway.MemoryRecorder{}
-	svc := policygateway.NewService(eng, rec, "t_acme")
 
 	store := policygateway.NewMemoryStore()
 	store.SetAgentTeams("spiffe://t_acme/agent/inv-7", "sre")
@@ -45,7 +44,9 @@ func newC1(t *testing.T) (PolicyEngine, *policygateway.MemoryRecorder) {
 		Parents: []string{"sre"},
 		Attrs:   map[string]any{"env": "prod", "danger": true, "read_only": false},
 	})
-	return NewPolicyAdapter(svc, store), rec
+
+	svc := policygateway.NewService(eng, rec, "t_acme", policygateway.WithStore(store))
+	return NewPolicyAdapter(svc), rec
 }
 
 func TestC1Integration_PermitFlowsThroughGatekeeper(t *testing.T) {

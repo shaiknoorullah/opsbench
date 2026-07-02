@@ -9,10 +9,10 @@ import (
 // ToolRef identifies a tool for list-phase filtering: its Cedar resource identity
 // (id + type + owning-team parents) and the attributes policies evaluate.
 type ToolRef struct {
-	ID      string
-	Type    string         // Cedar entity type (default "Tool")
-	Parents []string       // owning teams
-	Attrs   map[string]any // env, danger, read_only, ...
+	ID      string         `json:"id"`
+	Type    string         `json:"type,omitempty"`    // Cedar entity type (default "Tool")
+	Parents []string       `json:"parents,omitempty"` // owning teams
+	Attrs   map[string]any `json:"attrs,omitempty"`   // env, danger, read_only, ...
 }
 
 // listPermit reports whether the principal may see the tool (Action "list").
