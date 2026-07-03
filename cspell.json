@@ -298,7 +298,7 @@
     "subdirs", "Sysdig", "tanzu", "TARGETOS", "tcpconnect", "tcpdrop", "tekuri", "tfsec",
     "tmpfs", "tomjwxf", "trailofbits", "Truto", "tshark", "unbrokered", "unevidenced",
     "unfavourable", "ungated", "unioned", "unledgered", "Unmarshal", "unpermitted",
-    "unresumable", "unreviewed", "unscoreable", "unscored", "unvetted", "Unvetted",
+    "unresumable", "unreviewed", "unsandboxed", "unscoreable", "unscored", "unvetted", "Unvetted",
     "unviable", "upstreamed", "uuidgen", "vaporise", "Veeam", "wiremcp", "wrappable",
     "XSOAR", "Yubi", "ztunnel", "seqs", "HTMX", "Datastar", "Bubbletea", "goroutine", "goroutines"
   ],
