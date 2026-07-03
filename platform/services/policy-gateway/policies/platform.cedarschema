@@ -1,0 +1,30 @@
+// Cedar schema for the C1 policy-gateway platform model (documents the entity/action
+// contract that platform.cedar and the engine's per-call entity slice conform to).
+//
+// cedar-go (the runtime engine) is an authorizer, not a validator, so platform.cedar is
+// validated in Go by policies_test.go (parse + decision battery). This schema is the
+// human/CI-readable contract and can be fed to `cedar validate` / cedar-wasm as a gate.
+
+entity Team;
+
+entity Agent in [Team];
+
+entity Tool in [Team] {
+  "env"?: String,        // prod | staging | dev
+  "danger"?: Bool,       // irreversible / high-blast-radius
+  "read_only"?: Bool,    // no mutation
+  "owner_team"?: String, // owning team id
+};
+
+type ToolContext = {
+  "scope"?: String,          // target scope uri
+  "justification"?: String,
+  "human_approval"?: Bool,
+  "verdict_status"?: String,
+};
+
+action "invoke", "list" appliesTo {
+  principal: [Agent],
+  resource: [Tool],
+  context: ToolContext
+};
