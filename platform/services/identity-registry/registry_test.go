@@ -55,7 +55,7 @@ func TestRegistryLifecycle(t *testing.T) {
 
 func TestRegistryReturnsIsolatedCopies(t *testing.T) {
 	r := New()
-	r.Register(Agent{ID: "a", Teams: []string{"sre"}, OnBehalfOf: []string{"usr"}})
+	r.Register(Agent{ID: "a", Teams: []string{"sre"}, Scopes: []string{"scope://t/*"}, OnBehalfOf: []string{"usr"}})
 
 	teams := r.Teams("a")
 	teams[0] = "mutated"
@@ -65,9 +65,13 @@ func TestRegistryReturnsIsolatedCopies(t *testing.T) {
 
 	a, _ := r.Lookup("a")
 	a.Teams[0] = "mutated"
+	a.Scopes[0] = "mutated"
 	a.OnBehalfOf[0] = "mutated"
 	if got := r.Teams("a"); got[0] != "sre" {
 		t.Fatal("Lookup must return an isolated copy of Teams")
+	}
+	if got, _ := r.Lookup("a"); got.Scopes[0] != "scope://t/*" {
+		t.Fatal("Lookup must return an isolated copy of Scopes")
 	}
 }
 

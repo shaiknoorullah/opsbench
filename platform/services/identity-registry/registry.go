@@ -33,6 +33,7 @@ type Agent struct {
 	ID         string        // SPIFFE id, e.g. spiffe://<tenant>/agent/<id>
 	TenantID   string        //
 	Teams      []string      // team memberships (backs C1's entity store)
+	Scopes     []string      // permitted write scopes (backs C4's credential intersection)
 	Owner      string        // human owner
 	Autonomy   AutonomyLevel // granted autonomy level
 	OnBehalfOf []string      // delegation chain (humans/agents this identity acts for)
@@ -54,6 +55,7 @@ func (r *Registry) Register(a Agent) {
 	defer r.mu.Unlock()
 	a.revoked = false
 	a.Teams = append([]string(nil), a.Teams...)
+	a.Scopes = append([]string(nil), a.Scopes...)
 	a.OnBehalfOf = append([]string(nil), a.OnBehalfOf...)
 	r.agents[a.ID] = a
 }
@@ -82,6 +84,7 @@ func (r *Registry) Lookup(id string) (Agent, bool) {
 		return Agent{}, false
 	}
 	a.Teams = append([]string(nil), a.Teams...)
+	a.Scopes = append([]string(nil), a.Scopes...)
 	a.OnBehalfOf = append([]string(nil), a.OnBehalfOf...)
 	return a, true
 }
