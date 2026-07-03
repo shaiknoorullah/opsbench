@@ -24,16 +24,18 @@ Effort uses T-shirt sizes (S ≈ ≤1 wk, M ≈ 1–2 wk, L ≈ 2–4 wk, XL ≈
 
 ## 2. TL;DR — where the platform stands
 
+> **Progress update (2026-07-04):** the governed-action spine's core is now built and merged to `main` (`v1.4.0`). **C1** Policy Gateway (PR #33), **C7** Identity Registry incl. its C1 policy-store adapter (PR #34/#35), and **C4** Credential Broker (PR #36) landed as tested Go libraries (**LIB**), joining C5 (SHIPPED) and C2/C3 (LIB). The chain **C7 identity → C1 policy → C2 gatekeeper → C4 credential** is wired in-process and passes `go test -race` end-to-end (active agent executes; unknown/revoked/out-of-scope fail closed). The §3 matrix below reflects this; the 2026-07-01 snapshot bullets that follow are superseded for C1/C4/C7. Remaining to MVP: service surfaces (HTTP/RPC) + durable stores, cloud federation (C4), SPIFFE issuance + delegation graph (C7), and the components still in design or spike (C6, C8–C16).
+
 The platform is **early**: the *governed-action spine* is partially real, everything else is design or throwaway-spike.
 
 - **1 of 16 components implemented** (C5 Audit Ledger, Go, tested).
 - **2 partial libraries** (C2 Gatekeeper, C3 Approvals) — real logic + tests, but **in-memory stores, no network surface, key dependencies stubbed**.
 - **4 validated as throwaway spikes** (C8/C10/C11/C13 via S2/S5/S3/S4, in TypeScript) — **not promoted** to `services/`.
 - **9 design-only** (C1, C4, C6, C7, C9, C12, C14, C15, C16).
-- **Requirement coverage:** of 118 reqs / 51 P0, roughly **8 P0 are partially implemented** (the C2/C3/C5 spine slice); **0 are fully shippable** end-to-end because the spine has no front door (C1), no credentials (C4), no identity (C7), and no event stream/surface (C6/C15).
+- **Requirement coverage:** of 118 requirements / 51 P0, roughly **8 P0 are partially implemented** (the C2/C3/C5 spine slice); **0 are fully shippable** end-to-end because the spine has no front door (C1), no credentials (C4), no identity (C7), and no event stream/surface (C6/C15).
 - **The MVP demo cannot run** today: it needs C1→C2→C3→C4→C5 wired as services plus C11 (phone-ack) and C6/C15 (a surface).
 
-The good news: the five load-bearing bets are **de-risked** (all spikes passed), the data contracts exist (`@opsbench/schemas`), and the hardest on-path component (C5) is done. The work ahead is mostly *promotion + service-ification + wiring*, not research.
+The good news: the five load-bearing bets are **de-risked** (all spikes passed), the data contracts exist (`@opsbench/schemas`), and the hardest on-path component (C5) is done. The work ahead is mostly *promotion + service-building + wiring*, not research.
 
 ## 3. Component status matrix (C1–C16)
 
@@ -41,13 +43,13 @@ State legend: **SHIPPED** (Go service, tested) · **LIB** (Go package, no servic
 
 | # | Component | State | Evidence | PRD coverage | In MVP? | Gap to MVP |
 |---|---|---|---|---|---|---|
-| C1 | Policy Gateway | **DESIGN** | — | GOV-002, GOV-009, GOV-012, INT-012 | ✅ | Build: Cedar PDP w/ preparse + entity-slicing (A1), tool-list filtering, decision records → C5, freeze-as-policy (GOV-009) |
-| C2 | Actuation Gatekeeper | **LIB** | `services/gatekeeper/` (4 impl, 2 test, 872 loc) | GOV-001/003/008/015/017 | ✅ | Add HTTP/RPC surface; replace `FreezeChecker` placeholder (→C1) + `CredentialBroker` stub (→C4); tool registry + dry-run; populate `ApprovalRef` |
+| C1 | Policy Gateway | **LIB** | `services/policy-gateway/` (Cedar PDP, PDR→C5, tiers, freeze, HTTP + binary) | GOV-002, GOV-009, GOV-012, INT-012 | ✅ | ✅ core built + merged (PR #33): Cedar PDP (preparse + entity-slicing, A1), tool-list filtering, decision records → C5, freeze (GOV-009), in-process + HTTP wiring into C2. Remaining: tenant policy-store loading; perf/isolation hardening |
+| C2 | Actuation Gatekeeper | **LIB** | `services/gatekeeper/` (4 impl, 2 test, 872 loc) | GOV-001/003/008/015/017 | ✅ | Add HTTP/RPC surface; **C1 policy, C4 credential + C1 freeze adapters now wired (PR #33/#36)**; tool registry + dry-run; populate `ApprovalRef` |
 | C3 | Approval Service | **LIB** | `services/approvals/` (5 impl, 1 test, 993 loc) | GOV-004/005/011 | ✅ | Durable Postgres store; wire post-approval states (executing/executed/failed); cross-surface propagation (→C6); HTTP surface |
-| C4 | Credential Broker | **DESIGN** | — | INT-009, IDN-004/006, NF-007 | ✅ | Build: OIDC issuer, cloud federation (STS/WIF/Entra), JIT minting, inventory, ≤NF-007 lifetimes |
+| C4 | Credential Broker | **LIB** | `services/credential-broker/` (JIT mint, C7-gated, intersection scope, inventory) | INT-009, IDN-004/006, NF-007 | ✅ | ✅ core built + merged (PR #36): JIT minting, C7-identity-gated, intersection scope, ≤NF-007 capped lifetimes, attribution inventory, C2 adapter. Remaining: OIDC issuer, cloud federation (STS/WIF/Entra) |
 | C5 | Audit Ledger | **SHIPPED** | `services/audit-ledger/` (11 impl, 3 test, 1382 loc): hash chain, Merkle checkpoints, verify CLI, mem+pg stores | IDN-001/002, NF-003 | ✅ | Measure durable Postgres insert vs NF-003 ≤25 ms (A3); confirm 1024-cadence in code; optional service surface |
 | C6 | Event Stream | **DESIGN** | — | SUR-001, NF-008 | ✅ | Build: Redis Streams, tenant-scoped, consumer groups; the spine emits to it |
-| C7 | Identity Registry | **DESIGN** | — | IDN-003/005/011 | ✅ | Build: NHI registry, SPIFFE IDs, delegation graph; unknown-identity-deny (TEAM-003) |
+| C7 | Identity Registry | **LIB** | `services/identity-registry/` (NHI registry, teams/scopes, revoke, C1 policy-store adapter) | IDN-003/005/011 | ✅ | ✅ core built + merged (PR #34/#35): NHI registry, team + scope grants, revoke, unknown/revoked-identity-deny (TEAM-003), C1 `policygateway.Store` adapter. Remaining: SPIFFE issuance, delegation graph |
 | C8 | Memory Proxy | **SPIKE** | `spikes/s2-memory-rbac/` (37/37) | MEM-001..005, MEM-012 | partial | Promote to Go; org/team write scopes only for MVP; live-Redis round-trip (S2's open item) |
 | C9 | Knowledge/Context Store | **DESIGN** | — | MEM-006..008, NF-010 | ✅ | Build: incident ledger (MEM-006), fact layers, topology; fast local read path (NF-010) |
 | C10 | Connector Hub | **SPIKE** | `spikes/s5-capability-schema/` (41/41) | INT-001..016 | ✅ (launch tier) | Promote `observability/1` (A4/A5/A6); 2 obs backends + 1 ITSM + 1 CRM; read-only profiles (INT-002) |
