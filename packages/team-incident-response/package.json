@@ -25,7 +25,7 @@
     "test": "npm run test:policies && npm run test:hooks"
   },
   "devDependencies": {
-    "@cedar-policy/cedar-wasm": "4.11.1",
+    "@cedar-policy/cedar-wasm": "4.11.2",
     "bats": "^1.11.1"
   }
 }
