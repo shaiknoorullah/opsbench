@@ -36,6 +36,12 @@ func NewServer(sp *Spine) *Server {
 	s.mux.HandleFunc("GET /v1/approvals/by-action/{ref}", s.handleApprovalByAction)
 	s.mux.HandleFunc("POST /v1/approvals/{id}/decide", s.handleDecide)
 	s.mux.HandleFunc("GET /v1/evidence", s.handleEvidence)
+	// admin/registration API (identities + tools) — makes the server standalone
+	s.mux.HandleFunc("POST /v1/agents", s.handleRegisterAgent)
+	s.mux.HandleFunc("GET /v1/agents", s.handleAgents)
+	s.mux.HandleFunc("DELETE /v1/agents", s.handleRevokeAgent)
+	s.mux.HandleFunc("POST /v1/tools", s.handleRegisterTool)
+	s.mux.HandleFunc("GET /v1/tools", s.handleTools)
 	s.mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok\n"))

@@ -144,6 +144,10 @@ func (s *Spine) RegisterAgent(a identityregistry.Agent) { s.ids.Register(a) }
 
 // RegisterTool makes a tool executable (C2) and gives C1 its entity metadata (owning teams
 // + attributes). In production the metadata comes from C10; here it is supplied directly.
+//
+// The two writes are not one atomic step, so a concurrent Execute can briefly observe the
+// C1 metadata registered before the C2 executable. That window fails closed: C2 reports
+// "unknown tool" and denies — never executes a half-registered tool.
 func (s *Spine) RegisterTool(parents []string, attrs map[string]any, tool gatekeeper.Tool) {
 	s.tools.SetTool(tool.Name(), policygateway.ToolMeta{Parents: parents, Attrs: attrs})
 	s.gk.Register(tool)

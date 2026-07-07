@@ -104,3 +104,21 @@ func (r *Registry) IsActive(id string) bool {
 	_, ok := r.Lookup(id)
 	return ok
 }
+
+// List returns every active (non-revoked) agent, each with isolated slice copies so a
+// caller cannot mutate registry state. Order is unspecified.
+func (r *Registry) List() []Agent {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]Agent, 0, len(r.agents))
+	for _, a := range r.agents {
+		if a.revoked {
+			continue
+		}
+		a.Teams = append([]string(nil), a.Teams...)
+		a.Scopes = append([]string(nil), a.Scopes...)
+		a.OnBehalfOf = append([]string(nil), a.OnBehalfOf...)
+		out = append(out, a)
+	}
+	return out
+}
