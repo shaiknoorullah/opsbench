@@ -233,19 +233,21 @@ func (s *Spine) executeWithDecision(ctx context.Context, a gatekeeper.Action, by
 	}
 }
 
-// Close flushes and stops the C5 appender. Read evidence only after Close.
+// Close stops the C5 appender workers. Call it at shutdown. Reading evidence does NOT
+// require Close — the appender's Append blocks until each record is durable, so completed
+// actions are already committed.
 func (s *Spine) Close() { s.ledgerApp.Close() }
 
-// Evidence returns the full per-tenant audit chain. Call Close first so all records are
-// durably flushed.
+// Evidence returns the full per-tenant audit chain (every record of a completed action is
+// already durable).
 func (s *Spine) Evidence(ctx context.Context) ([]auditledger.AuditRecord, error) {
 	return s.store.ReadRange(ctx, s.tenant, 0, int64(1)<<62)
 }
 
-// VerifyEvidence seals the chain (Close), reads it, and verifies it offline (no platform
-// or DB access) — the IDN-001 property. It returns the verification result and the records.
+// VerifyEvidence reads the current per-tenant audit chain and verifies it offline (no
+// platform or DB access) — the IDN-001 property. It is read-only and repeatable — safe to
+// call on a live server.
 func (s *Spine) VerifyEvidence(ctx context.Context) (auditledger.VerifyResult, []auditledger.AuditRecord, error) {
-	s.Close()
 	recs, err := s.Evidence(ctx)
 	if err != nil {
 		return auditledger.VerifyResult{}, nil, err
