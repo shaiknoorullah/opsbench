@@ -82,3 +82,33 @@ func TestAutonomyLevelString(t *testing.T) {
 		}
 	}
 }
+
+func TestRegistryList(t *testing.T) {
+	r := New()
+	r.Register(Agent{ID: "a", Teams: []string{"sre"}})
+	r.Register(Agent{ID: "b", Teams: []string{"payments"}})
+	r.Register(Agent{ID: "c"})
+	r.Revoke("c") // revoked agents are excluded
+
+	got := r.List()
+	if len(got) != 2 {
+		t.Fatalf("want 2 active agents, got %d", len(got))
+	}
+	ids := map[string]bool{}
+	for _, a := range got {
+		ids[a.ID] = true
+	}
+	if !ids["a"] || !ids["b"] || ids["c"] {
+		t.Fatalf("List should return a and b (not revoked c), got %v", ids)
+	}
+
+	// Isolation: mutating a returned agent's slice must not affect the registry.
+	got[0].Teams = append(got[0].Teams, "mutated")
+	for _, a := range r.List() {
+		for _, tm := range a.Teams {
+			if tm == "mutated" {
+				t.Fatal("List must return isolated copies")
+			}
+		}
+	}
+}

@@ -2,6 +2,7 @@ package gatekeeper
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	auditledger "github.com/shaiknoorullah/opsbench/platform/services/audit-ledger"
@@ -20,7 +21,9 @@ type Config struct {
 // Gatekeeper is the actuation control point (C2). Agents never hold write credentials;
 // they propose Actions and only Execute mutates anything.
 type Gatekeeper struct {
-	cfg   Config
+	cfg Config
+
+	mu    sync.RWMutex // guards tools (registration may run concurrently with Execute)
 	tools map[string]Tool
 }
 
@@ -31,8 +34,19 @@ func New(cfg Config) *Gatekeeper {
 	return &Gatekeeper{cfg: cfg, tools: make(map[string]Tool)}
 }
 
-// Register makes a tool available for execution.
-func (g *Gatekeeper) Register(t Tool) { g.tools[t.Name()] = t }
+// Register makes a tool available for execution. Safe to call concurrently with Execute.
+func (g *Gatekeeper) Register(t Tool) {
+	g.mu.Lock()
+	g.tools[t.Name()] = t
+	g.mu.Unlock()
+}
+
+// tool looks up a registered tool under the read lock.
+func (g *Gatekeeper) tool(name string) Tool {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	return g.tools[name]
+}
 
 // payloadHash pins the exact payload via canonical JSON + SHA-256 (reuses C5's hashing).
 func payloadHash(p map[string]any) (string, error) {
@@ -100,7 +114,7 @@ func (g *Gatekeeper) Execute(ctx context.Context, a Action) (Result, error) {
 	}
 
 	// 4. Tool + dry-run contract (GOV-003 auto-escalation).
-	tool := g.tools[a.Tool]
+	tool := g.tool(a.Tool)
 	if tool == nil {
 		_, _ = rec("tool_call", "deny", "denied", nil)
 		return denied("unknown tool: "+a.Tool, dec.Tier), nil
