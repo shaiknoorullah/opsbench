@@ -3,6 +3,8 @@
 All notable changes to opsbench are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
 
+## [1.7.0](https://github.com/shaiknoorullah/opsbench/compare/v1.6.0...v1.7.0) (2026-07-07)
+
 ## [1.6.0](https://github.com/shaiknoorullah/opsbench/compare/v1.5.1...v1.6.0) (2026-07-07)
 
 ## [1.5.1](https://github.com/shaiknoorullah/opsbench/compare/v1.5.0...v1.5.1) (2026-07-03)
