@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>opsbench — evidence, or it didn't happen</title>
+<meta name="description" content="opsbench is an open-source, forensic-grade agent toolkit for DevOps, SRE, platform, security and network teams. Verdict-blind investigation, SHA-256 evidence sealing, Cedar-gated mutations — for Claude Code and Codex CLI.">
+<meta property="og:title" content="opsbench — evidence, or it didn't happen">
+<meta property="og:description" content="A multi-team agent toolkit that treats production incidents as forensic cases. Evidence sealed. Mutations gated. Verdicts earned.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0b0e'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23ffb454' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23ffb454'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- ————— preloader ————— -->
+<div id="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <div class="loader-seal"></div>
+    <p class="mono loader-line" id="loader-line">opening evidence file…</p>
+    <div class="loader-bar"><span id="loader-fill"></span></div>
+  </div>
+</div>
+
+<!-- ————— webgl stage ————— -->
+<canvas id="stage" aria-hidden="true"></canvas>
+<div id="grain-dom" aria-hidden="true"></div>
+
+<!-- ————— nav ————— -->
+<header id="nav">
+  <a class="wordmark mono" href="#exhibit-00">ops<span>bench</span></a>
+  <nav aria-label="Sections">
+    <a href="#exhibit-01">Deficit</a>
+    <a href="#exhibit-02">The Gate</a>
+    <a href="#exhibit-03">The Ledger</a>
+    <a href="#exhibit-04">The Team</a>
+    <a href="#exhibit-06">Run it</a>
+  </nav>
+  <div class="nav-cta">
+    <a class="btn btn-ghost mono" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</header>
+
+<!-- ————— progress rail ————— -->
+<aside id="rail" aria-hidden="true">
+  <div class="rail-line"><span id="rail-fill"></span></div>
+  <ol class="mono">
+    <li data-ex="00">00</li>
+    <li data-ex="01">01</li>
+    <li data-ex="02">02</li>
+    <li data-ex="03">03</li>
+    <li data-ex="04">04</li>
+    <li data-ex="05">05</li>
+    <li data-ex="06">06</li>
+  </ol>
+</aside>
+
+<main id="content">
+
+  <!-- EXHIBIT 00 — HERO -->
+  <section class="exhibit hero" id="exhibit-00" data-act="0">
+    <div class="ex-inner">
+      <p class="eyebrow mono reveal">EXHIBIT 00 · OPEN-SOURCE AGENT TOOLKIT · MIT</p>
+      <h1 class="display reveal-words">Evidence, or it didn&rsquo;t happen.</h1>
+      <p class="lede reveal">
+        opsbench is a multi-team agent toolkit for DevOps, SRE, platform, security
+        and network teams running Claude&nbsp;Code and Codex&nbsp;CLI on production
+        infrastructure. It treats every incident as a forensic case:
+        verdict-blind investigation, SHA-256 evidence sealing, Cedar-gated
+        mutations, and a human approval at every round boundary.
+      </p>
+      <div class="cta-row reveal">
+        <button class="btn btn-solid mono" id="copy-install" data-cmd="curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash">
+          <span class="prompt">$</span> curl -fsSL …/install.sh | bash
+          <span class="copy-hint">copy</span>
+        </button>
+        <a class="btn btn-ghost" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">View the source ↗</a>
+      </div>
+      <ul class="proof mono reveal">
+        <li><b data-count="11">0</b> chained skills</li>
+        <li><b data-count="33">0</b> subagents</li>
+        <li><b data-count="9">0</b> JSON schemas</li>
+        <li><b data-count="50">0</b> MCP recipes</li>
+      </ul>
+    </div>
+    <p class="scroll-cue mono" aria-hidden="true">scroll to open the case file<span class="cue-line"></span></p>
+  </section>
+
+  <!-- EXHIBIT 01 — TRUST DEFICIT -->
+  <section class="exhibit" id="exhibit-01" data-act="1">
+    <div class="ex-inner narrow">
+      <p class="eyebrow mono reveal">EXHIBIT 01 · THE TRUST DEFICIT</p>
+      <h2 class="display reveal-words">90% adoption.<br>24% trust.</h2>
+      <p class="body reveal">
+        DORA measured the gap in 2025: teams adopted AI on infrastructure far
+        faster than they learned to trust it. On open benchmarks,
+        state-of-the-art agents resolve roughly one in ten realistic SRE
+        scenarios — while every vendor accuracy number you have read is
+        self-reported. The failure mode is always the same: a single megaprompt
+        guesses a <em>&ldquo;probable&rdquo;</em> root cause and calls it a day.
+      </p>
+      <p class="body strong reveal">opsbench bans the word.</p>
+      <div class="verdicts reveal" role="list">
+        <span class="chip mono confirmed" role="listitem">CONFIRMED</span>
+        <span class="chip mono falsified" role="listitem">FALSIFIED</span>
+        <span class="chip mono" role="listitem">NEED-MORE-EVIDENCE</span>
+        <span class="chip mono" role="listitem">INCONCLUSIVE</span>
+      </div>
+      <p class="cite mono reveal">
+        The only verdicts an opsbench agent may render. &ldquo;Probable&rdquo; is a
+        forbidden word — rejected by a PostToolUse hook at write time.<br>
+        <span>— docs/concepts/tone-and-constitution.md · DORA 2025 · ITBench (arXiv:2502.05352)</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- EXHIBIT 02 — THE GATE -->
+  <section class="exhibit" id="exhibit-02" data-act="2">
+    <div class="ex-inner">
+      <p class="eyebrow mono reveal">EXHIBIT 02 · CEDAR-GATED MUTATIONS</p>
+      <h2 class="display reveal-words">No agent touches production on its own judgment.</h2>
+      <p class="body reveal">
+        Every tool call passes a deterministic, default-deny policy gate that
+        lives <em>outside</em> the model&rsquo;s reasoning loop. Per-agent
+        least-privilege allowlists decide what each specialist may touch; loop
+        governors cap iteration; hooks intercept before and after every call.
+        The model&rsquo;s confidence is never the enforcement mechanism.
+      </p>
+      <div class="card-grid reveal">
+        <article class="card">
+          <h3 class="mono">tools.cedar</h3>
+          <p>Per-agent tool allowlists. An evidence collector can read a cluster; it cannot write to one. Deny by default.</p>
+        </article>
+        <article class="card">
+          <h3 class="mono">governors.cedar</h3>
+          <p>Loop caps and iteration discipline. Investigations converge or escalate — they never spiral.</p>
+        </article>
+        <article class="card">
+          <h3 class="mono">4 hooks</h3>
+          <p>PreToolUse, PostToolUse, SessionStart, SubagentStop — the tripwires around every action, including denials.</p>
+        </article>
+      </div>
+      <p class="cite mono reveal"><span>— packages/team-incident-response/policies/ · docs/concepts/cedar-policies.md</span></p>
+    </div>
+  </section>
+
+  <!-- EXHIBIT 03 — THE LEDGER -->
+  <section class="exhibit" id="exhibit-03" data-act="3">
+    <div class="ex-inner narrow right">
+      <p class="eyebrow mono reveal">EXHIBIT 03 · CHAIN OF CUSTODY</p>
+      <h2 class="display reveal-words">Sealed the moment it&rsquo;s collected.</h2>
+      <p class="body reveal">
+        Evidence is gathered in parallel across seven layers — application,
+        node, network, storage, control plane, observability, and history —
+        then sealed with SHA-256 manifests and entered into a custody log,
+        per NIST SP 800-86. Hypothesis agents investigate
+        <em>verdict-blind</em>: one subagent per hypothesis, none aware of the
+        others&rsquo; conclusions, every claim pinned to a
+        <code class="mono">file:timestamp</code> citation.
+      </p>
+      <blockquote class="pull reveal">
+        <p>&ldquo;A claim without a citation is a rumor.&rdquo;</p>
+        <footer class="mono">— the opsbench constitution</footer>
+      </blockquote>
+      <p class="cite mono reveal"><span>— docs/concepts/tone-and-constitution.md · NIST SP 800-86 · ISO/IEC 27037</span></p>
+    </div>
+  </section>
+
+  <!-- EXHIBIT 04 — THE TEAM -->
+  <section class="exhibit" id="exhibit-04" data-act="4">
+    <div class="ex-inner">
+      <p class="eyebrow mono reveal">EXHIBIT 04 · 33 SPECIALISTS, ONE DISCIPLINE</p>
+      <h2 class="display reveal-words">Not one megaprompt. A disciplined team.</h2>
+      <p class="body reveal">
+        An incident commander orchestrates the outer DAG. Collectors sweep each
+        layer in parallel. A cataloger and a witness seal what they find.
+        Hypothesis specialists investigate independently, a forensic
+        synthesizer writes the narrative, and an enforcement pass —
+        schema validator, citation checker, redaction checker, tone reviewer —
+        blocks anything that doesn&rsquo;t meet the constitution. If the verdict
+        isn&rsquo;t CONFIRMED, the investigation loops. Up to five rounds.
+      </p>
+      <div class="roles mono reveal">
+        <span>incident-commander</span><span>quarantine-coordinator</span><span>timeline-keeper</span>
+        <span>evidence-source-discoverer</span><span>node-collector</span><span>network-collector</span>
+        <span>storage-collector</span><span>controlplane-collector</span><span>observability-collector</span>
+        <span>evidence-cataloger</span><span>evidence-witness</span><span>hypothesis-generator</span>
+        <span>hypothesis-storage</span><span>hypothesis-network</span><span>hypothesis-app</span>
+        <span>forensic-synthesizer</span><span>schema-validator</span><span>evidence-citation-checker</span>
+        <span>redaction-checker</span><span>tone-reviewer</span><span>rca-author</span>
+        <span>mitigations-author</span><span>customer-comms-author</span><span>recovery-executor</span>
+        <span class="more">+ 9 more</span>
+      </div>
+      <p class="cite mono reveal"><span>— packages/team-incident-response/agents/ · NTSB party-process, round-N+1 model</span></p>
+    </div>
+  </section>
+
+  <!-- EXHIBIT 05 — HUMAN GATE -->
+  <section class="exhibit" id="exhibit-05" data-act="4">
+    <div class="ex-inner narrow">
+      <p class="eyebrow mono reveal">EXHIBIT 05 · HUMAN-GATED</p>
+      <h2 class="display reveal-words">No mutation without a human.</h2>
+      <p class="body reveal">
+        Quarantine comes first — clients scaled to zero, default-deny network
+        policy — so the investigation can&rsquo;t trample its own evidence. From
+        there, nothing mutates without explicit human approval at each round
+        boundary and Cedar authorization at each tool call. Recovery runs
+        through the same approval queue as everything else. When the case
+        closes, the team authors the full post-incident suite: a NIST 800-61
+        incident report, a 5-Whys RCA, CAPA mitigations, and a NIST 800-86
+        investigation report.
+      </p>
+      <ul class="standards mono reveal">
+        <li>NIST SP 800-86</li><li>NIST SP 800-61r2</li><li>ISO/IEC 27037</li>
+        <li>NTSB party-process</li><li>MITRE ATT&amp;CK</li><li>SANS DFIR</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- EXHIBIT 06 — RUN IT -->
+  <section class="exhibit cta-final" id="exhibit-06" data-act="5">
+    <div class="ex-inner narrow center">
+      <p class="eyebrow mono reveal">EXHIBIT 06 · RUN IT</p>
+      <h2 class="display reveal-words">One command. The bench is yours.</h2>
+      <div class="term reveal" role="group" aria-label="Install commands">
+        <div class="term-bar mono"><span></span><span></span><span></span> install.sh</div>
+        <pre class="mono"><code><span class="c"># install every team</span>
+<span class="p">$</span> curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash
+
+<span class="c"># preview without writing anything</span>
+<span class="p">$</span> curl -fsSL …/install.sh | bash -s -- --dry-run</code></pre>
+        <button class="term-copy mono" data-cmd="curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash">copy</button>
+      </div>
+      <p class="body dim reveal">
+        Then, from Claude Code: <code class="mono">/storage-incident-response</code> —
+        and the commander takes it from there.
+      </p>
+      <div class="cta-row center reveal">
+        <a class="btn btn-solid" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">Star on GitHub ↗</a>
+        <a class="btn btn-ghost" href="https://github.com/shaiknoorullah/opsbench/tree/main/docs" target="_blank" rel="noopener">Read the docs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer / custody log -->
+  <footer id="custody">
+    <div class="custody-grid">
+      <div>
+        <p class="mono eyebrow-sm">CHAIN OF CUSTODY — THIS ARTIFACT</p>
+        <p class="mono log">
+          artifact&nbsp;&nbsp;: landing/index.html<br>
+          sealed&nbsp;&nbsp;&nbsp;&nbsp;: 2026-07-17T00:00:00Z<br>
+          license&nbsp;&nbsp;&nbsp;: MIT<br>
+          verdict&nbsp;&nbsp;&nbsp;: <span class="ok">CONFIRMED</span> — every claim above cites its source
+        </p>
+      </div>
+      <div>
+        <p class="mono eyebrow-sm">TEAMS</p>
+        <p class="mono log">
+          team-incident-response&nbsp;&nbsp;<span class="ok">stable</span><br>
+          team-platform-engineering&nbsp;&nbsp;planned<br>
+          team-security-response&nbsp;&nbsp;planned<br>
+          team-network-operations&nbsp;&nbsp;planned<br>
+          team-it-helpdesk&nbsp;&nbsp;planned
+        </p>
+      </div>
+      <div>
+        <p class="mono eyebrow-sm">SOURCE</p>
+        <p class="mono log">
+          <a href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">github.com/shaiknoorullah/opsbench</a><br>
+          built by <a href="https://github.com/shaiknoorullah" target="_blank" rel="noopener">Shaik Noorullah</a><br>
+          while running production Kubernetes
+        </p>
+      </div>
+    </div>
+    <p class="mono baseline">opsbench — a disciplined team of agents that can never go wrong by design.</p>
+  </footer>
+
+</main>
+
+<div id="toast" class="mono" role="status" aria-live="polite">copied to clipboard</div>
+
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis/lenis.min.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
