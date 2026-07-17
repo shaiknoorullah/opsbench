@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#04050a" />
+    <title>opsbench — the governance plane for AI operations agents</title>
+    <meta
+      name="description"
+      content="opsbench makes agent write-access to production provably safe: deterministic authorization outside the model, a tamper-evident audit ledger, autonomy earned through evaluation, and a human always reachable."
+    />
+    <meta property="og:title" content="opsbench — prove your agents are safe" />
+    <meta
+      property="og:description"
+      content="The governance and orchestration plane for AI operations agents. Authorization outside the model. Evidence, not claims. Autonomy that is earned, never assumed."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <!-- Preloader -->
+    <div class="preloader" id="preloader" aria-hidden="true">
+      <div class="preloader__inner">
+        <div class="preloader__mark">opsbench</div>
+        <div class="preloader__bar"><span id="preloader-fill"></span></div>
+        <div class="preloader__meta">
+          <span id="preloader-pct">0</span><span>%</span>
+          <span class="preloader__label">calibrating the ledger</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WebGL stage -->
+    <canvas id="stage" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- Fixed chrome -->
+    <header class="nav" id="nav">
+      <a class="nav__brand" href="#top" aria-label="opsbench home">
+        <span class="nav__dot"></span>
+        opsbench
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#gatekeeper">Gatekeeper</a>
+        <a href="#ledger">Ledger</a>
+        <a href="#autonomy">Autonomy</a>
+        <a href="#reach">Escalation</a>
+      </nav>
+      <a class="nav__cta" href="#install">Install <span aria-hidden="true">→</span></a>
+    </header>
+
+    <!-- Scroll progress rail -->
+    <div class="rail" id="rail" aria-hidden="true">
+      <span class="rail__fill" id="rail-fill"></span>
+    </div>
+
+    <!-- Section index (right side) -->
+    <aside class="dial" id="dial" aria-hidden="true"></aside>
+
+    <main id="content"><!-- injected by ui/dom.js --></main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
