@@ -38,8 +38,8 @@ export function Effects({ director, sun }: { director: Director; sun: THREE.Mesh
     const dof = low
       ? null
       : new DepthOfFieldEffect(camera as THREE.PerspectiveCamera, {
-          worldFocusDistance: 11,
-          worldFocusRange: 8,
+          worldFocusDistance: 9.3,
+          worldFocusRange: 16,
           bokehScale: 3.6,
           height: 480,
         });
@@ -86,7 +86,10 @@ export function Effects({ director, sun }: { director: Director; sun: THREE.Mesh
     if (fx.dof) {
       const coc = fx.dof.cocMaterial;
       coc.worldFocusDistance = director.focusDist;
-      coc.worldFocusRange = 8 / Math.max(0.3, director.aperture);
+      // CoC ramps from zero blur at the focus plane to full blur at
+      // focusRange — a wide range keeps the subject zone crisp while
+      // near-lens dust and the far hall still melt into bokeh
+      coc.worldFocusRange = 16 / Math.max(0.35, director.aperture);
     }
   });
 

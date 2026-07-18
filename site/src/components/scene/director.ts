@@ -26,6 +26,8 @@ interface Shot {
   fog?: number;
   /** dutch tilt, degrees */
   roll?: number;
+  /** focus distance to the act's subject, world meters */
+  focus?: number;
   p?: number;
 }
 
@@ -36,20 +38,20 @@ const SHOTS: Shot[] = [
   // pilaster pair breaks the left frame edge as a defocused foreground mass.
   // grades: warm print at the seal, cool desaturated doubt in the deficit,
   // hot amber through the gate, neutral-cool forensic ledger, warm finale.
-  { at: ['sec', 0, 0.0], pos: [-2.1, 1.9, 9.4], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0, temp: 0.14, sat: 1.0, fog: 0.03, roll: 0 },
-  { at: ['mid', 0, 0.5], pos: [1.5, 1.95, 8.4], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0, temp: 0.06, sat: 0.96, fog: 0.034, roll: 0.4 },
-  { at: ['sec', 1, 0.0], pos: [5.0, 2.35, 3.0], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8, temp: -0.2, sat: 0.8, fog: 0.042, roll: 1.1 },
-  { at: ['mid', 1, 0.55], pos: [2.4, 2.3, -4.0], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2, temp: -0.04, sat: 0.92, fog: 0.036, roll: 0.5 },
-  { at: ['sec', 2, 0.0], pos: [1.7, 2.3, -8.6], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0, temp: 0.2, sat: 1.05, fog: 0.032, roll: 0 },
-  { at: ['mid', 2, 0.62], pos: [0.4, 2.42, -15.3], tgt: [0.15, 2.5, -24.0], bloom: 0.68, ap: 0.8, temp: 0.32, sat: 1.08, fog: 0.026, roll: 0 },
-  { at: ['sec', 3, 0.0], pos: [5.4, 2.7, -27.6], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15, temp: -0.1, sat: 0.95, fog: 0.03, roll: -0.8 },
-  { at: ['mid', 3, 0.55], pos: [0.6, 3.1, -30.2], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2, temp: -0.08, sat: 0.95, fog: 0.03, roll: -0.5 },
-  { at: ['sec', 4, 0.0], pos: [1.2, 3.4, -46.5], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0, temp: 0.08, sat: 1.04, fog: 0.024, roll: 0 },
-  { at: ['mid', 4, 0.5], pos: [-3.8, 4.1, -49.0], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95, temp: 0.1, sat: 1.04, fog: 0.023, roll: 0.5 },
-  { at: ['sec', 5, 0.0], pos: [-5.8, 3.1, -52.5], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9, temp: 0.16, sat: 1.05, fog: 0.022, roll: 0 },
-  { at: ['mid', 5, 0.5], pos: [-2.0, 5.6, -45.5], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8, temp: 0.1, sat: 1.0, fog: 0.026, roll: -0.4 },
-  { at: ['sec', 6, 0.0], pos: [0.0, 8.0, -42.0], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0 },
-  { at: ['end'], pos: [0.0, 9.6, -40.0], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0 },
+  { at: ['sec', 0, 0.0], pos: [-2.1, 1.9, 9.4], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0, temp: 0.14, sat: 1.0, fog: 0.03, roll: 0, focus: 9.3 },
+  { at: ['mid', 0, 0.5], pos: [1.5, 1.95, 8.4], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0, temp: 0.06, sat: 0.96, fog: 0.034, roll: 0.4, focus: 8.2 },
+  { at: ['sec', 1, 0.0], pos: [5.0, 2.35, 3.0], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8, temp: -0.2, sat: 0.8, fog: 0.042, roll: 1.1, focus: 12.0 },
+  { at: ['mid', 1, 0.55], pos: [2.4, 2.3, -4.0], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2, temp: -0.04, sat: 0.92, fog: 0.036, roll: 0.5, focus: 12.0 },
+  { at: ['sec', 2, 0.0], pos: [1.7, 2.3, -8.6], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0, temp: 0.2, sat: 1.05, fog: 0.032, roll: 0, focus: 7.6 },
+  { at: ['mid', 2, 0.62], pos: [0.4, 2.42, -15.3], tgt: [0.15, 2.5, -24.0], bloom: 0.68, ap: 0.8, temp: 0.32, sat: 1.08, fog: 0.026, roll: 0, focus: 5.0 },
+  { at: ['sec', 3, 0.0], pos: [5.4, 2.7, -27.6], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15, temp: -0.1, sat: 0.95, fog: 0.03, roll: -0.8, focus: 8.4 },
+  { at: ['mid', 3, 0.55], pos: [0.6, 3.1, -30.2], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2, temp: -0.08, sat: 0.95, fog: 0.03, roll: -0.5, focus: 5.1 },
+  { at: ['sec', 4, 0.0], pos: [1.2, 3.4, -46.5], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0, temp: 0.08, sat: 1.04, fog: 0.024, roll: 0, focus: 9.6 },
+  { at: ['mid', 4, 0.5], pos: [-3.8, 4.1, -49.0], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95, temp: 0.1, sat: 1.04, fog: 0.023, roll: 0.5, focus: 8.0 },
+  { at: ['sec', 5, 0.0], pos: [-5.8, 3.1, -52.5], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9, temp: 0.16, sat: 1.05, fog: 0.022, roll: 0, focus: 6.8 },
+  { at: ['mid', 5, 0.5], pos: [-2.0, 5.6, -45.5], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8, temp: 0.1, sat: 1.0, fog: 0.026, roll: -0.4, focus: 11.0 },
+  { at: ['sec', 6, 0.0], pos: [0.0, 8.0, -42.0], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 11.4 },
+  { at: ['end'], pos: [0.0, 9.6, -40.0], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 15.7 },
 ];
 
 const easeIO = (x: number) => x * x * (3 - 2 * x);
@@ -67,6 +69,7 @@ export class Director {
     sat: 1,
     fog: 0.03,
     roll: 0,
+    focus: 9.3,
   };
 
   /* spring-smoothed camera state */
@@ -138,6 +141,7 @@ export class Director {
     this.shot.sat = THREE.MathUtils.lerp(a.sat ?? 1, b.sat ?? 1, t);
     this.shot.fog = THREE.MathUtils.lerp(a.fog ?? 0.03, b.fog ?? 0.03, t);
     this.shot.roll = THREE.MathUtils.lerp(a.roll ?? 0, b.roll ?? 0, t);
+    this.shot.focus = THREE.MathUtils.lerp(a.focus ?? 10, b.focus ?? 10, t);
   }
 
   /** Advance springs; apply to camera. Returns nothing — read fields. */
@@ -198,7 +202,8 @@ export class Director {
 
     this.bloom += (this.shot.bloom - this.bloom) * (1 - Math.exp(-dt * 3));
     this.aperture = this.shot.ap * (1 + this.ramp * 0.6);
-    const fd = camera.position.distanceTo(this.tgt);
-    this.focusDist += (fd - this.focusDist) * (1 - Math.exp(-dt * 3.5));
+    // authored focus pull — racks to each act's subject like a focus puller,
+    // lagging the cut by design (~200ms feel)
+    this.focusDist += (this.shot.focus - this.focusDist) * (1 - Math.exp(-dt * 3.5));
   }
 }
