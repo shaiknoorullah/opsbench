@@ -77,7 +77,7 @@ function resetParticle(p: Particle, initial = false) {
 }
 
 export function Gate() {
-  const count = quality.tier === 'low' ? 22 : 40;
+  const count = quality.tier === 'low' ? 34 : 70;
   const inst = useRef<THREE.InstancedMesh>(null!);
   const membrane = useRef<THREE.ShaderMaterial>(null!);
   const ringMat = useRef<THREE.MeshStandardMaterial>(null!);

@@ -30,11 +30,11 @@ const RECIPES: Record<string, () => THREE.MeshPhysicalMaterial> = {
     new THREE.MeshPhysicalMaterial({
       color: 0x30343c, roughness: 0.34, metalness: 1, envMapIntensity: 1.0,
     }),
-  SlabL: () =>
+  Colonnade: () =>
     new THREE.MeshPhysicalMaterial({
-      color: 0x101216, roughness: 0.4, metalness: 0.5, envMapIntensity: 0.4,
+      color: 0x111318, roughness: 0.44, metalness: 0.45, envMapIntensity: 0.35,
     }),
-  SlabR: () =>
+  Steles: () =>
     new THREE.MeshPhysicalMaterial({
       color: 0x101216, roughness: 0.4, metalness: 0.5, envMapIntensity: 0.4,
     }),
@@ -77,6 +77,15 @@ export function BakedSet() {
 
     set.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return;
+      if (obj.name === 'Strips') {
+        obj.material = new THREE.MeshStandardMaterial({
+          color: 0x1a1206,
+          emissive: 0xffd9a0,
+          emissiveIntensity: 2.6,
+          roughness: 0.4,
+        });
+        return;
+      }
       const recipe = RECIPES[obj.name];
       if (!recipe) return;
       const mat = recipe();

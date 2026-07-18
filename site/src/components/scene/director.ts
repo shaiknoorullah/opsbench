@@ -24,8 +24,10 @@ interface Shot {
 /* Same storyboard as the vanilla build — every shot faces down the corridor,
    finale is a pull-back crane. */
 const SHOTS: Shot[] = [
-  { at: ['sec', 0, 0.0], pos: [-1.8, 2.05, 12.8], tgt: [-3.4, 2.65, 0.0], bloom: 0.5, ap: 1.0 },
-  { at: ['mid', 0, 0.5], pos: [1.8, 2.0, 10.0], tgt: [-1.6, 2.5, 0.0], bloom: 0.5, ap: 1.0 },
+  // hero: closer and lower — monolith large in the right third, the nearest
+  // pilaster pair breaks the left frame edge as a defocused foreground mass
+  { at: ['sec', 0, 0.0], pos: [-2.1, 1.9, 9.4], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0 },
+  { at: ['mid', 0, 0.5], pos: [1.5, 1.95, 8.4], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0 },
   { at: ['sec', 1, 0.0], pos: [5.0, 2.35, 3.0], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8 },
   { at: ['mid', 1, 0.55], pos: [2.4, 2.3, -4.0], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2 },
   { at: ['sec', 2, 0.0], pos: [1.7, 2.3, -8.6], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0 },
