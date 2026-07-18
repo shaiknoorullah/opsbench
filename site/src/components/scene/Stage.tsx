@@ -17,6 +17,8 @@ import { initDomChoreography } from '../../lib/choreography';
 
 function detectTier(): typeof quality.tier {
   if (typeof navigator === 'undefined') return 'mid';
+  const forced = new URLSearchParams(location.search).get('tier');
+  if (forced === 'low' || forced === 'mid' || forced === 'high') return forced;
   const coarse = matchMedia('(pointer: coarse)').matches;
   const mem = (navigator as any).deviceMemory ?? 8;
   const cores = navigator.hardwareConcurrency ?? 8;
@@ -35,6 +37,7 @@ function detectTier(): typeof quality.tier {
 
 function Rig({ director }: { director: Director }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
+  const scene = useThree((s) => s.scene);
   const lastY = useRef(0);
 
   useFrame((st, rawDt) => {
@@ -44,12 +47,15 @@ function Rig({ director }: { director: Director }) {
     lastY.current = y;
     scrollState.p = readScroll();
     director.update(camera, scrollState.p, scrollState.v, dt, st.clock.elapsedTime, REDUCED);
+    // per-act atmosphere density rides the grade spring
+    if (scene.fog instanceof THREE.FogExp2) scene.fog.density = director.fogDensity;
   });
   return null;
 }
 
 export default function Stage() {
   const [ready, setReady] = useState(false);
+  const [sun, setSun] = useState<THREE.Mesh | null>(null);
   const director = useMemo(() => new Director(REDUCED), []);
 
   useEffect(() => {
@@ -104,13 +110,13 @@ export default function Stage() {
       }}
     >
       <Suspense fallback={null}>
-        <Atmosphere />
+        <Atmosphere onSun={setSun} />
         <BakedSet />
         <Gate />
         <CustodyChain />
         <Constellation />
         {ready && <Rig director={director} />}
-        <Effects director={director} />
+        <Effects director={director} sun={sun} />
       </Suspense>
     </Canvas>
   );

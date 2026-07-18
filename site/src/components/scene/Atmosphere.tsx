@@ -22,19 +22,6 @@ function softCircleTexture() {
   return t;
 }
 
-function shaftTexture() {
-  const cv = document.createElement('canvas');
-  cv.width = 4;
-  cv.height = 128;
-  const g = cv.getContext('2d')!;
-  const grad = g.createLinearGradient(0, 0, 0, 128);
-  grad.addColorStop(0, 'rgba(255,214,160,0.9)');
-  grad.addColorStop(1, 'rgba(255,214,160,0)');
-  g.fillStyle = grad;
-  g.fillRect(0, 0, 4, 128);
-  return new THREE.CanvasTexture(cv);
-}
-
 /* Three depth layers of motes: fine haze, mid dust, sparse large near-lens
    particles that the DOF turns into bokeh. Sizes clamped so nothing blows out. */
 function DustLayer({ count, size, opacity, spread }: { count: number; size: number; opacity: number; spread: number }) {
@@ -103,35 +90,72 @@ function Dust() {
 }
 
 const SHAFTS: { pos: [number, number, number]; tilt: number; h: number; r: number; o: number }[] = [
-  { pos: [-2.6, 6.5, -1.2], tilt: 0.12, h: 13, r: 1.9, o: 0.05 },
-  { pos: [2.2, 6, 0.8], tilt: -0.08, h: 12, r: 1.5, o: 0.04 },
-  { pos: [0.4, 7, -2.2], tilt: 0.05, h: 14, r: 2.4, o: 0.035 },
+  { pos: [-2.6, 6.5, -1.2], tilt: 0.12, h: 13, r: 1.9, o: 0.55 },
+  { pos: [2.2, 6, 0.8], tilt: -0.08, h: 12, r: 1.5, o: 0.45 },
+  { pos: [0.4, 7, -2.2], tilt: 0.05, h: 14, r: 2.4, o: 0.4 },
+  { pos: [0, 6.5, -34], tilt: 0.03, h: 13, r: 2.2, o: 0.35 },
 ];
 
+/* Volumetric-reading shafts: view-angle softness (thin at the silhouette),
+   vertical falloff, and drifting noise so the "air" inside the beam moves. */
+const shaftMaterial = () =>
+  new THREE.ShaderMaterial({
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    uniforms: {
+      uTime: { value: 0 },
+      uOpacity: { value: 0.5 },
+      uColor: { value: new THREE.Color(0xffd9a0) },
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      varying float vSoft;
+      void main() {
+        vUv = uv;
+        vec3 n = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vec3 v = normalize(-mv.xyz);
+        vSoft = pow(abs(dot(n, v)), 1.6);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uTime;
+      uniform float uOpacity;
+      uniform vec3 uColor;
+      varying vec2 vUv;
+      varying float vSoft;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x),
+                   mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+      }
+      void main() {
+        float vert = smoothstep(0.0, 0.25, vUv.y) * (0.25 + 0.75 * vUv.y);
+        float drift = noise(vec2(vUv.x * 5.0, vUv.y * 2.4 - uTime * 0.06))
+                    * noise(vec2(vUv.x * 11.0 + 3.7, vUv.y * 5.0 - uTime * 0.11));
+        float a = vSoft * vert * (0.35 + drift * 0.9) * uOpacity * 0.14;
+        gl_FragColor = vec4(uColor, a);
+      }`,
+  });
+
 function Shafts() {
-  const tex = useMemo(shaftTexture, []);
-  const mats = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
+  const mats = useMemo(() => SHAFTS.map(() => shaftMaterial()), []);
   useFrame((st) => {
     const t = st.clock.elapsedTime;
-    mats.current.forEach((m, i) => {
-      if (m) m.opacity = SHAFTS[i].o + i * 0.008 + Math.sin(t * 0.5 + i * 2.1) * 0.008;
+    mats.forEach((m, i) => {
+      m.uniforms.uTime.value = t;
+      m.uniforms.uOpacity.value = SHAFTS[i].o * (1 + Math.sin(t * 0.5 + i * 2.1) * 0.18);
     });
   });
   return (
     <>
       {SHAFTS.map((s, i) => (
-        <mesh key={i} position={s.pos} rotation={[0, 0, s.tilt]}>
-          <coneGeometry args={[s.r, s.h, 32, 1, true]} />
-          <meshBasicMaterial
-            ref={(el) => (mats.current[i] = el)}
-            map={tex}
-            transparent
-            opacity={s.o}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            side={THREE.DoubleSide}
-            fog={false}
-          />
+        <mesh key={i} position={s.pos} rotation={[0, 0, s.tilt]} material={mats[i]}>
+          <coneGeometry args={[s.r, s.h, 48, 1, true]} />
         </mesh>
       ))}
     </>
@@ -178,7 +202,7 @@ function Shards() {
   );
 }
 
-export function Atmosphere() {
+export function Atmosphere({ onSun }: { onSun?: (m: THREE.Mesh) => void }) {
   const seal = useRef<THREE.PointLight>(null!);
   const sealRing = useRef<THREE.MeshStandardMaterial>(null!);
 
@@ -204,7 +228,7 @@ export function Atmosphere() {
         <torusGeometry args={[0.5, 0.035, 24, 96]} />
         <meshStandardMaterial ref={sealRing} color={0x1a1206} emissive={0xffb454} emissiveIntensity={2.6} roughness={0.4} />
       </mesh>
-      <mesh position={[0, 3.05, 0.465]}>
+      <mesh position={[0, 3.05, 0.465]} ref={(m) => m && onSun?.(m)}>
         <circleGeometry args={[0.16, 48]} />
         <meshStandardMaterial color={0x1a1206} emissive={0xffb454} emissiveIntensity={3.2} roughness={0.4} />
       </mesh>

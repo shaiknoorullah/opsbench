@@ -1,66 +1,114 @@
-/* The film grade: SMAA -> bloom -> DOF (focus-pulled by the Director) ->
-   chromatic aberration -> grain -> vignette, AgX-style tone mapping.
-   pmndrs/postprocessing merges these into minimal fullscreen passes. */
+/* The film grade: SMAA -> god rays (high tier) -> DOF -> bloom -> CA ->
+   per-act parametric grade -> grain -> vignette -> AgX tone mapping.
 
-import { useRef } from 'react';
+   All simple effects are instantiated directly and driven imperatively in
+   useFrame. Deliberately NOT using the wrapper components' ref props: with
+   React 19 refs are plain props, and @react-three/postprocessing memoizes
+   wrapped effects with JSON.stringify(props) — a ref to a live effect drags
+   the scene graph into stringify and crashes on its circular references. */
+
+import { useMemo } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
+import { EffectComposer } from '@react-three/postprocessing';
 import {
-  Bloom,
-  ChromaticAberration,
-  DepthOfField,
-  EffectComposer,
-  Noise,
-  SMAA,
-  ToneMapping,
-  Vignette,
-} from '@react-three/postprocessing';
-import { BlendFunction, ToneMappingMode } from 'postprocessing';
+  BlendFunction,
+  BloomEffect,
+  ChromaticAberrationEffect,
+  DepthOfFieldEffect,
+  GodRaysEffect,
+  KernelSize,
+  NoiseEffect,
+  SMAAEffect,
+  ToneMappingEffect,
+  ToneMappingMode,
+  VignetteEffect,
+} from 'postprocessing';
 import type { Director } from './director';
+import { GradeEffect } from './GradeEffect';
 import { quality, REDUCED } from './store';
 
-export function Effects({ director }: { director: Director }) {
-  const bloom = useRef<any>(null);
-  const dof = useRef<any>(null);
-  const ca = useRef<any>(null);
-
+export function Effects({ director, sun }: { director: Director; sun: THREE.Mesh | null }) {
+  const camera = useThree((s) => s.camera);
   const low = quality.tier === 'low';
+  const high = quality.tier === 'high';
+
+  const fx = useMemo(() => {
+    const smaa = new SMAAEffect();
+    const dof = low
+      ? null
+      : new DepthOfFieldEffect(camera as THREE.PerspectiveCamera, {
+          worldFocusDistance: 11,
+          worldFocusRange: 8,
+          bokehScale: 3.6,
+          height: 480,
+        });
+    const bloom = new BloomEffect({
+      intensity: 0.5,
+      luminanceThreshold: 0.72,
+      luminanceSmoothing: 0.3,
+      mipmapBlur: true,
+    });
+    const ca = new ChromaticAberrationEffect({
+      blendFunction: BlendFunction.NORMAL,
+      offset: new THREE.Vector2(0.00045, 0.00027),
+      radialModulation: true,
+      modulationOffset: 0.55,
+    });
+    const grade = new GradeEffect();
+    const noise = new NoiseEffect({ premultiply: true });
+    noise.blendMode.opacity.value = 0.55;
+    const vignette = new VignetteEffect({ eskil: false, offset: 0.28, darkness: 0.72 });
+    const tone = new ToneMappingEffect({ mode: ToneMappingMode.AGX });
+    return { smaa, dof, bloom, ca, grade, noise, vignette, tone };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [camera, low]);
+
+  const godRays = useMemo(() => {
+    if (!high || !sun || REDUCED) return null;
+    return new GodRaysEffect(camera, sun, {
+      density: 0.92,
+      decay: 0.93,
+      weight: 0.3,
+      exposure: 0.28,
+      samples: 48,
+      kernelSize: KernelSize.SMALL,
+      blur: true,
+    });
+  }, [camera, sun, high]);
 
   useFrame(() => {
-    if (bloom.current) bloom.current.intensity = director.bloom;
-    if (dof.current) {
-      const cocMaterial = dof.current.cocMaterial ?? dof.current.circleOfConfusionMaterial;
-      if (cocMaterial) {
-        cocMaterial.focusDistance = 0; // we drive via worldFocusDistance
-        cocMaterial.worldFocusDistance = director.focusDist;
-        cocMaterial.worldFocusRange = 6 / Math.max(0.25, director.aperture);
-      }
-    }
-    if (ca.current?.offset) {
-      const k = 0.00045 + director.ramp * 0.002;
-      ca.current.offset.set(k, k * 0.6);
+    fx.bloom.intensity = director.bloom;
+    const k = 0.00045 + director.ramp * 0.002;
+    fx.ca.offset.set(k, k * 0.6);
+    fx.grade.temp = director.temp;
+    fx.grade.sat = director.sat;
+    if (fx.dof) {
+      const coc = fx.dof.cocMaterial;
+      coc.worldFocusDistance = director.focusDist;
+      coc.worldFocusRange = 8 / Math.max(0.3, director.aperture);
     }
   });
 
   if (REDUCED) {
     return (
       <EffectComposer multisampling={0}>
-        <ToneMapping mode={ToneMappingMode.AGX} />
+        <primitive object={fx.tone} dispose={null} />
       </EffectComposer>
     );
   }
 
   return (
     <EffectComposer multisampling={0} enableNormalPass={false}>
-      <SMAA />
-      {low ? <></> : (
-        <DepthOfField ref={dof} focusDistance={0.02} focalLength={0.05} bokehScale={4.5} height={480} />
-      )}
-      <Bloom ref={bloom} intensity={0.5} luminanceThreshold={0.72} luminanceSmoothing={0.3} mipmapBlur />
-      <ChromaticAberration ref={ca} blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.00045, 0.00027)} radialModulation modulationOffset={0.55} />
-      <Noise premultiply opacity={0.55} />
-      <Vignette eskil={false} offset={0.28} darkness={0.72} />
-      <ToneMapping mode={ToneMappingMode.AGX} />
+      <primitive object={fx.smaa} dispose={null} />
+      {godRays ? <primitive object={godRays} dispose={null} /> : <></>}
+      {fx.dof ? <primitive object={fx.dof} dispose={null} /> : <></>}
+      <primitive object={fx.bloom} dispose={null} />
+      <primitive object={fx.ca} dispose={null} />
+      <primitive object={fx.grade} dispose={null} />
+      <primitive object={fx.noise} dispose={null} />
+      <primitive object={fx.vignette} dispose={null} />
+      <primitive object={fx.tone} dispose={null} />
     </EffectComposer>
   );
 }

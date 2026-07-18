@@ -10,12 +10,72 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 const BAKED = '/assets/baked';
 
+/* Multi-octave value-noise detail map — breaks up uniform roughness, the
+   single biggest "CG plastic" tell. Generated once at runtime (512px). */
+function detailRoughnessTexture() {
+  const s = 512;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = s;
+  const g = cv.getContext('2d')!;
+  const img = g.createImageData(s, s);
+  const rand = (() => {
+    let seed = 987654321;
+    return () => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+  })();
+  // octave value-noise on coarse grids, bilinearly sampled
+  const octave = (cells: number) => {
+    const grid = Array.from({ length: (cells + 1) * (cells + 1) }, () => rand());
+    return (x: number, y: number) => {
+      const gx = (x / s) * cells;
+      const gy = (y / s) * cells;
+      const x0 = Math.floor(gx);
+      const y0 = Math.floor(gy);
+      const fx = gx - x0;
+      const fy = gy - y0;
+      const sm = (v: number) => v * v * (3 - 2 * v);
+      const i = (xx: number, yy: number) => grid[(yy % cells) * (cells + 1) + (xx % cells)];
+      return (
+        i(x0, y0) * (1 - sm(fx)) * (1 - sm(fy)) +
+        i(x0 + 1, y0) * sm(fx) * (1 - sm(fy)) +
+        i(x0, y0 + 1) * (1 - sm(fx)) * sm(fy) +
+        i(x0 + 1, y0 + 1) * sm(fx) * sm(fy)
+      );
+    };
+  };
+  const o1 = octave(6);
+  const o2 = octave(23);
+  const o3 = octave(89);
+  for (let y = 0; y < s; y++) {
+    for (let x = 0; x < s; x++) {
+      const n = o1(x, y) * 0.5 + o2(x, y) * 0.32 + o3(x, y) * 0.18;
+      // centered on mid-gray: map multiplies material roughness
+      const v = Math.round(160 + (n - 0.5) * 70);
+      const idx = (y * s + x) * 4;
+      img.data[idx] = img.data[idx + 1] = img.data[idx + 2] = v;
+      img.data[idx + 3] = 255;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(cv);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.NoColorSpace;
+  return t;
+}
+
 /** name -> runtime material recipe layered over the baked light */
 const RECIPES: Record<string, () => THREE.MeshPhysicalMaterial> = {
-  Floor: () =>
-    new THREE.MeshPhysicalMaterial({
-      color: 0x191a1f, roughness: 0.46, metalness: 0.5, envMapIntensity: 0.08,
-    }),
+  Floor: () => {
+    const m = new THREE.MeshPhysicalMaterial({
+      color: 0x191a1f, roughness: 0.62, metalness: 0.5, envMapIntensity: 0.08,
+    });
+    const detail = detailRoughnessTexture();
+    detail.repeat.set(9, 9);
+    m.roughnessMap = detail; // green channel; mid-gray-centered variation
+    return m;
+  },
   Plinth: () =>
     new THREE.MeshPhysicalMaterial({
       color: 0x0e0f13, roughness: 0.3, metalness: 0.4,
@@ -29,6 +89,7 @@ const RECIPES: Record<string, () => THREE.MeshPhysicalMaterial> = {
   Gate: () =>
     new THREE.MeshPhysicalMaterial({
       color: 0x30343c, roughness: 0.34, metalness: 1, envMapIntensity: 1.0,
+      anisotropy: 0.65, anisotropyRotation: Math.PI / 2, // brushed along the ring
     }),
   Colonnade: () =>
     new THREE.MeshPhysicalMaterial({

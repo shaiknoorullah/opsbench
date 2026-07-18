@@ -18,6 +18,14 @@ interface Shot {
   bloom: number;
   /** aperture scale — 1 = act default, >1 = shallower focus */
   ap: number;
+  /** color temperature -1 (cool) .. +1 (warm) */
+  temp?: number;
+  /** saturation multiplier */
+  sat?: number;
+  /** fog density for the act */
+  fog?: number;
+  /** dutch tilt, degrees */
+  roll?: number;
   p?: number;
 }
 
@@ -25,21 +33,23 @@ interface Shot {
    finale is a pull-back crane. */
 const SHOTS: Shot[] = [
   // hero: closer and lower — monolith large in the right third, the nearest
-  // pilaster pair breaks the left frame edge as a defocused foreground mass
-  { at: ['sec', 0, 0.0], pos: [-2.1, 1.9, 9.4], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0 },
-  { at: ['mid', 0, 0.5], pos: [1.5, 1.95, 8.4], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0 },
-  { at: ['sec', 1, 0.0], pos: [5.0, 2.35, 3.0], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8 },
-  { at: ['mid', 1, 0.55], pos: [2.4, 2.3, -4.0], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2 },
-  { at: ['sec', 2, 0.0], pos: [1.7, 2.3, -8.6], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0 },
-  { at: ['mid', 2, 0.62], pos: [0.4, 2.42, -15.3], tgt: [0.15, 2.5, -24.0], bloom: 0.68, ap: 0.8 },
-  { at: ['sec', 3, 0.0], pos: [5.4, 2.7, -27.6], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15 },
-  { at: ['mid', 3, 0.55], pos: [0.6, 3.1, -30.2], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2 },
-  { at: ['sec', 4, 0.0], pos: [1.2, 3.4, -46.5], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0 },
-  { at: ['mid', 4, 0.5], pos: [-3.8, 4.1, -49.0], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95 },
-  { at: ['sec', 5, 0.0], pos: [-5.8, 3.1, -52.5], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9 },
-  { at: ['mid', 5, 0.5], pos: [-2.0, 5.6, -45.5], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8 },
-  { at: ['sec', 6, 0.0], pos: [0.0, 8.0, -42.0], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7 },
-  { at: ['end'], pos: [0.0, 9.6, -40.0], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65 },
+  // pilaster pair breaks the left frame edge as a defocused foreground mass.
+  // grades: warm print at the seal, cool desaturated doubt in the deficit,
+  // hot amber through the gate, neutral-cool forensic ledger, warm finale.
+  { at: ['sec', 0, 0.0], pos: [-2.1, 1.9, 9.4], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0, temp: 0.14, sat: 1.0, fog: 0.03, roll: 0 },
+  { at: ['mid', 0, 0.5], pos: [1.5, 1.95, 8.4], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0, temp: 0.06, sat: 0.96, fog: 0.034, roll: 0.4 },
+  { at: ['sec', 1, 0.0], pos: [5.0, 2.35, 3.0], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8, temp: -0.2, sat: 0.8, fog: 0.042, roll: 1.1 },
+  { at: ['mid', 1, 0.55], pos: [2.4, 2.3, -4.0], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2, temp: -0.04, sat: 0.92, fog: 0.036, roll: 0.5 },
+  { at: ['sec', 2, 0.0], pos: [1.7, 2.3, -8.6], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0, temp: 0.2, sat: 1.05, fog: 0.032, roll: 0 },
+  { at: ['mid', 2, 0.62], pos: [0.4, 2.42, -15.3], tgt: [0.15, 2.5, -24.0], bloom: 0.68, ap: 0.8, temp: 0.32, sat: 1.08, fog: 0.026, roll: 0 },
+  { at: ['sec', 3, 0.0], pos: [5.4, 2.7, -27.6], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15, temp: -0.1, sat: 0.95, fog: 0.03, roll: -0.8 },
+  { at: ['mid', 3, 0.55], pos: [0.6, 3.1, -30.2], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2, temp: -0.08, sat: 0.95, fog: 0.03, roll: -0.5 },
+  { at: ['sec', 4, 0.0], pos: [1.2, 3.4, -46.5], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0, temp: 0.08, sat: 1.04, fog: 0.024, roll: 0 },
+  { at: ['mid', 4, 0.5], pos: [-3.8, 4.1, -49.0], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95, temp: 0.1, sat: 1.04, fog: 0.023, roll: 0.5 },
+  { at: ['sec', 5, 0.0], pos: [-5.8, 3.1, -52.5], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9, temp: 0.16, sat: 1.05, fog: 0.022, roll: 0 },
+  { at: ['mid', 5, 0.5], pos: [-2.0, 5.6, -45.5], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8, temp: 0.1, sat: 1.0, fog: 0.026, roll: -0.4 },
+  { at: ['sec', 6, 0.0], pos: [0.0, 8.0, -42.0], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0 },
+  { at: ['end'], pos: [0.0, 9.6, -40.0], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0 },
 ];
 
 const easeIO = (x: number) => x * x * (3 - 2 * x);
@@ -49,10 +59,14 @@ export class Director {
   private keys: Required<Shot>[] = [];
 
   readonly shot = {
-    pos: new THREE.Vector3(-1.8, 2.05, 12.8),
-    tgt: new THREE.Vector3(-3.4, 2.65, 0),
+    pos: new THREE.Vector3(-2.1, 1.9, 9.4),
+    tgt: new THREE.Vector3(-3.6, 2.75, 0),
     bloom: 0.5,
     ap: 1,
+    temp: 0.14,
+    sat: 1,
+    fog: 0.03,
+    roll: 0,
   };
 
   /* spring-smoothed camera state */
@@ -65,6 +79,11 @@ export class Director {
   /** 0..1 speed-ramp intensity, from smoothed scroll velocity */
   ramp = 0;
   focusDist = 12;
+  /* per-act grade, spring-smoothed */
+  temp = 0.14;
+  sat = 1.0;
+  fogDensity = 0.03;
+  roll = 0;
 
   private introT = 0;
   private ptr = { x: 0, y: 0, sx: 0, sy: 0 };
@@ -115,6 +134,10 @@ export class Director {
     );
     this.shot.bloom = THREE.MathUtils.lerp(a.bloom, b.bloom, t);
     this.shot.ap = THREE.MathUtils.lerp(a.ap, b.ap, t);
+    this.shot.temp = THREE.MathUtils.lerp(a.temp ?? 0, b.temp ?? 0, t);
+    this.shot.sat = THREE.MathUtils.lerp(a.sat ?? 1, b.sat ?? 1, t);
+    this.shot.fog = THREE.MathUtils.lerp(a.fog ?? 0.03, b.fog ?? 0.03, t);
+    this.shot.roll = THREE.MathUtils.lerp(a.roll ?? 0, b.roll ?? 0, t);
   }
 
   /** Advance springs; apply to camera. Returns nothing — read fields. */
@@ -155,6 +178,16 @@ export class Director {
     this.look.x += this.ptr.sx * 0.12;
     this.look.y += this.ptr.sy * 0.08;
     camera.lookAt(this.look);
+
+    // dutch tilt — slow spring so it reads as intention, not wobble
+    this.roll += (this.shot.roll - this.roll) * (1 - Math.exp(-dt * 2.2));
+    camera.rotateZ(THREE.MathUtils.degToRad(this.roll));
+
+    // grade springs
+    const kG = 1 - Math.exp(-dt * 2.8);
+    this.temp += (this.shot.temp - this.temp) * kG;
+    this.sat += (this.shot.sat - this.sat) * kG;
+    this.fogDensity += (this.shot.fog - this.fogDensity) * kG;
 
     // FOV kick on speed ramps — the "whip" through transitions
     const fov = 42 + this.ramp * 9;
