@@ -1,0 +1,208 @@
+/* The Director: cinematography as data.
+   Shot keyframes are anchored to real DOM section offsets at runtime, sampled
+   by scroll progress with smoothstep easing, then chased by critically damped
+   springs. Scroll velocity drives the speed-ramp (FOV kick + aperture + grain).
+
+   This module is deliberately framework-agnostic: it is the adapter seam where
+   a Theatre.js sequence can replace the keyframe table without touching the
+   scene components. */
+
+import * as THREE from 'three';
+
+type ShotAnchor = ['sec', number, number] | ['mid', number, number] | ['end'];
+
+interface Shot {
+  at: ShotAnchor;
+  pos: [number, number, number];
+  tgt: [number, number, number];
+  bloom: number;
+  /** aperture scale — 1 = act default, >1 = shallower focus */
+  ap: number;
+  /** color temperature -1 (cool) .. +1 (warm) */
+  temp?: number;
+  /** saturation multiplier */
+  sat?: number;
+  /** fog density for the act */
+  fog?: number;
+  /** dutch tilt, degrees */
+  roll?: number;
+  /** focus distance to the act's subject, world meters */
+  focus?: number;
+  p?: number;
+}
+
+/* Same storyboard as the vanilla build — every shot faces down the corridor,
+   finale is a pull-back crane. */
+const SHOTS: Shot[] = [
+  // 50mm blocking: FOV 27deg, cameras 1.6x further back along the subject
+  // ray — same frame composition, telephoto compression. through-the-gate and
+  // the human close-up are hand-blocked to stay clear of the colonnade.
+  { at: ['sec', 0, 0.0], pos: [-1.2, 1.4, 15.0], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0, temp: 0.14, sat: 1.0, fog: 0.03, roll: 0, focus: 14.7 },
+  { at: ['mid', 0, 0.5], pos: [3.4, 1.6, 13.7], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0, temp: 0.06, sat: 0.96, fog: 0.034, roll: 0.4, focus: 13.8 },
+  { at: ['sec', 1, 0.0], pos: [9.4, 2.4, 9.3], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8, temp: -0.2, sat: 0.8, fog: 0.042, roll: 1.1, focus: 21.0 },
+  { at: ['mid', 1, 0.55], pos: [4.6, 2.3, 3.2], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2, temp: -0.04, sat: 0.92, fog: 0.036, roll: 0.5, focus: 19.5 },
+  { at: ['sec', 2, 0.0], pos: [3.5, 2.27, -4.2], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0, temp: 0.2, sat: 1.05, fog: 0.032, roll: 0, focus: 12.3 },
+  { at: ['mid', 2, 0.62], pos: [0.3, 2.42, -13.8], tgt: [0.15, 2.5, -26.0], bloom: 0.68, ap: 0.8, temp: 0.32, sat: 1.08, fog: 0.026, roll: 0, focus: 8.0 },
+  { at: ['sec', 3, 0.0], pos: [10.2, 2.46, -23.5], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15, temp: -0.1, sat: 0.95, fog: 0.03, roll: -0.8, focus: 14.7 },
+  { at: ['mid', 3, 0.55], pos: [4.1, 3.0, -26.7], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2, temp: -0.08, sat: 0.95, fog: 0.03, roll: -0.5, focus: 9.9 },
+  { at: ['sec', 4, 0.0], pos: [3.2, 3.5, -40.8], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0, temp: 0.08, sat: 1.04, fog: 0.024, roll: 0, focus: 15.7 },
+  { at: ['mid', 4, 0.5], pos: [-5.5, 4.6, -44.8], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95, temp: 0.1, sat: 1.04, fog: 0.023, roll: 0.5, focus: 12.5 },
+  { at: ['sec', 5, 0.0], pos: [-8.0, 2.9, -49.0], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9, temp: 0.16, sat: 1.05, fog: 0.022, roll: 0, focus: 11.0 },
+  { at: ['mid', 5, 0.5], pos: [-3.2, 7.2, -39.2], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8, temp: 0.1, sat: 1.0, fog: 0.026, roll: -0.4, focus: 17.6 },
+  { at: ['sec', 6, 0.0], pos: [0.0, 11.2, -33.6], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 24.0 },
+  { at: ['end'], pos: [0.0, 13.9, -30.4], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 28.0 },
+];
+
+const easeIO = (x: number) => x * x * (3 - 2 * x);
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
+
+export class Director {
+  private keys: Required<Shot>[] = [];
+
+  readonly shot = {
+    pos: new THREE.Vector3(-1.2, 1.4, 15.0),
+    tgt: new THREE.Vector3(-3.6, 2.75, 0),
+    bloom: 0.5,
+    ap: 1,
+    temp: 0.14,
+    sat: 1,
+    fog: 0.03,
+    roll: 0,
+    focus: 14.7,
+  };
+
+  /* spring-smoothed camera state */
+  readonly pos = new THREE.Vector3(-1.2, 1.9, 24.0);
+  readonly tgt = new THREE.Vector3(-3.4, 2.65, 0);
+  readonly look = new THREE.Vector3();
+
+  bloom = 0.5;
+  aperture = 1;
+  /** 0..1 speed-ramp intensity, from smoothed scroll velocity */
+  ramp = 0;
+  focusDist = 14.7;
+  /* per-act grade, spring-smoothed */
+  temp = 0.14;
+  sat = 1.0;
+  fogDensity = 0.03;
+  roll = 0;
+
+  private introT = 0;
+  private ptr = { x: 0, y: 0, sx: 0, sy: 0 };
+  private drift = 0;
+
+  constructor(reduced: boolean) {
+    if (reduced) this.introT = 1;
+  }
+
+  buildKeys() {
+    const secs = Array.from(document.querySelectorAll<HTMLElement>('.exhibit'));
+    if (!secs.length) return;
+    const scrollable = Math.max(1, document.body.scrollHeight - innerHeight);
+    const P = secs.map((s) => clamp01(s.offsetTop / scrollable));
+    const resolve = (at: ShotAnchor): number => {
+      if (at[0] === 'end') return 1;
+      if (at[0] === 'sec') return P[at[1]] ?? 1;
+      const a = P[at[1]] ?? 0;
+      const b = at[1] + 1 < P.length ? (P[at[1] + 1] ?? 1) : 1;
+      return a + (b - a) * at[2];
+    };
+    this.keys = SHOTS.map((s) => ({ ...s, p: resolve(s.at) })) as Required<Shot>[];
+    this.keys.sort((a, b) => a.p - b.p);
+  }
+
+  setPointer(x: number, y: number) {
+    this.ptr.x = x;
+    this.ptr.y = y;
+  }
+
+  private sample(p: number) {
+    const K = this.keys;
+    if (!K.length) return;
+    let i = 0;
+    while (i < K.length - 2 && p > K[i + 1].p) i++;
+    const a = K[i];
+    const b = K[i + 1];
+    const t = easeIO(clamp01((p - a.p) / Math.max(1e-5, b.p - a.p)));
+    this.shot.pos.set(
+      THREE.MathUtils.lerp(a.pos[0], b.pos[0], t),
+      THREE.MathUtils.lerp(a.pos[1], b.pos[1], t),
+      THREE.MathUtils.lerp(a.pos[2], b.pos[2], t),
+    );
+    this.shot.tgt.set(
+      THREE.MathUtils.lerp(a.tgt[0], b.tgt[0], t),
+      THREE.MathUtils.lerp(a.tgt[1], b.tgt[1], t),
+      THREE.MathUtils.lerp(a.tgt[2], b.tgt[2], t),
+    );
+    this.shot.bloom = THREE.MathUtils.lerp(a.bloom, b.bloom, t);
+    this.shot.ap = THREE.MathUtils.lerp(a.ap, b.ap, t);
+    this.shot.temp = THREE.MathUtils.lerp(a.temp ?? 0, b.temp ?? 0, t);
+    this.shot.sat = THREE.MathUtils.lerp(a.sat ?? 1, b.sat ?? 1, t);
+    this.shot.fog = THREE.MathUtils.lerp(a.fog ?? 0.03, b.fog ?? 0.03, t);
+    this.shot.roll = THREE.MathUtils.lerp(a.roll ?? 0, b.roll ?? 0, t);
+    this.shot.focus = THREE.MathUtils.lerp(a.focus ?? 10, b.focus ?? 10, t);
+  }
+
+  /** Advance springs; apply to camera. Returns nothing — read fields. */
+  update(camera: THREE.PerspectiveCamera, p: number, v: number, dt: number, t: number, reduced: boolean) {
+    this.sample(p);
+
+    // intro dolly on first load
+    if (this.introT < 1) {
+      this.introT = Math.min(1, this.introT + dt * 0.36);
+      const k = 1 - easeIO(this.introT);
+      this.shot.pos.z += k * 9.0;
+      this.shot.pos.y += k * 0.5;
+    }
+
+    const kPos = reduced ? 1 : 1 - Math.exp(-dt * 4.2);
+    const kTgt = reduced ? 1 : 1 - Math.exp(-dt * 5.0);
+    this.pos.lerp(this.shot.pos, kPos);
+    this.tgt.lerp(this.shot.tgt, kTgt);
+
+    // pointer parallax with inertia
+    const kPtr = 1 - Math.exp(-dt * 2.6);
+    this.ptr.sx += (this.ptr.x - this.ptr.sx) * kPtr;
+    this.ptr.sy += (this.ptr.y - this.ptr.sy) * kPtr;
+
+    // speed ramp: smoothed |velocity| -> 0..1
+    const target = clamp01(Math.abs(v) / 55);
+    this.ramp += (target - this.ramp) * (1 - Math.exp(-dt * 5));
+
+    // handheld micro-drift so held shots never freeze
+    this.drift = t;
+    const dx = Math.sin(t * 0.31) * 0.028 + Math.sin(t * 0.83) * 0.012;
+    const dy = Math.cos(t * 0.27) * 0.019 + Math.sin(t * 0.63) * 0.01;
+
+    camera.position.copy(this.pos);
+    camera.position.x += this.ptr.sx * 0.22 + dx;
+    camera.position.y += this.ptr.sy * 0.14 + dy;
+    this.look.copy(this.tgt);
+    this.look.x += this.ptr.sx * 0.075;
+    this.look.y += this.ptr.sy * 0.05;
+    camera.lookAt(this.look);
+
+    // dutch tilt — slow spring so it reads as intention, not wobble
+    this.roll += (this.shot.roll - this.roll) * (1 - Math.exp(-dt * 2.2));
+    camera.rotateZ(THREE.MathUtils.degToRad(this.roll));
+
+    // grade springs
+    const kG = 1 - Math.exp(-dt * 2.8);
+    this.temp += (this.shot.temp - this.temp) * kG;
+    this.sat += (this.shot.sat - this.sat) * kG;
+    this.fogDensity += (this.shot.fog - this.fogDensity) * kG;
+
+    // FOV kick on speed ramps — the "whip" through transitions
+    const fov = 27 + this.ramp * 5;
+    if (Math.abs(camera.fov - fov) > 0.01) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
+
+    this.bloom += (this.shot.bloom - this.bloom) * (1 - Math.exp(-dt * 3));
+    this.aperture = this.shot.ap * (1 + this.ramp * 0.6);
+    // authored focus pull — racks to each act's subject like a focus puller,
+    // lagging the cut by design (~200ms feel)
+    this.focusDist += (this.shot.focus - this.focusDist) * (1 - Math.exp(-dt * 3.5));
+  }
+}

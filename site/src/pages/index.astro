@@ -1,0 +1,369 @@
+---
+import Base from '../layouts/Base.astro';
+import Stage from '../components/scene/Stage';
+
+const INSTALL =
+  'curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash';
+
+// build-time star count — refreshes on every deploy, never blocks the page
+let stars: string | null = null;
+try {
+  const res = await fetch('https://api.github.com/repos/shaiknoorullah/opsbench', {
+    headers: { accept: 'application/vnd.github+json' },
+  });
+  if (res.ok) {
+    const n = (await res.json()).stargazers_count as number;
+    stars = n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+  }
+} catch {
+  /* offline build — nav renders without the count */
+}
+---
+
+<Base>
+  <!-- preloader -->
+  <div id="loader" aria-hidden="true">
+    <div class="text-center">
+      <div class="loader-seal"></div>
+      <p class="font-mono text-[0.78rem] tracking-[0.08em] text-steel">opening evidence file…</p>
+    </div>
+  </div>
+
+  <!-- webgl stage island -->
+  <div id="stage-root" aria-hidden="true">
+    <Stage client:only="react" />
+  </div>
+  <div class="grain-dom" aria-hidden="true"></div>
+
+  <!-- nav -->
+  <header id="nav">
+    <a class="wordmark" href="#exhibit-00">ops<span>bench</span></a>
+    <nav aria-label="Sections">
+      <a href="#exhibit-01">Deficit</a>
+      <a href="#exhibit-02">The Gate</a>
+      <a href="#exhibit-03">The Ledger</a>
+      <a href="#exhibit-04">The Team</a>
+      <a href="#exhibit-06">Run it</a>
+      <a href="/case-files/">Case files</a>
+    </nav>
+    <a
+      class="btn btn-ghost font-mono text-sm"
+      href="https://github.com/shaiknoorullah/opsbench"
+      target="_blank"
+      rel="noopener"
+      data-umami-event="github_click"
+      data-umami-event-placement="nav"
+    >
+      GitHub{stars && <span class="ml-1 text-amber">★ {stars}</span>} ↗
+    </a>
+  </header>
+
+  <!-- progress rail -->
+  <aside id="rail" aria-hidden="true">
+    <div class="rail-line"><span id="rail-fill"></span></div>
+    <ol>
+      <li>00</li><li>01</li><li>02</li><li>03</li><li>04</li><li>05</li><li>06</li>
+    </ol>
+  </aside>
+
+  <main class="relative z-[5]">
+    <!-- EXHIBIT 00 — HERO -->
+    <section class="exhibit relative flex min-h-svh flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-00">
+      <div class="scrim mx-auto w-full max-w-[1080px]">
+        <p class="eyebrow reveal mb-6">EXHIBIT 00 · OPEN-SOURCE AGENT TOOLKIT · MIT</p>
+        <h1 class="display reveal-words mb-7">Evidence, or it didn&rsquo;t happen.</h1>
+        <p class="reveal mb-10 max-w-[46em] text-[clamp(1.02rem,1.5vw,1.22rem)] text-steel">
+          opsbench is a multi-team agent toolkit for DevOps, SRE, platform, security
+          and network teams running Claude&nbsp;Code and Codex&nbsp;CLI on production
+          infrastructure. It treats every incident as a forensic case:
+          verdict-blind investigation, SHA-256 evidence sealing, Cedar-gated
+          mutations, and a human approval at every round boundary.
+        </p>
+        <div class="reveal mb-12 flex flex-wrap gap-4">
+          <button class="btn btn-solid font-mono text-[0.82rem]" data-cmd={INSTALL}>
+            <span class="opacity-55">$</span> curl -fsSL …/install.sh | bash
+            <span class="ml-2 rounded-[3px] border border-obsidian/35 px-2 py-0.5 text-[0.62rem] uppercase tracking-[0.14em]">copy</span>
+          </button>
+          <a class="btn btn-ghost" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">View the source ↗</a>
+        </div>
+        <ul class="reveal hairline flex max-w-[46em] list-none flex-wrap gap-[clamp(1.2rem,4vw,3rem)] border-t pt-6 font-mono">
+          {[
+            [11, 'chained skills'],
+            [33, 'subagents'],
+            [9, 'JSON schemas'],
+            [50, 'MCP recipes'],
+          ].map(([n, label]) => (
+            <li class="text-[0.75rem] tracking-[0.06em] text-steel">
+              <b class="block text-[clamp(1.6rem,3vw,2.2rem)] font-medium tabular-nums text-bone" data-count={n}>0</b>
+              {label}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p class="absolute bottom-9 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 font-mono text-[0.66rem] tracking-[0.18em] text-steel" aria-hidden="true">
+        scroll to open the case file
+        <span class="block h-11 w-px bg-gradient-to-b from-amber to-transparent"></span>
+      </p>
+    </section>
+
+    <!-- EXHIBIT 01 — TRUST DEFICIT -->
+    <section class="exhibit flex min-h-screen flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-01">
+      <div class="scrim mx-auto w-full max-w-[760px]">
+        <p class="eyebrow reveal mb-6">EXHIBIT 01 · THE TRUST DEFICIT</p>
+        <h2 class="display reveal-words mb-7">90% adoption.<br />24% trust.</h2>
+        <p class="reveal mb-6 max-w-[44em] text-[clamp(0.98rem,1.3vw,1.12rem)] text-steel">
+          DORA measured the gap in 2025: teams adopted AI on infrastructure far
+          faster than they learned to trust it. On open benchmarks,
+          state-of-the-art agents resolve roughly one in ten realistic SRE
+          scenarios — while every vendor accuracy number you have read is
+          self-reported. The failure mode is always the same: a single megaprompt
+          guesses a <em class="text-bone">&ldquo;probable&rdquo;</em> root cause and calls it a day.
+        </p>
+        <p class="reveal mb-2 text-[clamp(1.2rem,2vw,1.5rem)] font-medium text-bone">opsbench bans the word.</p>
+        <div class="reveal mt-8 flex flex-wrap gap-3" role="list">
+          <span class="chip confirmed" role="listitem">CONFIRMED</span>
+          <span class="chip falsified" role="listitem">FALSIFIED</span>
+          <span class="chip" role="listitem">NEED-MORE-EVIDENCE</span>
+          <span class="chip" role="listitem">INCONCLUSIVE</span>
+        </div>
+        <p class="cite reveal mt-9">
+          The only verdicts an opsbench agent may render. &ldquo;Probable&rdquo; is a
+          forbidden word — rejected by a PostToolUse hook at write time.<br />
+          <span>— docs/concepts/tone-and-constitution.md · DORA 2025 · ITBench (arXiv:2502.05352)</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- EXHIBIT 02 — THE GATE -->
+    <section class="exhibit flex min-h-screen flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-02">
+      <div class="scrim mx-auto w-full max-w-[1080px]">
+        <p class="eyebrow reveal mb-6">EXHIBIT 02 · CEDAR-GATED MUTATIONS</p>
+        <h2 class="display reveal-words mb-7">No agent touches production on its own judgment.</h2>
+        <p class="reveal mb-6 max-w-[44em] text-[clamp(0.98rem,1.3vw,1.12rem)] text-steel">
+          Every tool call passes a deterministic, default-deny policy gate that
+          lives <em class="text-bone">outside</em> the model&rsquo;s reasoning loop. Per-agent
+          least-privilege allowlists decide what each specialist may touch; loop
+          governors cap iteration; hooks intercept before and after every call.
+          The model&rsquo;s confidence is never the enforcement mechanism.
+        </p>
+        <div class="card-grid reveal mt-10">
+          <article class="card">
+            <h3>tools.cedar</h3>
+            <p>Per-agent tool allowlists. An evidence collector can read a cluster; it cannot write to one. Deny by default.</p>
+          </article>
+          <article class="card">
+            <h3>governors.cedar</h3>
+            <p>Loop caps and iteration discipline. Investigations converge or escalate — they never spiral.</p>
+          </article>
+          <article class="card">
+            <h3>4 hooks</h3>
+            <p>PreToolUse, PostToolUse, SessionStart, SubagentStop — the tripwires around every action, including denials.</p>
+          </article>
+        </div>
+        <p class="cite reveal mt-9"><span>— packages/team-incident-response/policies/ · docs/concepts/cedar-policies.md</span></p>
+      </div>
+    </section>
+
+    <!-- EXHIBIT 03 — THE LEDGER -->
+    <section class="exhibit flex min-h-screen flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-03">
+      <div class="scrim ml-auto mr-[clamp(0rem,6vw,4rem)] w-full max-w-[760px] max-[860px]:mx-auto">
+        <p class="eyebrow reveal mb-6">EXHIBIT 03 · CHAIN OF CUSTODY</p>
+        <h2 class="display reveal-words mb-7">Sealed the moment it&rsquo;s collected.</h2>
+        <p class="reveal mb-6 max-w-[44em] text-[clamp(0.98rem,1.3vw,1.12rem)] text-steel">
+          Evidence is gathered in parallel across seven layers — application,
+          node, network, storage, control plane, observability, and history —
+          then sealed with SHA-256 manifests and entered into a custody log,
+          per NIST SP 800-86. Hypothesis agents investigate
+          <em class="text-bone">verdict-blind</em>: one subagent per hypothesis, none aware of the
+          others&rsquo; conclusions, every claim pinned to a
+          <code class="inline">file:timestamp</code> citation.
+        </p>
+        <blockquote class="reveal mt-10 border-l-2 border-amber py-1 pl-6">
+          <p class="text-[clamp(1.3rem,2.4vw,1.9rem)] font-[450] leading-[1.3] tracking-[-0.01em]">
+            &ldquo;A claim without a citation is a rumor.&rdquo;
+          </p>
+          <footer class="mt-3 font-mono text-[0.7rem] tracking-[0.08em] text-steel">— the opsbench constitution</footer>
+        </blockquote>
+        <p class="cite reveal mt-9"><span>— docs/concepts/tone-and-constitution.md · NIST SP 800-86 · ISO/IEC 27037</span></p>
+      </div>
+    </section>
+
+    <!-- EXHIBIT 04 — THE TEAM -->
+    <section class="exhibit flex min-h-screen flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-04">
+      <div class="scrim mx-auto w-full max-w-[1080px]">
+        <p class="eyebrow reveal mb-6">EXHIBIT 04 · 33 SPECIALISTS, ONE DISCIPLINE</p>
+        <h2 class="display reveal-words mb-7">Not one megaprompt. A disciplined team.</h2>
+        <p class="reveal mb-6 max-w-[44em] text-[clamp(0.98rem,1.3vw,1.12rem)] text-steel">
+          An incident commander orchestrates the outer DAG. Collectors sweep each
+          layer in parallel. A cataloger and a witness seal what they find.
+          Hypothesis specialists investigate independently, a forensic
+          synthesizer writes the narrative, and an enforcement pass —
+          schema validator, citation checker, redaction checker, tone reviewer —
+          blocks anything that doesn&rsquo;t meet the constitution. If the verdict
+          isn&rsquo;t CONFIRMED, the investigation loops. Up to five rounds.
+        </p>
+        <div class="reveal mt-9 flex max-w-[900px] flex-wrap gap-2 font-mono">
+          {[
+            'incident-commander', 'quarantine-coordinator', 'timeline-keeper',
+            'evidence-source-discoverer', 'node-collector', 'network-collector',
+            'storage-collector', 'controlplane-collector', 'observability-collector',
+            'evidence-cataloger', 'evidence-witness', 'hypothesis-generator',
+            'hypothesis-storage', 'hypothesis-network', 'hypothesis-app',
+            'forensic-synthesizer', 'schema-validator', 'evidence-citation-checker',
+            'redaction-checker', 'tone-reviewer', 'rca-author',
+            'mitigations-author', 'customer-comms-author', 'recovery-executor',
+          ].map((role) => (
+            <span class="rounded border border-[var(--hair)] bg-[rgba(15,17,22,0.6)] px-3 py-1 text-[0.68rem] tracking-[0.04em] text-steel transition-colors hover:border-[var(--amber-dim)] hover:text-amber">
+              {role}
+            </span>
+          ))}
+          <span class="rounded border border-dashed border-[var(--hair)] bg-[rgba(15,17,22,0.6)] px-3 py-1 text-[0.68rem] tracking-[0.04em] text-amber">+ 9 more</span>
+        </div>
+        <p class="cite reveal mt-9"><span>— packages/team-incident-response/agents/ · NTSB party-process, round-N+1 model</span></p>
+      </div>
+    </section>
+
+    <!-- EXHIBIT 05 — HUMAN GATE -->
+    <section class="exhibit flex min-h-screen flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-05">
+      <div class="scrim mx-auto w-full max-w-[760px]">
+        <p class="eyebrow reveal mb-6">EXHIBIT 05 · HUMAN-GATED</p>
+        <h2 class="display reveal-words mb-7">No mutation without a human.</h2>
+        <p class="reveal mb-6 max-w-[44em] text-[clamp(0.98rem,1.3vw,1.12rem)] text-steel">
+          Quarantine comes first — clients scaled to zero, default-deny network
+          policy — so the investigation can&rsquo;t trample its own evidence. From
+          there, nothing mutates without explicit human approval at each round
+          boundary and Cedar authorization at each tool call. Recovery runs
+          through the same approval queue as everything else. When the case
+          closes, the team authors the full post-incident suite: a NIST 800-61
+          incident report, a 5-Whys RCA, CAPA mitigations, and a NIST 800-86
+          investigation report.
+        </p>
+        <ul class="reveal hairline mt-9 flex list-none flex-wrap gap-x-8 gap-y-2 border-t pt-6 font-mono">
+          {['NIST SP 800-86', 'NIST SP 800-61r2', 'ISO/IEC 27037', 'NTSB party-process', 'MITRE ATT&CK', 'SANS DFIR'].map((s) => (
+            <li class="text-[0.74rem] tracking-[0.1em] text-steel">{s}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- EXHIBIT 06 — RUN IT -->
+    <section class="exhibit flex min-h-[110vh] flex-col justify-center px-[clamp(1.4rem,6vw,6rem)] py-[clamp(6rem,12vh,9rem)]" id="exhibit-06">
+      <div class="scrim mx-auto w-full max-w-[760px] text-center">
+        <p class="eyebrow reveal mb-6">EXHIBIT 06 · RUN IT</p>
+        <h2 class="display reveal-words mb-7">One command. The bench is yours.</h2>
+        <div class="term reveal mx-auto mt-10" role="group" aria-label="Install commands">
+          <div class="term-bar"><span></span><span></span><span></span> install.sh</div>
+          <pre><code><span class="c"># install every team</span>
+<span class="p">$</span> {INSTALL}
+
+<span class="c"># preview without writing anything</span>
+<span class="p">$</span> curl -fsSL …/install.sh | bash -s -- --dry-run</code></pre>
+          <button class="term-copy" data-cmd={INSTALL}>copy</button>
+        </div>
+        <p class="reveal mx-auto mt-7 max-w-[44em] text-[0.95rem] text-steel">
+          Then, from Claude Code: <code class="inline">/storage-incident-response</code> —
+          and the commander takes it from there.
+        </p>
+        <div class="reveal mt-10 flex flex-wrap justify-center gap-4">
+          <a class="btn btn-solid" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">Star on GitHub ↗</a>
+          <a class="btn btn-ghost" href="https://github.com/shaiknoorullah/opsbench/tree/main/docs" target="_blank" rel="noopener">Read the docs</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- custody footer -->
+    <footer class="hairline relative z-[5] border-t bg-gradient-to-b from-transparent to-[rgba(10,11,14,0.9)] px-[clamp(1.4rem,6vw,6rem)] pb-12 pt-16">
+      <div class="mx-auto grid max-w-[1080px] grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-10 font-mono">
+        <div>
+          <p class="mb-4 text-[0.64rem] tracking-[0.2em] text-amber">CHAIN OF CUSTODY — THIS ARTIFACT</p>
+          <p class="text-[0.72rem] leading-[2.1] text-steel">
+            artifact&nbsp;&nbsp;: site/src/pages/index.astro<br />
+            sealed&nbsp;&nbsp;&nbsp;&nbsp;: 2026-07-18T00:00:00Z<br />
+            license&nbsp;&nbsp;&nbsp;: MIT<br />
+            verdict&nbsp;&nbsp;&nbsp;: <span class="text-verdict">CONFIRMED</span> — every claim above cites its source
+          </p>
+        </div>
+        <div>
+          <p class="mb-4 text-[0.64rem] tracking-[0.2em] text-amber">TEAMS</p>
+          <p class="text-[0.72rem] leading-[2.1] text-steel">
+            team-incident-response&nbsp;&nbsp;<span class="text-verdict">stable</span><br />
+            team-platform-engineering&nbsp;&nbsp;planned<br />
+            team-security-response&nbsp;&nbsp;planned<br />
+            team-network-operations&nbsp;&nbsp;planned<br />
+            team-it-helpdesk&nbsp;&nbsp;planned
+          </p>
+        </div>
+        <div>
+          <p class="mb-4 text-[0.64rem] tracking-[0.2em] text-amber">SOURCE</p>
+          <p class="text-[0.72rem] leading-[2.1] text-steel">
+            <a class="border-b border-[var(--hair)] transition-colors hover:border-amber hover:text-bone" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">github.com/shaiknoorullah/opsbench</a><br />
+            built by <a class="border-b border-[var(--hair)] transition-colors hover:border-amber hover:text-bone" href="https://github.com/shaiknoorullah" target="_blank" rel="noopener">Shaik Noorullah</a><br />
+            while running production Kubernetes
+          </p>
+        </div>
+      </div>
+      <div class="hairline mx-auto mt-14 max-w-[1080px] border-t pt-8">
+        <p class="mb-3 font-mono text-[0.64rem] tracking-[0.2em] text-amber">DISPATCHES FROM THE BENCH</p>
+        <form data-form="subscribe" class="flex max-w-[440px] flex-wrap items-center gap-2" novalidate>
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="you@example.com"
+            autocomplete="email"
+            class="min-w-0 flex-1 rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-4 py-2.5 font-mono text-[0.82rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+          />
+          <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+          <input type="hidden" name="ts" value="" />
+          <button type="submit" class="btn btn-solid font-mono text-[0.78rem]">Subscribe</button>
+          <p data-status class="form-status w-full font-mono text-[0.7rem]" aria-live="polite"></p>
+        </form>
+        <p class="mt-2 font-mono text-[0.64rem] text-steel/60">
+          new case files and releases. no tracking pixels, unsubscribe anytime.
+          &nbsp;·&nbsp;<a class="hover:text-amber" href="/contact/">contact</a>
+        </p>
+      </div>
+      <p class="hairline mx-auto mt-10 max-w-[1080px] border-t pt-6 font-mono text-[0.68rem] tracking-[0.06em] text-steel/60">
+        opsbench — a disciplined team of agents that can never go wrong by design.
+      </p>
+    </footer>
+  </main>
+
+  <!-- the one newsletter prompt (see src/lib/prompt.ts for the etiquette) -->
+  <aside id="news-prompt" aria-label="Newsletter" role="dialog">
+    <button data-dismiss class="prompt-x font-mono" aria-label="Dismiss">×</button>
+    <p class="eyebrow mb-3 !text-[0.62rem]">BEFORE YOU CLOSE THE FILE</p>
+    <p class="mb-4 text-[1.02rem] leading-snug text-bone">
+      One email when a new case file is sealed. Nothing else.
+    </p>
+    <form data-form="subscribe" class="flex flex-wrap items-center gap-2" novalidate>
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="you@example.com"
+        autocomplete="email"
+        class="min-w-0 flex-1 rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-3 py-2 font-mono text-[0.78rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+      />
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+      <input type="hidden" name="ts" value="" />
+      <button type="submit" class="btn btn-solid font-mono text-[0.72rem]">Subscribe</button>
+      <p data-status class="form-status w-full font-mono text-[0.68rem]" aria-live="polite"></p>
+    </form>
+  </aside>
+
+  <div id="toast" role="status" aria-live="polite">copied to clipboard</div>
+
+  <script>
+    import { initForms } from '../lib/forms/client';
+    import { initPrompt } from '../lib/prompt';
+    import { initScrollDepth, track } from '../lib/analytics';
+
+    initForms();
+    initPrompt();
+    initScrollDepth();
+    document.querySelectorAll('[data-cmd]').forEach((b) =>
+      b.addEventListener('click', () => track('copy_install_command')),
+    );
+  </script>
+</Base>

@@ -1,0 +1,58 @@
+---
+title: Why "probable" is a banned word
+description: The most dangerous sentence in incident response starts with "the probable root cause is." How opsbench enforces verdict discipline at write time, and what happened when we let a hook do the reviewing.
+date: 2026-07-10
+caseNumber: CF-001
+tags:
+  - constitution
+  - verdicts
+  - incident-response
+draft: false
+---
+
+Every incident review has heard it: *"the probable root cause was the deployment."*
+The word does a lot of quiet damage. It closes the investigation while sounding
+like a conclusion. It lets a hypothesis graduate to history without ever being
+tested. Six months later the same incident happens again, because "probable"
+was never CONFIRMED — it was just tired people agreeing to stop looking.
+
+opsbench takes a blunt position: **the word is banned.** A forensic artifact
+may render exactly four verdicts:
+
+- `CONFIRMED` — the evidence proves it, with citations
+- `FALSIFIED` — the evidence disproves it, with citations
+- `NEED-MORE-EVIDENCE` — the honest middle state
+- `INCONCLUSIVE` — the evidence cannot decide either way
+
+There is no fifth verdict. There is especially no verdict that means
+"we ran out of patience but want to sound finished."
+
+## Enforcement, not encouragement
+
+A style guide nobody enforces is a suggestion. The constitution is enforced in
+three layers, and the interesting one is the last:
+
+1. **Skill-level instruction** — every skill tells its agents the rules.
+2. **The tone-reviewer subagent** — reviews every artifact before it is
+   written, revising against the constitution's principles.
+3. **A PostToolUse hook** — greps every `Write` call for forbidden words and
+   rejects the call outright if one appears.
+
+The hook is the part that matters. Agents, like people, drift under pressure —
+late in a long investigation, a model will reach for "probably" for the same
+reason an exhausted engineer does. The hook does not negotiate. The write
+fails, the agent rephrases, and the artifact that lands on disk either commits
+to a verdict or admits it does not have one.
+
+## What it changes
+
+The practical effect is that investigations loop. If round three ends at
+`NEED-MORE-EVIDENCE`, the commander sends collectors back out — up to five
+rounds — instead of shipping a maybe. Post-incident reports stop containing
+soft conclusions, because soft conclusions are unwritable.
+
+> A claim without a citation is a rumor.
+
+The ban is one sentence in a constitution file. It is also the entire
+difference between an agent that investigates and an agent that guesses with
+confidence formatting.

@@ -300,7 +300,9 @@
     "unfavourable", "ungated", "unioned", "unledgered", "Unmarshal", "unpermitted",
     "unresumable", "unreviewed", "unsandboxed", "unscoreable", "unscored", "unvetted", "Unvetted",
     "unviable", "upstreamed", "uuidgen", "vaporise", "Veeam", "wiremcp", "wrappable",
-    "XSOAR", "Yubi", "ztunnel", "seqs", "HTMX", "Datastar", "Bubbletea", "goroutine", "goroutines"
+    "XSOAR", "Yubi", "ztunnel", "seqs", "HTMX", "Datastar", "Bubbletea", "goroutine", "goroutines", "numpy", "SMAA",
+    "SOTA", "Grotesk", "grotesk", "GSAP", "gsap", "verlet", "PMREM", "Bokeh", "bokeh", "Lenis", "lenis",
+    "catenary", "clearcoat", "woff", "Umami", "UMAMI", "umami", "listmonk", "LISTMONK", "Keystatic", "keystatic"
   ],
   "allowCompoundWords": true
 }

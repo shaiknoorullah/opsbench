@@ -1,0 +1,88 @@
+# Umami — self-hosted, cookieless analytics for the opsbench site.
+# Assumes an existing Postgres; create the secret first:
+#
+#   kubectl -n site-services create secret generic umami \
+#     --from-literal=DATABASE_URL='postgresql://umami:PASS@postgres:5432/umami' \
+#     --from-literal=APP_SECRET="$(openssl rand -hex 32)"
+#
+# Then point PUBLIC_UMAMI_SRC at https://analytics.example.com/script.js and
+# PUBLIC_UMAMI_WEBSITE_ID at the website id created in the Umami UI.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: site-services
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami
+  namespace: site-services
+  labels:
+    app: umami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: umami
+  template:
+    metadata:
+      labels:
+        app: umami
+    spec:
+      containers:
+        - name: umami
+          image: ghcr.io/umami-software/umami:postgresql-v2.18.1
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: umami
+          resources:
+            requests:
+              cpu: 50m
+              memory: 192Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+          readinessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: 3000
+            initialDelaySeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: umami
+  namespace: site-services
+spec:
+  selector:
+    app: umami
+  ports:
+    - port: 80
+      targetPort: 3000
+---
+# Adapt to your ingress controller / cert-manager setup.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: umami
+  namespace: site-services
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt # adjust
+spec:
+  rules:
+    - host: analytics.example.com # adjust
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: umami
+                port:
+                  number: 80
+  tls:
+    - hosts: # adjust
+        - analytics.example.com
+      secretName: umami-tls

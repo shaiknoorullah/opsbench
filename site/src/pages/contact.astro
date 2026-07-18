@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Contact — opsbench"
+  description="Questions, team proposals, or incident war stories — reach the opsbench maintainers."
+>
+  <header id="nav" class="in">
+    <a class="wordmark" href="/">ops<span>bench</span></a>
+    <nav aria-label="Sections">
+      <a href="/case-files/">Case files</a>
+    </nav>
+    <a class="btn btn-ghost font-mono text-sm" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">GitHub ↗</a>
+  </header>
+
+  <main class="mx-auto max-w-[640px] px-[clamp(1.4rem,5vw,3rem)] pb-24 pt-40">
+    <p class="eyebrow mb-6">OPEN A LINE · EVERY MESSAGE IS READ</p>
+    <h1 class="display mb-6">Contact.</h1>
+    <p class="mb-10 max-w-[38em] text-steel">
+      Questions, new-team proposals, incident war stories, or a correction with
+      a citation — all welcome. For bugs and feature requests,
+      <a class="text-amber" href="https://github.com/shaiknoorullah/opsbench/issues" target="_blank" rel="noopener">open an issue</a>
+      so the discussion stays public.
+    </p>
+
+    <form data-form="contact" class="space-y-4" novalidate>
+      <div>
+        <label class="mb-1.5 block font-mono text-[0.68rem] tracking-[0.14em] text-steel" for="c-name">NAME</label>
+        <input
+          id="c-name"
+          type="text"
+          name="name"
+          required
+          autocomplete="name"
+          class="w-full rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-4 py-2.5 text-[0.95rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block font-mono text-[0.68rem] tracking-[0.14em] text-steel" for="c-email">EMAIL</label>
+        <input
+          id="c-email"
+          type="email"
+          name="email"
+          required
+          autocomplete="email"
+          class="w-full rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-4 py-2.5 font-mono text-[0.88rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+        />
+      </div>
+      <div>
+        <label class="mb-1.5 block font-mono text-[0.68rem] tracking-[0.14em] text-steel" for="c-msg">MESSAGE</label>
+        <textarea
+          id="c-msg"
+          name="message"
+          rows="6"
+          required
+          class="w-full rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-4 py-2.5 text-[0.95rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+        ></textarea>
+      </div>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+      <input type="hidden" name="ts" value="" />
+      <div class="flex items-center gap-4">
+        <button type="submit" class="btn btn-solid font-mono text-[0.8rem]">Send</button>
+        <p data-status class="form-status font-mono text-[0.72rem]" aria-live="polite"></p>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    import { initForms } from '../lib/forms/client';
+    initForms();
+  </script>
+</Base>

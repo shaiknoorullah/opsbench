@@ -1,0 +1,98 @@
+# listmonk — self-hosted newsletter for the opsbench site.
+# Assumes an existing Postgres; create the secret first:
+#
+#   kubectl -n site-services create secret generic listmonk \
+#     --from-literal=LISTMONK_db__host=postgres \
+#     --from-literal=LISTMONK_db__port='5432' \
+#     --from-literal=LISTMONK_db__user=listmonk \
+#     --from-literal=LISTMONK_db__password=PASS \
+#     --from-literal=LISTMONK_db__database=listmonk \
+#     --from-literal=LISTMONK_app__admin_username=admin \
+#     --from-literal=LISTMONK_app__admin_password=CHANGE_ME
+#
+# One-time schema install (idempotent):
+#   kubectl -n site-services run listmonk-install --rm -it --restart=Never \
+#   kubectl -n site-services run listmonk-install --rm -it --restart=Never \
+#     --image=listmonk/listmonk:v5.0.3 -- ./listmonk --install --idempotent --yes
+#   (mount the same env secret; see your cluster's preferred one-off job pattern)
+#
+# For the site's /api/subscribe endpoint, create an API user in the listmonk
+# admin UI and set LISTMONK_URL / LISTMONK_USER / LISTMONK_TOKEN /
+# LISTMONK_LIST_ID in Vercel's environment.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: listmonk
+  namespace: site-services
+  labels:
+    app: listmonk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: listmonk
+  template:
+    metadata:
+      labels:
+        app: listmonk
+    spec:
+      containers:
+        - name: listmonk
+          image: listmonk/listmonk:v5.0.3
+          args: ['--config', '']
+          ports:
+            - containerPort: 9000
+          env:
+            - name: LISTMONK_app__address
+              value: 0.0.0.0:9000
+          envFrom:
+            - secretRef:
+                name: listmonk
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: listmonk
+  namespace: site-services
+spec:
+  selector:
+    app: listmonk
+  ports:
+    - port: 80
+      targetPort: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: listmonk
+  namespace: site-services
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt # adjust
+spec:
+  rules:
+    - host: news.example.com # adjust
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: listmonk
+                port:
+                  number: 80
+  tls:
+    - hosts: # adjust
+        - news.example.com
+      secretName: listmonk-tls

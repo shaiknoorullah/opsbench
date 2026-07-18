@@ -1,0 +1,66 @@
+---
+title: Chain of custody for AI agents
+description: NIST SP 800-86 was written for human forensic examiners. Applying it to AI agents — SHA-256 sealing, custody logs, and verdict-blind investigation — turns out to be the thing that makes their conclusions trustworthy.
+date: 2026-07-14
+caseNumber: CF-002
+tags:
+  - forensics
+  - nist-800-86
+  - evidence
+draft: false
+---
+
+When a human forensic examiner collects evidence, the first thing they do is
+seal it. Hash the disk image, log who touched it and when, and never work on
+the original. Nobody extends this courtesy to AI agents — we let them read
+production state, mutate it mid-investigation, and then we wonder whether the
+timeline in their report describes the incident or describes what the agent
+did to the incident.
+
+opsbench applies **NIST SP 800-86 discipline to agent investigations**,
+and it changes what the output is worth.
+
+## Quarantine before anything
+
+The first act of an investigation is to stop the bleeding *and* stop the
+trampling: clients scaled to zero, a default-deny network policy around the
+affected workloads. Not only containment — evidence preservation. An
+investigation that runs while traffic keeps rewriting the state is studying a
+moving target.
+
+## Seal at collection time
+
+Collectors sweep seven layers in parallel — application, node, network,
+storage, control plane, observability, history. Everything they capture is
+sealed immediately:
+
+```text
+sha256:9f2a11c4…  node-collector   journal-worker-3.log     SEALED
+sha256:4be80d21…  storage-collector pvc-metrics-0.snapshot  SEALED
+```
+
+A cataloger indexes the evidence; a separate witness agent attests the
+manifest. From that point, every claim in every report must cite a sealed
+artifact by `file:timestamp`. If an agent asserts something it cannot pin to
+the manifest, the citation checker blocks the artifact.
+
+## Verdict-blind investigation
+
+The subtle failure mode of agent investigations is consensus by contamination:
+one confident early hypothesis leaks into every later prompt, and the
+"independent" analyses converge on it. opsbench runs hypothesis agents
+**verdict-blind** — one subagent per hypothesis, none aware of the others'
+conclusions, each grading only its own theory against the sealed evidence.
+The forensic synthesizer is the first thing allowed to see all verdicts at
+once — the same reason the NTSB runs party submissions before the board writes
+the final report.
+
+## Why bother
+
+Because the alternative is trusting a narrative. A sealed-evidence
+investigation can be *re-run*: hand the manifest to a different model, a
+different team, or an auditor, and the citations either hold or they do not.
+That property — reconstructability — is what separates a report you can act
+on from a story that sounds right.
+
+Evidence, or it didn't happen.
