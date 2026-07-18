@@ -34,24 +34,23 @@ interface Shot {
 /* Same storyboard as the vanilla build — every shot faces down the corridor,
    finale is a pull-back crane. */
 const SHOTS: Shot[] = [
-  // hero: closer and lower — monolith large in the right third, the nearest
-  // pilaster pair breaks the left frame edge as a defocused foreground mass.
-  // grades: warm print at the seal, cool desaturated doubt in the deficit,
-  // hot amber through the gate, neutral-cool forensic ledger, warm finale.
-  { at: ['sec', 0, 0.0], pos: [-2.1, 1.9, 9.4], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0, temp: 0.14, sat: 1.0, fog: 0.03, roll: 0, focus: 9.3 },
-  { at: ['mid', 0, 0.5], pos: [1.5, 1.95, 8.4], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0, temp: 0.06, sat: 0.96, fog: 0.034, roll: 0.4, focus: 8.2 },
-  { at: ['sec', 1, 0.0], pos: [5.0, 2.35, 3.0], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8, temp: -0.2, sat: 0.8, fog: 0.042, roll: 1.1, focus: 12.0 },
-  { at: ['mid', 1, 0.55], pos: [2.4, 2.3, -4.0], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2, temp: -0.04, sat: 0.92, fog: 0.036, roll: 0.5, focus: 12.0 },
-  { at: ['sec', 2, 0.0], pos: [1.7, 2.3, -8.6], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0, temp: 0.2, sat: 1.05, fog: 0.032, roll: 0, focus: 7.6 },
-  { at: ['mid', 2, 0.62], pos: [0.4, 2.42, -15.3], tgt: [0.15, 2.5, -24.0], bloom: 0.68, ap: 0.8, temp: 0.32, sat: 1.08, fog: 0.026, roll: 0, focus: 5.0 },
-  { at: ['sec', 3, 0.0], pos: [5.4, 2.7, -27.6], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15, temp: -0.1, sat: 0.95, fog: 0.03, roll: -0.8, focus: 8.4 },
-  { at: ['mid', 3, 0.55], pos: [0.6, 3.1, -30.2], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2, temp: -0.08, sat: 0.95, fog: 0.03, roll: -0.5, focus: 5.1 },
-  { at: ['sec', 4, 0.0], pos: [1.2, 3.4, -46.5], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0, temp: 0.08, sat: 1.04, fog: 0.024, roll: 0, focus: 9.6 },
-  { at: ['mid', 4, 0.5], pos: [-3.8, 4.1, -49.0], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95, temp: 0.1, sat: 1.04, fog: 0.023, roll: 0.5, focus: 8.0 },
-  { at: ['sec', 5, 0.0], pos: [-5.8, 3.1, -52.5], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9, temp: 0.16, sat: 1.05, fog: 0.022, roll: 0, focus: 6.8 },
-  { at: ['mid', 5, 0.5], pos: [-2.0, 5.6, -45.5], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8, temp: 0.1, sat: 1.0, fog: 0.026, roll: -0.4, focus: 11.0 },
-  { at: ['sec', 6, 0.0], pos: [0.0, 8.0, -42.0], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 11.4 },
-  { at: ['end'], pos: [0.0, 9.6, -40.0], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 15.7 },
+  // 50mm blocking: FOV 27deg, cameras 1.6x further back along the subject
+  // ray — same frame composition, telephoto compression. through-the-gate and
+  // the human close-up are hand-blocked to stay clear of the colonnade.
+  { at: ['sec', 0, 0.0], pos: [-1.2, 1.4, 15.0], tgt: [-3.6, 2.75, 0.0], bloom: 0.5, ap: 1.0, temp: 0.14, sat: 1.0, fog: 0.03, roll: 0, focus: 14.7 },
+  { at: ['mid', 0, 0.5], pos: [3.4, 1.6, 13.7], tgt: [-1.6, 2.55, -0.5], bloom: 0.5, ap: 1.0, temp: 0.06, sat: 0.96, fog: 0.034, roll: 0.4, focus: 13.8 },
+  { at: ['sec', 1, 0.0], pos: [9.4, 2.4, 9.3], tgt: [-2.4, 2.3, -7.5], bloom: 0.42, ap: 1.8, temp: -0.2, sat: 0.8, fog: 0.042, roll: 1.1, focus: 21.0 },
+  { at: ['mid', 1, 0.55], pos: [4.6, 2.3, 3.2], tgt: [-1.2, 2.3, -16.0], bloom: 0.52, ap: 1.2, temp: -0.04, sat: 0.92, fog: 0.036, roll: 0.5, focus: 19.5 },
+  { at: ['sec', 2, 0.0], pos: [3.5, 2.27, -4.2], tgt: [-1.3, 2.35, -16.0], bloom: 0.58, ap: 1.0, temp: 0.2, sat: 1.05, fog: 0.032, roll: 0, focus: 12.3 },
+  { at: ['mid', 2, 0.62], pos: [0.3, 2.42, -13.8], tgt: [0.15, 2.5, -26.0], bloom: 0.68, ap: 0.8, temp: 0.32, sat: 1.08, fog: 0.026, roll: 0, focus: 8.0 },
+  { at: ['sec', 3, 0.0], pos: [10.2, 2.46, -23.5], tgt: [-2.6, 3.1, -34.5], bloom: 0.55, ap: 1.15, temp: -0.1, sat: 0.95, fog: 0.03, roll: -0.8, focus: 14.7 },
+  { at: ['mid', 3, 0.55], pos: [4.1, 3.0, -26.7], tgt: [-5.2, 3.3, -36.0], bloom: 0.55, ap: 1.2, temp: -0.08, sat: 0.95, fog: 0.03, roll: -0.5, focus: 9.9 },
+  { at: ['sec', 4, 0.0], pos: [3.2, 3.5, -40.8], tgt: [-2.2, 3.2, -56.0], bloom: 0.6, ap: 1.0, temp: 0.08, sat: 1.04, fog: 0.024, roll: 0, focus: 15.7 },
+  { at: ['mid', 4, 0.5], pos: [-5.5, 4.6, -44.8], tgt: [-1.0, 3.2, -56.0], bloom: 0.62, ap: 0.95, temp: 0.1, sat: 1.04, fog: 0.023, roll: 0.5, focus: 12.5 },
+  { at: ['sec', 5, 0.0], pos: [-8.0, 2.9, -49.0], tgt: [0.0, 3.4, -56.5], bloom: 0.62, ap: 0.9, temp: 0.16, sat: 1.05, fog: 0.022, roll: 0, focus: 11.0 },
+  { at: ['mid', 5, 0.5], pos: [-3.2, 7.2, -39.2], tgt: [0.0, 3.0, -56.0], bloom: 0.58, ap: 0.8, temp: 0.1, sat: 1.0, fog: 0.026, roll: -0.4, focus: 17.6 },
+  { at: ['sec', 6, 0.0], pos: [0.0, 11.2, -33.6], tgt: [0.0, 2.6, -56.0], bloom: 0.55, ap: 0.7, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 24.0 },
+  { at: ['end'], pos: [0.0, 13.9, -30.4], tgt: [0.0, 2.4, -56.0], bloom: 0.52, ap: 0.65, temp: 0.06, sat: 0.98, fog: 0.028, roll: 0, focus: 28.0 },
 ];
 
 const easeIO = (x: number) => x * x * (3 - 2 * x);
@@ -61,7 +60,7 @@ export class Director {
   private keys: Required<Shot>[] = [];
 
   readonly shot = {
-    pos: new THREE.Vector3(-2.1, 1.9, 9.4),
+    pos: new THREE.Vector3(-1.2, 1.4, 15.0),
     tgt: new THREE.Vector3(-3.6, 2.75, 0),
     bloom: 0.5,
     ap: 1,
@@ -69,11 +68,11 @@ export class Director {
     sat: 1,
     fog: 0.03,
     roll: 0,
-    focus: 9.3,
+    focus: 14.7,
   };
 
   /* spring-smoothed camera state */
-  readonly pos = new THREE.Vector3(-1.8, 2.75, 19.3);
+  readonly pos = new THREE.Vector3(-1.2, 1.9, 24.0);
   readonly tgt = new THREE.Vector3(-3.4, 2.65, 0);
   readonly look = new THREE.Vector3();
 
@@ -81,7 +80,7 @@ export class Director {
   aperture = 1;
   /** 0..1 speed-ramp intensity, from smoothed scroll velocity */
   ramp = 0;
-  focusDist = 12;
+  focusDist = 14.7;
   /* per-act grade, spring-smoothed */
   temp = 0.14;
   sat = 1.0;
@@ -152,8 +151,8 @@ export class Director {
     if (this.introT < 1) {
       this.introT = Math.min(1, this.introT + dt * 0.36);
       const k = 1 - easeIO(this.introT);
-      this.shot.pos.z += k * 6.5;
-      this.shot.pos.y += k * 0.7;
+      this.shot.pos.z += k * 9.0;
+      this.shot.pos.y += k * 0.5;
     }
 
     const kPos = reduced ? 1 : 1 - Math.exp(-dt * 4.2);
@@ -172,15 +171,15 @@ export class Director {
 
     // handheld micro-drift so held shots never freeze
     this.drift = t;
-    const dx = Math.sin(t * 0.31) * 0.045 + Math.sin(t * 0.83) * 0.02;
-    const dy = Math.cos(t * 0.27) * 0.03 + Math.sin(t * 0.63) * 0.016;
+    const dx = Math.sin(t * 0.31) * 0.028 + Math.sin(t * 0.83) * 0.012;
+    const dy = Math.cos(t * 0.27) * 0.019 + Math.sin(t * 0.63) * 0.01;
 
     camera.position.copy(this.pos);
-    camera.position.x += this.ptr.sx * 0.35 + dx;
-    camera.position.y += this.ptr.sy * 0.22 + dy;
+    camera.position.x += this.ptr.sx * 0.22 + dx;
+    camera.position.y += this.ptr.sy * 0.14 + dy;
     this.look.copy(this.tgt);
-    this.look.x += this.ptr.sx * 0.12;
-    this.look.y += this.ptr.sy * 0.08;
+    this.look.x += this.ptr.sx * 0.075;
+    this.look.y += this.ptr.sy * 0.05;
     camera.lookAt(this.look);
 
     // dutch tilt — slow spring so it reads as intention, not wobble
@@ -194,7 +193,7 @@ export class Director {
     this.fogDensity += (this.shot.fog - this.fogDensity) * kG;
 
     // FOV kick on speed ramps — the "whip" through transitions
-    const fov = 42 + this.ramp * 9;
+    const fov = 27 + this.ramp * 5;
     if (Math.abs(camera.fov - fov) > 0.01) {
       camera.fov = fov;
       camera.updateProjectionMatrix();

@@ -103,7 +103,7 @@ export default function Stage() {
         toneMapping: THREE.NoToneMapping, // grade happens in the composer (AgX)
       }}
       dpr={low ? [1, 1.5] : [1, 1.75]}
-      camera={{ fov: 42, near: 0.1, far: 200, position: [-1.8, 2.75, 19.3] }}
+      camera={{ fov: 27, near: 0.1, far: 200, position: [-1.2, 1.9, 24.0] }}
       onCreated={({ gl }) => {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         document.getElementById('loader')?.classList.add('done');
