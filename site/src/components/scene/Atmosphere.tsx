@@ -146,13 +146,13 @@ function Shards() {
       Array.from({ length: 14 }, (_, i) => ({
         pos: [
           Math.cos((i / 14) * Math.PI * 2) * (2.6 + (i % 4) * 0.8),
-          1.3 + (i % 5) * 0.8,
+          1.9 + (i % 5) * 0.75,
           -8.5 - (i % 7) * 1.4,
         ] as [number, number, number],
         rot: [Math.sin(i) * 0.7, (i / 14) * Math.PI * 2, Math.cos(i * 2) * 0.5] as [number, number, number],
         size: [0.4 + Math.sin(i * 7.3) * 0.15, 0.025, 0.55 + Math.cos(i * 3.1) * 0.2] as [number, number, number],
         phase: i * 1.7,
-        baseY: 1.3 + (i % 5) * 0.8,
+        baseY: 1.9 + (i % 5) * 0.75,
       })),
     [],
   );
@@ -198,13 +198,13 @@ export function Atmosphere() {
       <directionalLight position={[6, 12, 8]} color={0xffd9a0} intensity={0.9} />
       <directionalLight position={[-8, 5, -14]} color={0x9ab8ff} intensity={0.4} />
 
-      {/* live wax seal on the monolith face */}
-      <pointLight ref={seal} position={[0, 2.7, 1.6]} color={0xffb454} intensity={14} distance={10} decay={2} />
-      <mesh position={[0, 2.95, 0.385]}>
+      {/* live wax seal — aligned to the baked glow recess on the monolith face */}
+      <pointLight ref={seal} position={[0, 2.9, 1.7]} color={0xffb454} intensity={14} distance={10} decay={2} />
+      <mesh position={[0, 3.05, 0.46]}>
         <torusGeometry args={[0.5, 0.035, 24, 96]} />
         <meshStandardMaterial ref={sealRing} color={0x1a1206} emissive={0xffb454} emissiveIntensity={2.6} roughness={0.4} />
       </mesh>
-      <mesh position={[0, 2.95, 0.386]}>
+      <mesh position={[0, 3.05, 0.465]}>
         <circleGeometry args={[0.16, 48]} />
         <meshStandardMaterial color={0x1a1206} emissive={0xffb454} emissiveIntensity={3.2} roughness={0.4} />
       </mesh>
