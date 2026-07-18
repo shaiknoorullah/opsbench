@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const posts = (await getCollection('caseFiles', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<Base
+  title="Case files — opsbench"
+  description="Field notes on forensic-grade AI operations: evidence discipline, policy gates, and the craft of agents that prove their work."
+>
+  <header id="nav" class="in">
+    <a class="wordmark" href="/">ops<span>bench</span></a>
+    <nav aria-label="Sections">
+      <a href="/#exhibit-01">Deficit</a>
+      <a href="/#exhibit-02">The Gate</a>
+      <a href="/#exhibit-03">The Ledger</a>
+      <a href="/case-files/" aria-current="page" style="color: var(--color-amber)">Case files</a>
+    </nav>
+    <a class="btn btn-ghost font-mono text-sm" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">GitHub ↗</a>
+  </header>
+
+  <main class="mx-auto max-w-[880px] px-[clamp(1.4rem,5vw,3rem)] pb-24 pt-40">
+    <p class="eyebrow mb-6">THE ARCHIVE · FIELD NOTES ON FORENSIC AI OPERATIONS</p>
+    <h1 class="display mb-6">Case files.</h1>
+    <p class="mb-14 max-w-[40em] text-steel">
+      Investigations, verdicts, and the occasional falsified hypothesis — notes
+      from building agents that prove their work. Every entry cited, sealed,
+      and revision-controlled: the archive&rsquo;s history is its own chain of custody.
+    </p>
+
+    <ol class="list-none space-y-0">
+      {posts.map((post) => (
+        <li class="hairline border-t">
+          <a
+            href={`/case-files/${post.id}/`}
+            class="group grid grid-cols-[auto_1fr] items-baseline gap-x-8 gap-y-2 py-8 transition-colors md:grid-cols-[130px_1fr_auto]"
+          >
+            <span class="font-mono text-[0.72rem] tracking-[0.14em] text-amber">{post.data.caseNumber}</span>
+            <span>
+              <span class="block text-[1.35rem] font-[480] leading-snug tracking-[-0.01em] text-bone transition-colors group-hover:text-amber">
+                {post.data.title}
+              </span>
+              <span class="mt-2 block max-w-[44em] text-[0.92rem] text-steel">{post.data.description}</span>
+              <span class="mt-3 flex flex-wrap gap-2">
+                {post.data.tags.map((t) => (
+                  <span class="rounded border border-[var(--hair)] px-2 py-0.5 font-mono text-[0.62rem] tracking-[0.08em] text-steel">{t}</span>
+                ))}
+              </span>
+            </span>
+            <time class="font-mono text-[0.7rem] text-steel/70" datetime={post.data.date.toISOString()}>
+              {fmt(post.data.date)}
+            </time>
+          </a>
+        </li>
+      ))}
+    </ol>
+
+    <p class="hairline mt-2 border-t pt-8 font-mono text-[0.7rem] text-steel/70">
+      <a class="hover:text-amber" href="/rss.xml">RSS</a> · edited with a git-backed CMS —
+      every revision is a commit
+    </p>
+  </main>
+</Base>

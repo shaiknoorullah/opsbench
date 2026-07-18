@@ -4,6 +4,20 @@ import Stage from '../components/scene/Stage';
 
 const INSTALL =
   'curl -fsSL https://raw.githubusercontent.com/shaiknoorullah/opsbench/main/scripts/install.sh | bash';
+
+// build-time star count — refreshes on every deploy, never blocks the page
+let stars: string | null = null;
+try {
+  const res = await fetch('https://api.github.com/repos/shaiknoorullah/opsbench', {
+    headers: { accept: 'application/vnd.github+json' },
+  });
+  if (res.ok) {
+    const n = (await res.json()).stargazers_count as number;
+    stars = n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+  }
+} catch {
+  /* offline build — nav renders without the count */
+}
 ---
 
 <Base>
@@ -30,8 +44,18 @@ const INSTALL =
       <a href="#exhibit-03">The Ledger</a>
       <a href="#exhibit-04">The Team</a>
       <a href="#exhibit-06">Run it</a>
+      <a href="/case-files/">Case files</a>
     </nav>
-    <a class="btn btn-ghost font-mono text-sm" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">GitHub ↗</a>
+    <a
+      class="btn btn-ghost font-mono text-sm"
+      href="https://github.com/shaiknoorullah/opsbench"
+      target="_blank"
+      rel="noopener"
+      data-umami-event="github_click"
+      data-umami-event-placement="nav"
+    >
+      GitHub{stars && <span class="ml-1 text-amber">★ {stars}</span>} ↗
+    </a>
   </header>
 
   <!-- progress rail -->
@@ -278,11 +302,68 @@ const INSTALL =
           </p>
         </div>
       </div>
-      <p class="hairline mx-auto mt-14 max-w-[1080px] border-t pt-6 font-mono text-[0.68rem] tracking-[0.06em] text-steel/60">
+      <div class="hairline mx-auto mt-14 max-w-[1080px] border-t pt-8">
+        <p class="mb-3 font-mono text-[0.64rem] tracking-[0.2em] text-amber">DISPATCHES FROM THE BENCH</p>
+        <form data-form="subscribe" class="flex max-w-[440px] flex-wrap items-center gap-2" novalidate>
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="you@example.com"
+            autocomplete="email"
+            class="min-w-0 flex-1 rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-4 py-2.5 font-mono text-[0.82rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+          />
+          <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+          <input type="hidden" name="ts" value="" />
+          <button type="submit" class="btn btn-solid font-mono text-[0.78rem]">Subscribe</button>
+          <p data-status class="form-status w-full font-mono text-[0.7rem]" aria-live="polite"></p>
+        </form>
+        <p class="mt-2 font-mono text-[0.64rem] text-steel/60">
+          new case files and releases. no tracking pixels, unsubscribe anytime.
+          &nbsp;·&nbsp;<a class="hover:text-amber" href="/contact/">contact</a>
+        </p>
+      </div>
+      <p class="hairline mx-auto mt-10 max-w-[1080px] border-t pt-6 font-mono text-[0.68rem] tracking-[0.06em] text-steel/60">
         opsbench — a disciplined team of agents that can never go wrong by design.
       </p>
     </footer>
   </main>
 
+  <!-- the one newsletter prompt (see src/lib/prompt.ts for the etiquette) -->
+  <aside id="news-prompt" aria-label="Newsletter" role="dialog">
+    <button data-dismiss class="prompt-x font-mono" aria-label="Dismiss">×</button>
+    <p class="eyebrow mb-3 !text-[0.62rem]">BEFORE YOU CLOSE THE FILE</p>
+    <p class="mb-4 text-[1.02rem] leading-snug text-bone">
+      One email when a new case file is sealed. Nothing else.
+    </p>
+    <form data-form="subscribe" class="flex flex-wrap items-center gap-2" novalidate>
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="you@example.com"
+        autocomplete="email"
+        class="min-w-0 flex-1 rounded-md border border-[var(--hair)] bg-[rgba(15,17,22,0.7)] px-3 py-2 font-mono text-[0.78rem] text-bone placeholder:text-steel/50 focus:border-[var(--amber-dim)] focus:outline-none"
+      />
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+      <input type="hidden" name="ts" value="" />
+      <button type="submit" class="btn btn-solid font-mono text-[0.72rem]">Subscribe</button>
+      <p data-status class="form-status w-full font-mono text-[0.68rem]" aria-live="polite"></p>
+    </form>
+  </aside>
+
   <div id="toast" role="status" aria-live="polite">copied to clipboard</div>
+
+  <script>
+    import { initForms } from '../lib/forms/client';
+    import { initPrompt } from '../lib/prompt';
+    import { initScrollDepth, track } from '../lib/analytics';
+
+    initForms();
+    initPrompt();
+    initScrollDepth();
+    document.querySelectorAll('[data-cmd]').forEach((b) =>
+      b.addEventListener('click', () => track('copy_install_command')),
+    );
+  </script>
 </Base>

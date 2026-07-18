@@ -1,0 +1,96 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('caseFiles', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<Base title={`${post.data.title} — opsbench case files`} description={post.data.description}>
+  <header id="nav" class="in">
+    <a class="wordmark" href="/">ops<span>bench</span></a>
+    <nav aria-label="Sections">
+      <a href="/case-files/">← All case files</a>
+    </nav>
+    <a class="btn btn-ghost font-mono text-sm" href="https://github.com/shaiknoorullah/opsbench" target="_blank" rel="noopener">GitHub ↗</a>
+  </header>
+
+  <main class="mx-auto max-w-[760px] px-[clamp(1.4rem,5vw,3rem)] pb-24 pt-40">
+    <p class="eyebrow mb-6">{post.data.caseNumber} · SEALED {fmt(post.data.date)}</p>
+    <h1 class="display mb-6">{post.data.title}</h1>
+    <p class="mb-4 max-w-[42em] text-[1.05rem] text-steel">{post.data.description}</p>
+    <p class="mb-12 flex flex-wrap gap-2">
+      {post.data.tags.map((t) => (
+        <span class="rounded border border-[var(--hair)] px-2 py-0.5 font-mono text-[0.62rem] tracking-[0.08em] text-steel">{t}</span>
+      ))}
+    </p>
+
+    <article class="case-file-body">
+      <Content />
+    </article>
+
+    <footer class="hairline mt-16 border-t pt-8 font-mono text-[0.7rem] leading-[2] text-steel/80">
+      artifact&nbsp;: src/content/case-files/{post.id}.mdx<br />
+      verdict&nbsp;&nbsp;: <span class="text-verdict">CONFIRMED</span> — revision history is the custody log<br />
+      <a class="hover:text-amber" href="/case-files/">← all case files</a>
+    </footer>
+  </main>
+</Base>
+
+<style is:global>
+  .case-file-body {
+    color: var(--color-bone);
+    font-size: 1.02rem;
+    line-height: 1.75;
+  }
+  .case-file-body h2 {
+    font-size: 1.6rem;
+    font-weight: 480;
+    letter-spacing: -0.015em;
+    margin: 2.6rem 0 1rem;
+  }
+  .case-file-body h3 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 2rem 0 0.8rem;
+  }
+  .case-file-body p { margin: 0 0 1.1rem; color: var(--color-steel); }
+  .case-file-body strong { color: var(--color-bone); font-weight: 550; }
+  .case-file-body a { color: var(--color-amber); border-bottom: 1px solid var(--amber-dim); }
+  .case-file-body ul, .case-file-body ol { margin: 0 0 1.2rem; padding-left: 1.4rem; color: var(--color-steel); }
+  .case-file-body li { margin-bottom: 0.45rem; }
+  .case-file-body blockquote {
+    border-left: 2px solid var(--color-amber);
+    padding: 0.2rem 0 0.2rem 1.2rem;
+    margin: 1.6rem 0;
+    color: var(--color-bone);
+    font-size: 1.15rem;
+  }
+  .case-file-body code {
+    font-family: var(--font-m, 'IBM Plex Mono', monospace);
+    background: var(--color-carbon);
+    border: 1px solid var(--hair);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-size: 0.88em;
+    color: var(--color-amber);
+  }
+  .case-file-body pre {
+    background: rgba(12, 13, 17, 0.9);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    padding: 1.1rem 1.2rem;
+    overflow-x: auto;
+    margin: 0 0 1.4rem;
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+  .case-file-body pre code { background: none; border: none; padding: 0; color: inherit; }
+  .case-file-body hr { border: none; border-top: 1px solid var(--hair); margin: 2.4rem 0; }
+</style>

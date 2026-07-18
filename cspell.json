@@ -302,7 +302,7 @@
     "unviable", "upstreamed", "uuidgen", "vaporise", "Veeam", "wiremcp", "wrappable",
     "XSOAR", "Yubi", "ztunnel", "seqs", "HTMX", "Datastar", "Bubbletea", "goroutine", "goroutines", "numpy", "SMAA",
     "SOTA", "Grotesk", "grotesk", "GSAP", "gsap", "verlet", "PMREM", "Bokeh", "bokeh", "Lenis", "lenis",
-    "catenary", "clearcoat", "woff"
+    "catenary", "clearcoat", "woff", "Umami", "UMAMI", "umami", "listmonk", "LISTMONK", "Keystatic", "keystatic"
   ],
   "allowCompoundWords": true
 }
