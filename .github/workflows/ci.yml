@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
       - run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#CHANGELOG.md" "#platform/spikes" "#tools/plugin-build/output"
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"   # cspell v10 requires Node >=22.18
       - run: npx --yes cspell --no-progress --no-must-find-files "**/*.md"
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
       - run: npx --yes -p ajv-cli@5 -p ajv-formats ajv compile --spec=draft2020 -c ajv-formats -s "packages/*/schemas/*.json"
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
       - run: npm ci
